@@ -201,7 +201,19 @@ El proyecto incluye datos iniciales para probar:
 
 ---
 
-## 📄 Licencia
+## 👥 Autores
+
+<div align="center">
+
+| |
+|---|
+| **Juan Esteban Aguirre Foronda** |
+| **Sebastian Mogollón Mendoza** |
+
+</div>
+> © 2026 EcommerceCaps - Todos los derechos reservados---
+
+## �📄 Licencia
 
 Este proyecto está bajo la licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
 
