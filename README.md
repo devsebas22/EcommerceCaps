@@ -17,11 +17,13 @@ EcommerceCaps es una API RESTful desarrollada con **FastAPI** que proporciona la
 ### ✨ Características Principales
 
 - 🔐 **Autenticación segura** con JWT y hashing de contraseñas
-- 📦 **Gestión de productos** con categorías y stock
+- 👥 **Gestión de usuarios** con roles y puntos de fidelidad
+- 📦 **Gestión de productos** con categorías, marcas y stock
 - 🛒 **Carrito de compras** persistente por usuario
-- 📋 **Sistema de pedidos** completo
+- 📋 **Sistema de pedidos** completo con estados
 - 🐘 **Base de datos PostgreSQL** con Docker
 - 📚 **Documentación interactiva** con Swagger UI
+- 🔄 **Scripts SQL** para inicialización y datos de prueba
 
 ---
 
@@ -83,13 +85,23 @@ DATABASE_URL=postgresql://ecommerce_user:ecommerce123@127.0.0.1:5433/ecommerce_d
 docker compose up -d
 ```
 
-### 6. Arrancar el Servidor
+### 6. Inicializar la Base de Datos
+
+```bash
+# Ejecutar script de creación de tablas
+docker exec -i ecommerce-db psql -U ecommerce_user -d ecommerce_db < create_tables.sql
+
+# (Opcional) Cargar datos de ejemplo
+docker exec -i ecommerce-db psql -U ecommerce_user -d ecommerce_db < seed.sql
+```
+
+### 7. Arrancar el Servidor
 
 ```bash
 uvicorn app.main:app --reload --env-file .env
 ```
 
-### 7. Acceder a la Documentación
+### 8. Acceder a la Documentación
 
 Abre en tu navegador: **[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)**
 
@@ -121,10 +133,34 @@ proyectoFinal/
 │       ├── categoria.py
 │       ├── carrito.py
 │       └── pedido.py
+├── create_tables.sql       # Script de creación de tablas
+├── seed.sql                # Datos de ejemplo iniciales
 ├── docker-compose.yml      # Configuración de contenedores
 ├── requirements.txt        # Dependencias Python
 └── .env                    # Variables de entorno
 ```
+
+---
+
+## 🗄️ Esquema de Base de Datos
+
+### Tablas Principales
+
+| Tabla | Descripción |
+|-------|-------------|
+| `usuarios` | Usuarios con email, password, dirección, teléfono, rol admin y puntos de fidelidad |
+| `categorias` | Categorías de productos (gorras, lociones, relojes) |
+| `productos` | Productos con nombre, descripción, precio, marca, stock e imagen |
+| `carritos` | Carritos asociados a usuarios |
+| `carrito_items` | Items dentro del carrito (relación carrito-producto) |
+| `pedidos` | Pedidos con estado, total y dirección de envío |
+| `pedido_items` | Items de cada pedido |
+
+### Datos de Ejemplo (seed.sql)
+
+El proyecto incluye datos iniciales para probar:
+- **3 categorías:** gorras, lociones, relojes
+- **5 productos:** Gorras Nike, Loción Armani, Reloj Casio, Loción Gucci, Gorra Puma BMW
 
 ---
 
