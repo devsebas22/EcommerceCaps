@@ -2,12 +2,12 @@
 
 :root {
   --bg-dark: #0a0b0d;
-  --card-bg: #121418;
+  --card-bg: #1a1d24;
   --input-bg: #08090a;
   --border-color: #24272e;
   --accent-cyan: #ceaa1b;
   --text-main: #eef0f2;
-  --text-muted: #4d5560;
+  --text-muted: #c0c7d0;
 }
 
 body {
@@ -96,5 +96,12 @@ body {
   color: var(--accent-cyan) !important;
   font-weight: 800;
   letter-spacing: 1px;
+}
+.card-theme h3 {
+  color: var(--text-main) !important;
+}
+
+.card-theme .text-muted {
+  color: var(--text-muted) !important;
 }
 
