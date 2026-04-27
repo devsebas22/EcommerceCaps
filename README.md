@@ -42,9 +42,45 @@ EcommerceCaps es una API RESTful desarrollada con **FastAPI** que proporciona la
 
 ## 📋 Requisitos Previos
 
-- Python 3.12 o superior
-- Docker Desktop
-- WSL2 (Ubuntu 24.04) - *Para Windows*
+> ⚠️ **IMPORTANTE:** Antes de iniciar, asegúrate de tener instaladas las versiones correctas de cada herramienta. Las versiones anteriores pueden causar problemas de compatibilidad.
+
+### Requisitos del Sistema
+
+| Herramienta | Versión Mínima | Versión Recomendada | Verificar Instalación |
+|-------------|----------------|---------------------|----------------------|
+| **Python** | 3.12+ | 3.12.x | `python3 --version` |
+| **Node.js** | 18.0+ | 20.x LTS | `node --version` |
+| **npm** | 9.0+ | 10.x | `npm --version` |
+| **Docker** | 20.10+ | Latest | `docker --version` |
+| **Docker Compose** | 2.0+ | Latest | `docker compose version` |
+| **PostgreSQL** (cliente) | 14+ | 16 | `psql --version` |
+
+### Verificar Versiones Instaladas
+
+```bash
+# Verificar todas las versiones instaladas
+echo "=== Python ===" && python3 --version
+echo "=== Node.js ===" && node --version
+echo "=== npm ===" && npm --version
+echo "=== Docker ===" && docker --version
+echo "=== Docker Compose ===" && docker compose version
+```
+
+### Instalar Node.js (si no lo tienes)
+
+**Ubuntu/Debian:**
+```bash
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
+
+**macOS (con Homebrew):**
+```bash
+brew install node@20
+```
+
+**Windows:**
+Descargar desde [nodejs.org](https://nodejs.org/) la versión LTS recomendada.
 
 ---
 
@@ -101,9 +137,53 @@ docker exec -i ecommerce-db psql -U ecommerce_user -d ecommerce_db < seed.sql
 uvicorn app.main:app --reload --env-file .env
 ```
 
-### 8. Acceder a la Documentación
+### 8. (Opcional) Instalar y Ejecutar el Frontend
+
+El proyecto incluye un frontend en React. Para ejecutarlo:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+> 📌 **Nota:** El frontend se ejecutará en [http://localhost:5173](http://localhost:5173)
+
+### 9. Acceder a la Documentación
 
 Abre en tu navegador: **[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)**
+
+---
+
+## 🚀 Método Alternativo: Script `iniciar.sh`
+
+> ⚠️ **Nota:** Este script está diseñado para sistemas **Linux/macOS** con Zsh.
+
+Si prefieres iniciar todos los servicios con un solo comando, puedes usar el script `iniciar.sh`:
+
+```bash
+# Dar permisos de ejecución (solo la primera vez)
+chmod +x iniciar.sh
+
+# Ejecutar el script
+./iniciar.sh
+```
+
+### ¿Qué hace el script?
+
+1. **Carga el entorno de Zsh** (`source ~/.zshrc`)
+2. **Activa el entorno virtual** de Python
+3. **Inicia el backend** (FastAPI) en segundo plano
+4. **Inicia el frontend** (Vite) en el puerto 5173
+5. **Maneja la limpieza** al presionar `Ctrl+C` (cierra todos los procesos)
+
+### Requisitos para usar el script
+
+- Zsh instalado y configurado
+- Entorno virtual `.venv` ya creado
+- Dependencias de Python instaladas (`pip install -r requirements.txt`)
+- Dependencias de Node.js instaladas (`cd frontend && npm install`)
+- Base de datos PostgreSQL levantada (`docker compose up -d`)
 
 ---
 
