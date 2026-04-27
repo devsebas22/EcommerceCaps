@@ -6,6 +6,8 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.136.0-009688?style=flat&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
+[![React](https://img.shields.io/badge/React-18.2-61DAFB?style=flat&logo=react&logoColor=white)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-5.2-646CFF?style=flat&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ---
@@ -37,6 +39,8 @@ EcommerceCaps es una API RESTful desarrollada con **FastAPI** que proporciona la
 | **Contenedores** | Docker + Docker Compose |
 | **Admin DB** | pgAdmin 4 |
 | **Servidor** | Uvicorn |
+| **Frontend** | React 18 + Vite 5 |
+| **UI** | Bootstrap 5 |
 
 ---
 
@@ -101,13 +105,21 @@ source venv/bin/activate    # Linux/Mac
 # venv\Scripts\activate     # Windows
 ```
 
-### 3. Instalar Dependencias
+### 3. Instalar Dependencias de Python
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Configurar Variables de Entorno
+### 4. Instalar Dependencias del Frontend
+
+```bash
+cd frontend
+npm install
+cd ..
+```
+
+### 5. Configurar Variables de Entorno
 
 Crea un archivo `.env` en la raíz del proyecto:
 
@@ -115,13 +127,13 @@ Crea un archivo `.env` en la raíz del proyecto:
 DATABASE_URL=postgresql://ecommerce_user:ecommerce123@127.0.0.1:5433/ecommerce_db
 ```
 
-### 5. Levantar la Base de Datos
+### 6. Levantar la Base de Datos
 
 ```bash
 docker compose up -d
 ```
 
-### 6. Inicializar la Base de Datos
+### 7. Inicializar la Base de Datos
 
 ```bash
 # Ejecutar script de creación de tablas
@@ -131,35 +143,13 @@ docker exec -i ecommerce-db psql -U ecommerce_user -d ecommerce_db < create_tabl
 docker exec -i ecommerce-db psql -U ecommerce_user -d ecommerce_db < seed.sql
 ```
 
-### 7. Arrancar el Servidor
-
-```bash
-uvicorn app.main:app --reload --env-file .env
-```
-
-### 8. (Opcional) Instalar y Ejecutar el Frontend
-
-El proyecto incluye un frontend en React. Para ejecutarlo:
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-> 📌 **Nota:** El frontend se ejecutará en [http://localhost:5173](http://localhost:5173)
-
-### 9. Acceder a la Documentación
-
-Abre en tu navegador: **[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)**
-
 ---
 
-## 🚀 Método Alternativo: Script `iniciar.sh`
+## ▶️ Iniciar el Proyecto
 
-> ⚠️ **Nota:** Este script está diseñado para sistemas **Linux/macOS** con Zsh.
+### ⚡ Método Rápido (Recomendado): Script `iniciar.sh`
 
-Si prefieres iniciar todos los servicios con un solo comando, puedes usar el script `iniciar.sh`:
+> ⚠️ **Nota:** Este script está diseñado para sistemas **Linux/macOS** con Zsh. Requiere haber completado los pasos de instalación anteriores.
 
 ```bash
 # Dar permisos de ejecución (solo la primera vez)
@@ -169,21 +159,34 @@ chmod +x iniciar.sh
 ./iniciar.sh
 ```
 
-### ¿Qué hace el script?
+**Esto iniciara:**
+1. Backend (FastAPI) en [http://127.0.0.1:8000](http://127.0.0.1:8000)
+2. Frontend (React + Vite) en [http://localhost:5173](http://localhost:5173)
+3. Documentación API en [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
-1. **Carga el entorno de Zsh** (`source ~/.zshrc`)
-2. **Activa el entorno virtual** de Python
-3. **Inicia el backend** (FastAPI) en segundo plano
-4. **Inicia el frontend** (Vite) en el puerto 5173
-5. **Maneja la limpieza** al presionar `Ctrl+C` (cierra todos los procesos)
+---
 
-### Requisitos para usar el script
+### 📝 Método Manual: Iniciar Servicios Manualmente
 
-- Zsh instalado y configurado
-- Entorno virtual `.venv` ya creado
-- Dependencias de Python instaladas (`pip install -r requirements.txt`)
-- Dependencias de Node.js instaladas (`cd frontend && npm install`)
-- Base de datos PostgreSQL levantada (`docker compose up -d`)
+Si prefieres iniciar los servicios manualmente:
+
+#### Iniciar el Backend
+
+```bash
+source venv/bin/activate
+uvicorn app.main:app --reload --env-file .env
+```
+
+#### Iniciar el Frontend
+
+```bash
+cd frontend
+npm run dev
+```
+
+#### Acceder a la Documentación
+
+Abre en tu navegador: **[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)**
 
 ---
 
@@ -213,10 +216,21 @@ proyectoFinal/
 │       ├── categoria.py
 │       ├── carrito.py
 │       └── pedido.py
+├── frontend/                # Frontend React + Vite
+│   ├── src/
+│   │   ├── App.jsx
+│   │   ├── Catalogo.jsx
+│   │   ├── Registro.jsx
+│   │   ├── main.jsx
+│   │   └── index.css
+│   ├── index.html
+│   ├── package.json
+│   └── vite.config.js
 ├── create_tables.sql       # Script de creación de tablas
 ├── seed.sql                # Datos de ejemplo iniciales
 ├── docker-compose.yml      # Configuración de contenedores
 ├── requirements.txt        # Dependencias Python
+├── iniciar.sh              # Script de inicio rápido
 └── .env                    # Variables de entorno
 ```
 
@@ -246,19 +260,45 @@ El proyecto incluye datos iniciales para probar:
 
 ## 🔗 Endpoints de la API
 
+### Usuarios
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
 | `POST` | `/usuarios/` | Crear usuario |
-| `POST` | `/usuarios/login` | Iniciar sesión |
-| `GET` | `/productos/` | Listar productos |
-| `POST` | `/productos/` | Crear producto |
-| `GET` | `/categorias/` | Listar categorías |
-| `POST` | `/carrito/` | Agregar al carrito |
-| `GET` | `/carrito/{usuario_id}` | Ver carrito |
-| `POST` | `/pedidos/` | Crear pedido |
-| `GET` | `/pedidos/{usuario_id}` | Ver pedidos |
+| `GET` | `/usuarios/{id}` | Obtener usuario por ID |
+| `PUT` | `/usuarios/{id}` | Actualizar usuario |
 
-> 📖 Documentación completa disponible en **Swagger UI**
+### Productos
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `GET` | `/productos/` | Listar todos los productos |
+| `GET` | `/productos/{id}` | Obtener producto por ID |
+| `POST` | `/productos/` | Crear nuevo producto |
+| `PUT` | `/productos/{id}` | Actualizar producto |
+| `DELETE` | `/productos/{id}` | Eliminar producto |
+
+### Categorías
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `GET` | `/categorias/` | Listar todas las categorías |
+| `GET` | `/categorias/{id}` | Obtener categoría por ID |
+| `POST` | `/categorias/` | Crear nueva categoría |
+| `DELETE` | `/categorias/{id}` | Eliminar categoría |
+
+### Carrito
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `GET` | `/carrito/{usuario_id}` | Ver carrito del usuario |
+| `POST` | `/carrito/{usuario_id}` | Agregar producto al carrito |
+| `PUT` | `/carrito/{usuario_id}/item/{item_id}` | Actualizar cantidad de un item |
+| `DELETE` | `/carrito/{usuario_id}/item/{item_id}` | Eliminar item del carrito |
+
+### Pedidos
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `POST` | `/pedidos/{usuario_id}` | Crear pedido desde el carrito |
+| `GET` | `/pedidos/historial/{usuario_id}` | Ver historial de pedidos |
+
+> 📖 Documentación completa disponible en **Swagger UI** en [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
 ---
 
