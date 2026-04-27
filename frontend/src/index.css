@@ -1,0 +1,100 @@
+/* index.css - Tema Deep Dark & Minimal Cyan */
+
+:root {
+  --bg-dark: #0a0b0d;
+  --card-bg: #121418;
+  --input-bg: #08090a;
+  --border-color: #24272e;
+  --accent-cyan: #ceaa1b;
+  --text-main: #eef0f2;
+  --text-muted: #4d5560;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  margin: 0;
+}
+
+/* Tarjeta Minimalista */
+.card-theme {
+  background-color: var(--card-bg) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Inputs de Alta Gama */
+.input-theme {
+  background-color: var(--input-bg) !important;
+  border: 1px solid var(--border-color) !important;
+  color: #fff !important;
+  padding: 14px 18px !important;
+  border-radius: 10px !important;
+  font-size: 0.95rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.input-theme:focus {
+  border-color: var(--accent-cyan) !important;
+  box-shadow: 0 0 0 4px rgba(228, 184, 9, 0.097) !important;
+  outline: none;
+}
+
+/* Labels */
+.label-theme {
+  color: var(--text-muted) !important;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+/* Botón Pro */
+.btn-theme-primary {
+  background-color: var(--accent-cyan) !important;
+  border: none !important;
+  color: #000 !important;
+  padding: 14px !important;
+  font-weight: 700 !important;
+  border-radius: 10px !important;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease !important;
+}
+
+.btn-theme-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3) !important;
+  filter: brightness(1.1);
+}
+
+.text-cyan {
+  color: var(--accent-cyan) !important;
+}
+
+/* Estilos adicionales para un Navbar Profesional */
+.navbar-theme {
+  background-color: rgba(10, 11, 13, 0.95) !important; /* Fondo translúcido */
+  border-bottom: 1px solid var(--border-color);
+  backdrop-filter: blur(10px); /* Efecto vidrio */
+}
+
+.nav-link-theme {
+  color: var(--text-main) !important;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.nav-link-theme:hover {
+  color: var(--accent-cyan) !important;
+}
+
+.navbar-brand-theme {
+  color: var(--accent-cyan) !important;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+

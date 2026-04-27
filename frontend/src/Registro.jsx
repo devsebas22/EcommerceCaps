@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Form, Button, Alert } from "react-bootstrap";
+import { Form, Button, Alert, Container, Row, Col, Card } from "react-bootstrap";
 
 const API_BASE = "http://127.0.0.1:8000";
 
@@ -7,96 +7,148 @@ export default function Registro() {
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [direccion, setDireccion] = useState("");
+  const [telefono, setTelefono] = useState("");
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState(null);
 
   const validar = () => {
     const e = {};
-    if (!nombre.trim()) e.nombre = "El nombre es obligatorio.";
-    if (!email.trim()) e.email = "El email es obligatorio.";
-    else {
-      const re = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
-      if (!re.test(email)) e.email = "Formato de email inválido.";
-    }
-    if (!password) e.password = "La contraseña es obligatoria.";
-    else if (password.length < 6) e.password = "Mínimo 6 caracteres.";
+    if (!nombre.trim()) e.nombre = "Campo requerido";
+    if (!email.trim()) e.email = "Campo requerido";
+    else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) e.email = "Email inválido";
+    if (!password) e.password = "Campo requerido";
+    else if (password.length < 6) e.password = "Mínimo 6 caracteres";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
   const handleSubmit = async (ev) => {
     ev.preventDefault();
-    setMessage(null);
     if (!validar()) return;
     setSubmitting(true);
+    setMessage(null);
+
     try {
       const res = await fetch(`${API_BASE}/usuarios/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nombre, email, password }),
+        body: JSON.stringify({ nombre, email, password, direccion, telefono }),
       });
+
       if (res.ok) {
-        setMessage({ type: "success", text: "Cuenta creada correctamente." });
-        setNombre("");
-        setEmail("");
-        setPassword("");
-        setErrors({});
+        setMessage({ type: "success", text: "Registro completado con éxito" });
+        setNombre(""); setEmail(""); setPassword(""); setDireccion(""); setTelefono("");
       } else {
-        const errBody = await res.json().catch(() => null);
-        const text = errBody?.detail || errBody?.message || `Error ${res.status}`;
-        setMessage({ type: "danger", text });
+        const err = await res.json();
+        setMessage({ type: "danger", text: err.detail || "Error al registrar" });
       }
     } catch (err) {
-      setMessage({ type: "danger", text: err.message || "Error de red" });
+      setMessage({ type: "danger", text: "Error de conexión con el servidor" });
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <div>
-      <h2 className="mb-4">Crear Cuenta</h2>
-      {message && <Alert variant={message.type}>{message.text}</Alert>}
+    <Container className="py-5">
+      <Row className="justify-content-center">
+        <Col lg={7} xl={6}>
+          <Card className="card-theme p-3">
+            <Card.Body>
+              <div className="mb-5">
+                <h3 className="fw-bold mb-1">Crea tu cuenta</h3>
+                <p className="text-muted small">
+                  Ingresa tus datos para empezar en <span className="text-cyan">Ecommerce Caps</span>
+                </p>
+              </div>
 
-      <Form noValidate onSubmit={handleSubmit}>
-        <Form.Group className="mb-3" controlId="nombre">
-          <Form.Label>Nombre</Form.Label>
-          <Form.Control
-            type="text"
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
-            isInvalid={!!errors.nombre}
-          />
-          <Form.Control.Feedback type="invalid">{errors.nombre}</Form.Control.Feedback>
-        </Form.Group>
+              {message && (
+                <Alert variant={message.type === "success" ? "success" : "danger"} className="py-2 border-0 bg-opacity-10 text-center">
+                  {message.text}
+                </Alert>
+              )}
 
-        <Form.Group className="mb-3" controlId="email">
-          <Form.Label>Email</Form.Label>
-          <Form.Control
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            isInvalid={!!errors.email}
-          />
-          <Form.Control.Feedback type="invalid">{errors.email}</Form.Control.Feedback>
-        </Form.Group>
+              <Form onSubmit={handleSubmit}>
+                <Form.Group className="mb-4">
+                  <Form.Label className="label-theme">Nombre completo</Form.Label>
+                  <Form.Control
+                    type="text"
+                    className="input-theme"
+                    placeholder="Ej.Baljeet"
+                    value={nombre}
+                    onChange={(e) => setNombre(e.target.value)}
+                    isInvalid={!!errors.nombre}
+                  />
+                </Form.Group>
 
-        <Form.Group className="mb-3" controlId="password">
-          <Form.Label>Contraseña</Form.Label>
-          <Form.Control
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            isInvalid={!!errors.password}
-          />
-          <Form.Control.Feedback type="invalid">{errors.password}</Form.Control.Feedback>
-        </Form.Group>
+                <Row>
+                  <Col md={6}>
+                    <Form.Group className="mb-4">
+                      <Form.Label className="label-theme">Email</Form.Label>
+                      <Form.Control
+                        type="email"
+                        className="input-theme"
+                        placeholder="nombre@gmail.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        isInvalid={!!errors.email}
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col md={6}>
+                    <Form.Group className="mb-4">
+                      <Form.Label className="label-theme">Contraseña</Form.Label>
+                      <Form.Control
+                        type="password"
+                        className="input-theme"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        isInvalid={!!errors.password}
+                      />
+                    </Form.Group>
+                  </Col>
+                </Row>
 
-        <Button variant="primary" type="submit" disabled={submitting}>
-          {submitting ? "Enviando..." : "Crear Cuenta"}
-        </Button>
-      </Form>
-    </div>
+                <Row>
+                  <Col md={7}>
+                    <Form.Group className="mb-4">
+                      <Form.Label className="label-theme">Dirección (Opcional)</Form.Label>
+                      <Form.Control
+                        type="text"
+                        className="input-theme"
+                        placeholder="Calle 123..."
+                        value={direccion}
+                        onChange={(e) => setDireccion(e.target.value)}
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col md={5}>
+                    <Form.Group className="mb-4">
+                      <Form.Label className="label-theme">Teléfono</Form.Label>
+                      <Form.Control
+                        type="text"
+                        className="input-theme"
+                        placeholder="300 000 0000"
+                        value={telefono}
+                        onChange={(e) => setTelefono(e.target.value)}
+                      />
+                    </Form.Group>
+                  </Col>
+                </Row>
+
+                <div className="d-grid gap-2 mt-4">
+                  <Button type="submit" className="btn-theme-primary" disabled={submitting}>
+                    {submitting ? "Procesando..." : "Registrar ahora"}
+                  </Button>
+                </div>
+              </Form>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+    </Container>
   );
 }
