@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.usuario import Usuario
-from app.schemas.usuario import UsuarioCreate, UsuarioResponse
+from app.schemas.usuario import UsuarioCreate, UsuarioResponse, LoginRequest, LoginResponse
 from passlib.context import CryptContext
 
 router = APIRouter(
@@ -65,3 +65,18 @@ def eliminar_usuario(id: int, db: Session = Depends(get_db)):
 def obtener_usuarios(db: Session = Depends(get_db)):
     usuarios = db.query(Usuario).all()
     return usuarios
+
+@router.post("/login", response_model=LoginResponse)
+def login(datos: LoginRequest, db: Session = Depends(get_db)):
+    usuario = db.query(Usuario).filter(Usuario.email == datos.email).first()
+    if not usuario:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    if not pwd_context.verify(datos.password, usuario.password):
+        raise HTTPException(status_code=400, detail="Contraseña incorrecta")
+    return LoginResponse(
+        id=usuario.id,
+        nombre=usuario.nombre,
+        email=usuario.email,
+        es_admin=usuario.es_admin,
+        mensaje="Login exitoso"
+    )
