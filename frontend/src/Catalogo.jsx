@@ -40,9 +40,17 @@ export default function Catalogo() {
         {productos.map((p) => (
           <Col key={p.id}>
             <Card className="h-100 card-theme border-0 overflow-hidden shadow-sm">
-              <div style={{ height: '200px', backgroundColor: '#08090a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span className="text-muted small">IMAGEN PRODUCTO</span>
-              </div>
+              <div style={{ height: '200px', backgroundColor: '#08090a', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                   {p.imagenes && p.imagenes.length > 0 ? (
+                  <img
+                  src={p.imagenes.find(img => img.es_principal)?.url || p.imagenes[0].url}
+                  alt={p.nombre}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              ) : (
+                <span className="text-muted small">SIN IMAGEN</span>
+              )}
+            </div>
               <Card.Body className="d-flex flex-column p-4">
                 <span className="label-theme mb-2 small fw-bold">
                   {p.categoria?.nombre || "COLECCIÓN"}
