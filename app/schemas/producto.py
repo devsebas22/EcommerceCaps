@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from app.schemas.categoria import CategoriaResponse
+from app.schemas.producto_imagen import ProductoImagenResponse
 
 class ProductoBase(BaseModel):
     nombre: str
@@ -16,6 +17,7 @@ class ProductoCreate(ProductoBase):
 class ProductoResponse(ProductoBase):
     id: int
     categoria: CategoriaResponse
+    imagenes: list[ProductoImagenResponse] = []
 
     class Config:
         from_attributes = True
