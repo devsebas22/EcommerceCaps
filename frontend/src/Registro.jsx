@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Form, Button, Alert, Container, Row, Col, Card } from "react-bootstrap";
+import { Form, Button, Alert, Row, Col } from "react-bootstrap";
+import { useNavigate, Link } from "react-router-dom";
 
 const API_BASE = "http://127.0.0.1:8000";
 
@@ -12,6 +13,8 @@ export default function Registro() {
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState(null);
+  const [exitoso, setExitoso] = useState(false);
+  const navigate = useNavigate();
 
   const validar = () => {
     const e = {};
@@ -29,126 +32,142 @@ export default function Registro() {
     if (!validar()) return;
     setSubmitting(true);
     setMessage(null);
-
     try {
       const res = await fetch(`${API_BASE}/usuarios/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nombre, email, password, direccion, telefono }),
       });
-
       if (res.ok) {
-        setMessage({ type: "success", text: "Registro completado con éxito" });
-        setNombre(""); setEmail(""); setPassword(""); setDireccion(""); setTelefono("");
+        setExitoso(true);
       } else {
         const err = await res.json();
-        setMessage({ type: "danger", text: err.detail || "Error al registrar" });
+        setMessage(err.detail || "Error al registrar");
       }
-    } catch (err) {
-      setMessage({ type: "danger", text: "Error de conexión con el servidor" });
+    } catch {
+      setMessage("Error de conexión con el servidor");
     } finally {
       setSubmitting(false);
     }
   };
 
+  if (exitoso) {
+    return (
+      <div className="auth-page">
+        <div style={{ width: "100%", maxWidth: "420px", textAlign: "center" }}>
+          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-accent)", borderRadius: "var(--r-xl)", padding: "48px 36px", boxShadow: "var(--shadow-gold)" }}>
+            <div style={{ fontSize: "3rem", marginBottom: "16px" }}>✓</div>
+            <h4 className="fw-bold mb-2" style={{ color: "var(--text-primary)" }}>¡Cuenta creada!</h4>
+            <p style={{ color: "var(--text-secondary)", fontSize: "0.88rem", marginBottom: "32px" }}>
+              Tu cuenta ha sido creada correctamente. Ya puedes iniciar sesión.
+            </p>
+            <Button className="btn-theme-primary px-5" style={{ padding: "12px 40px" }} onClick={() => navigate("/login")}>
+              Iniciar Sesión
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <Container className="py-5">
-      <Row className="justify-content-center">
-        <Col lg={7} xl={6}>
-          <Card className="card-theme p-3">
-            <Card.Body>
-              <div className="mb-5">
-                <h3 className="fw-bold mb-1">Crea tu cuenta</h3>
-                <p className="text-muted small">
-                  Ingresa tus datos para empezar en <span className="text-cyan">Ecommerce Caps</span>
-                </p>
-              </div>
+    <div className="auth-page">
+      <div style={{ width: "100%", maxWidth: "520px" }}>
+        {/* Logo */}
+        <div className="text-center mb-5">
+          <p className="navbar-brand-theme" style={{ fontSize: "1.1rem", letterSpacing: "2.5px", marginBottom: "8px" }}>
+            ECOMMERCE CAPS
+          </p>
+          <h2 className="fw-bold mb-1" style={{ color: "var(--text-primary)", fontSize: "1.6rem" }}>
+            Crea tu cuenta
+          </h2>
+          <p style={{ color: "var(--text-secondary)", fontSize: "0.88rem" }}>
+            Únete y empieza a explorar la colección
+          </p>
+        </div>
 
-              {message && (
-                <Alert variant={message.type === "success" ? "success" : "danger"} className="py-2 border-0 bg-opacity-10 text-center">
-                  {message.text}
-                </Alert>
-              )}
+        {/* Card */}
+        <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-hover)", borderRadius: "var(--r-xl)", padding: "36px", boxShadow: "var(--shadow-lg)" }}>
+          {message && (
+            <Alert variant="danger" className="py-2 text-center mb-4" style={{ fontSize: "0.87rem" }}>
+              {message}
+            </Alert>
+          )}
 
-              <Form onSubmit={handleSubmit}>
-                <Form.Group className="mb-4">
-                  <Form.Label className="label-theme">Nombre completo</Form.Label>
-                  <Form.Control
-                    type="text"
-                    className="input-theme"
-                    placeholder="Ej.Baljeet"
-                    value={nombre}
-                    onChange={(e) => setNombre(e.target.value)}
-                    isInvalid={!!errors.nombre}
-                  />
-                </Form.Group>
+          <Form onSubmit={handleSubmit}>
+            <Form.Group className="mb-4">
+              <Form.Label className="label-theme">Nombre completo</Form.Label>
+              <Form.Control
+                type="text"
+                className={`input-theme${errors.nombre ? " is-invalid" : ""}`}
+                placeholder="Tu nombre"
+                value={nombre}
+                onChange={(e) => setNombre(e.target.value)}
+              />
+              {errors.nombre && <div style={{ color: "var(--danger)", fontSize: "0.78rem", marginTop: "6px" }}>{errors.nombre}</div>}
+            </Form.Group>
 
-                <Row>
-                  <Col md={6}>
-                    <Form.Group className="mb-4">
-                      <Form.Label className="label-theme">Email</Form.Label>
-                      <Form.Control
-                        type="email"
-                        className="input-theme"
-                        placeholder="nombre@gmail.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        isInvalid={!!errors.email}
-                      />
-                    </Form.Group>
-                  </Col>
-                  <Col md={6}>
-                    <Form.Group className="mb-4">
-                      <Form.Label className="label-theme">Contraseña</Form.Label>
-                      <Form.Control
-                        type="password"
-                        className="input-theme"
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        isInvalid={!!errors.password}
-                      />
-                    </Form.Group>
-                  </Col>
-                </Row>
+            <Row className="g-3 mb-4">
+              <Col md={6}>
+                <Form.Label className="label-theme">Correo electrónico</Form.Label>
+                <Form.Control
+                  type="email"
+                  className={`input-theme${errors.email ? " is-invalid" : ""}`}
+                  placeholder="nombre@gmail.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+                {errors.email && <div style={{ color: "var(--danger)", fontSize: "0.78rem", marginTop: "6px" }}>{errors.email}</div>}
+              </Col>
+              <Col md={6}>
+                <Form.Label className="label-theme">Contraseña</Form.Label>
+                <Form.Control
+                  type="password"
+                  className={`input-theme${errors.password ? " is-invalid" : ""}`}
+                  placeholder="Mínimo 6 caracteres"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                {errors.password && <div style={{ color: "var(--danger)", fontSize: "0.78rem", marginTop: "6px" }}>{errors.password}</div>}
+              </Col>
+            </Row>
 
-                <Row>
-                  <Col md={7}>
-                    <Form.Group className="mb-4">
-                      <Form.Label className="label-theme">Dirección (Opcional)</Form.Label>
-                      <Form.Control
-                        type="text"
-                        className="input-theme"
-                        placeholder="Calle 123..."
-                        value={direccion}
-                        onChange={(e) => setDireccion(e.target.value)}
-                      />
-                    </Form.Group>
-                  </Col>
-                  <Col md={5}>
-                    <Form.Group className="mb-4">
-                      <Form.Label className="label-theme">Teléfono</Form.Label>
-                      <Form.Control
-                        type="text"
-                        className="input-theme"
-                        placeholder="300 000 0000"
-                        value={telefono}
-                        onChange={(e) => setTelefono(e.target.value)}
-                      />
-                    </Form.Group>
-                  </Col>
-                </Row>
+            <Row className="g-3 mb-5">
+              <Col md={7}>
+                <Form.Label className="label-theme">Dirección <span style={{ color: "var(--text-muted)", textTransform: "none", letterSpacing: 0 }}>(opcional)</span></Form.Label>
+                <Form.Control
+                  type="text"
+                  className="input-theme"
+                  placeholder="Calle 123, Ciudad"
+                  value={direccion}
+                  onChange={(e) => setDireccion(e.target.value)}
+                />
+              </Col>
+              <Col md={5}>
+                <Form.Label className="label-theme">Teléfono <span style={{ color: "var(--text-muted)", textTransform: "none", letterSpacing: 0 }}>(opcional)</span></Form.Label>
+                <Form.Control
+                  type="text"
+                  className="input-theme"
+                  placeholder="300 000 0000"
+                  value={telefono}
+                  onChange={(e) => setTelefono(e.target.value)}
+                />
+              </Col>
+            </Row>
 
-                <div className="d-grid gap-2 mt-4">
-                  <Button type="submit" className="btn-theme-primary" disabled={submitting}>
-                    {submitting ? "Procesando..." : "Registrar ahora"}
-                  </Button>
-                </div>
-              </Form>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
+            <Button type="submit" className="btn-theme-primary w-100" style={{ padding: "14px" }} disabled={submitting}>
+              {submitting ? "Creando cuenta…" : "Registrarme"}
+            </Button>
+          </Form>
+
+          <p className="text-center mt-4 mb-0" style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
+            ¿Ya tienes cuenta?{" "}
+            <Link to="/login" className="text-gold fw-semibold text-decoration-none">
+              Iniciar Sesión
+            </Link>
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -12,7 +12,7 @@ router = APIRouter(
 
 @router.get("/", response_model=list[ProductoResponse])
 def obtener_productos(db: Session = Depends(get_db)):
-    productos = db.query(Producto).all()
+    productos = db.query(Producto).order_by(Producto.id).all()
     return productos
 
 @router.get("/{id}", response_model=ProductoResponse)
