@@ -5,6 +5,7 @@ from app.models.pedido import Pedido, PedidoItem
 from app.models.carrito import Carrito, CarritoItem
 from app.models.usuario import Usuario
 from app.schemas.pedido import PedidoCreate, PedidoResponse
+from pydantic import BaseModel
 
 router = APIRouter(
     prefix="/pedidos",
@@ -47,3 +48,19 @@ def historial_pedidos(usuario_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     pedidos = db.query(Pedido).filter(Pedido.usuario_id == usuario_id).all()
     return pedidos
+
+@router.get("/todos/", response_model=list[PedidoResponse])
+def obtener_todos_pedidos(db: Session = Depends(get_db)):
+    return db.query(Pedido).order_by(Pedido.id).all()
+class ActualizarEstado(BaseModel):
+    estado: str
+
+@router.put("/{pedido_id}/estado")
+def actualizar_estado(pedido_id: int, datos: ActualizarEstado, db: Session = Depends(get_db)):
+    pedido = db.query(Pedido).filter(Pedido.id == pedido_id).first()
+    if not pedido:
+        raise HTTPException(status_code=404, detail="Pedido no encontrado")
+    pedido.estado = datos.estado
+    db.commit()
+    db.refresh(pedido)
+    return {"mensaje": "Estado actualizado", "estado": pedido.estado}

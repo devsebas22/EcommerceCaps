@@ -54,7 +54,7 @@ export default function App() {
           element={
             usuario?.es_admin
               ? <Dashboard admin={usuario} onLogout={handleLogout} />
-              : <AdminLogin onLogin={handleLogin} />
+              : <Login onLogin={handleLogin} />
           }
         />
 

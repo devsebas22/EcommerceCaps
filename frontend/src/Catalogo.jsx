@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Row, Col, Card, Spinner, Button, Modal } from "react-bootstrap";
+import { Row, Col, Card, Spinner, Button, Modal, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 const API_BASE = "http://127.0.0.1:8000";
@@ -7,13 +7,19 @@ const API_BASE = "http://127.0.0.1:8000";
 const imgPrincipal = (p) =>
   p.imagenes?.find((i) => i.es_principal)?.url ?? p.imagenes?.[0]?.url ?? null;
 
-export default function Catalogo({ usuario, onCarritoChange }) {
+export default function Catalogo({ usuario, onCarritoChange, esAdmin = false }) {
   const [productos, setProductos] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
   const [sel, setSel] = useState(null);
   const [agregando, setAgregando] = useState(false);
   const [agregadoId, setAgregadoId] = useState(null); // id del producto recién agregado
+  const [modalProducto, setModalProducto] = useState(false);
+  const [productoEditando, setProductoEditando] = useState(null);
+  const [categorias, setCategorias] = useState([]);
+  const [form, setForm] = useState({
+    nombre: "", descripcion: "", precio: "", marca: "", stock: "", imagen_url: "", categoria_id: ""
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -55,20 +61,91 @@ export default function Catalogo({ usuario, onCarritoChange }) {
       Error al cargar productos: {error}
     </div>
   );
+  const cargarCategorias = async () => {
+  const res = await fetch(`${API_BASE}/categorias/`);
+  const data = await res.json();
+  setCategorias(data);
+};
+
+const abrirEditar = (producto) => {
+  setForm({
+    nombre: producto.nombre,
+    descripcion: producto.descripcion || "",
+    precio: producto.precio,
+    marca: producto.marca,
+    stock: producto.stock,
+    imagen_url: producto.imagen_url || "",
+    categoria_id: producto.categoria_id
+  });
+  setProductoEditando(producto);
+  setModalProducto(true);
+  cargarCategorias();
+};
+
+const abrirNuevo = () => {
+  setForm({ nombre: "", descripcion: "", precio: "", marca: "", stock: "", imagen_url: "", categoria_id: "" });
+  setProductoEditando(null);
+  setModalProducto(true);
+  cargarCategorias();
+};
+
+const eliminarProducto = async (id) => {
+  if (!confirm("¿Eliminar este producto?")) return;
+  await fetch(`${API_BASE}/productos/${id}`, { method: "DELETE" });
+  setProductos(productos.filter(p => p.id !== id));
+};
+
+const handleSubmitProducto = async (e) => {
+  e.preventDefault();
+  const body = {
+    ...form,
+    precio: parseFloat(form.precio),
+    stock: parseInt(form.stock),
+    categoria_id: parseInt(form.categoria_id)
+  };
+  const url = productoEditando
+    ? `${API_BASE}/productos/${productoEditando.id}`
+    : `${API_BASE}/productos/`;
+  const method = productoEditando ? "PUT" : "POST";
+
+  const res = await fetch(url, {
+    method,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  if (res.ok) {
+    const data = await res.json();
+    if (productoEditando) {
+      setProductos(productos.map(p => p.id === data.id ? data : p));
+    } else {
+      setProductos([...productos, data]);
+    }
+    setModalProducto(false);
+  }
+};
+
 
   const selImg = sel ? imgPrincipal(sel) : null;
 
   return (
     <>
       {/* Encabezado */}
-      <div style={{ marginBottom: "44px" }}>
-        <p style={{ color: "var(--t2)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "1.8px", textTransform: "uppercase", margin: "0 0 6px" }}>
-          Colección actual
-        </p>
-        <h2 style={{ color: "var(--t1)", fontWeight: 800, fontSize: "1.75rem", margin: 0 }}>
-          Nuestros Productos
-        </h2>
-        <div className="heading-line" />
+      <div style={{ marginBottom: "44px", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+        <div>
+          <p style={{ color: "var(--t2)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "1.8px", textTransform: "uppercase", margin: "0 0 6px" }}>
+            Colección actual
+          </p>
+          <h2 style={{ color: "var(--t1)", fontWeight: 800, fontSize: "1.75rem", margin: 0 }}>
+            Nuestros Productos
+          </h2>
+          <div className="heading-line" />
+        </div>
+        {esAdmin && (
+          <Button className="btn-theme-primary" onClick={abrirNuevo}>
+            + Nuevo Producto
+          </Button>
+        )}
       </div>
 
       {/* Grid */}
@@ -125,14 +202,33 @@ export default function Catalogo({ usuario, onCarritoChange }) {
                         >
                           Ver
                         </Button>
-                        <Button
-                          className="btn-theme-primary flex-fill"
-                          style={{ padding: "8px", fontSize: "0.82rem" }}
-                          onClick={() => agregarAlCarrito(p)}
-                          disabled={agregando}
-                        >
-                          {yaAgregado ? "✓ Agregado" : "+ Carrito"}
-                        </Button>
+                        {esAdmin ? (
+                          <>
+                            <Button
+                              variant="outline-warning"
+                              style={{ flex: "1", borderRadius: "var(--r2)", fontSize: "0.8rem", padding: "8px" }}
+                              onClick={() => abrirEditar(p)}
+                            >
+                              Editar
+                            </Button>
+                            <Button
+                              variant="outline-danger"
+                              style={{ flex: "0 0 auto", borderRadius: "var(--r2)", fontSize: "0.8rem", padding: "8px 12px" }}
+                              onClick={() => eliminarProducto(p.id)}
+                            >
+                              ✕
+                            </Button>
+                          </>
+                        ) : (
+                          <Button
+                            className="btn-theme-primary flex-fill"
+                            style={{ padding: "8px", fontSize: "0.82rem" }}
+                            onClick={() => agregarAlCarrito(p)}
+                            disabled={agregando}
+                          >
+                            {yaAgregado ? "✓ Agregado" : "+ Carrito"}
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </Card.Body>
@@ -220,7 +316,53 @@ export default function Catalogo({ usuario, onCarritoChange }) {
           </>
         )}
       </Modal>
-
+          <Modal show={modalProducto} onHide={() => setModalProducto(false)} centered className="modal-admin">
+      <Modal.Header closeButton>
+        <Modal.Title>{productoEditando ? "Editar Producto" : "Nuevo Producto"}</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <Form onSubmit={handleSubmitProducto}>
+          <Form.Group className="mb-3">
+            <Form.Label className="label-theme">Nombre</Form.Label>
+            <Form.Control className="input-theme" value={form.nombre} onChange={(e) => setForm({...form, nombre: e.target.value})} required />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label className="label-theme">Descripción</Form.Label>
+            <Form.Control className="input-theme" as="textarea" rows={2} value={form.descripcion} onChange={(e) => setForm({...form, descripcion: e.target.value})} />
+          </Form.Group>
+          <div className="d-flex gap-3">
+            <Form.Group className="mb-3 flex-fill">
+              <Form.Label className="label-theme">Precio</Form.Label>
+              <Form.Control className="input-theme" type="number" value={form.precio} onChange={(e) => setForm({...form, precio: e.target.value})} required />
+            </Form.Group>
+            <Form.Group className="mb-3 flex-fill">
+              <Form.Label className="label-theme">Stock</Form.Label>
+              <Form.Control className="input-theme" type="number" value={form.stock} onChange={(e) => setForm({...form, stock: e.target.value})} required />
+            </Form.Group>
+          </div>
+          <Form.Group className="mb-3">
+            <Form.Label className="label-theme">Marca</Form.Label>
+            <Form.Control className="input-theme" value={form.marca} onChange={(e) => setForm({...form, marca: e.target.value})} required />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label className="label-theme">Categoría</Form.Label>
+            <Form.Select className="input-theme" value={form.categoria_id} onChange={(e) => setForm({...form, categoria_id: e.target.value})} required>
+              <option value="">Selecciona una categoría</option>
+              {categorias.map((c) => (<option key={c.id} value={c.id}>{c.nombre}</option>))}
+            </Form.Select>
+          </Form.Group>
+          <Form.Group className="mb-4">
+            <Form.Label className="label-theme">URL Imagen (opcional)</Form.Label>
+            <Form.Control className="input-theme" value={form.imagen_url} onChange={(e) => setForm({...form, imagen_url: e.target.value})} placeholder="https://i.ibb.co/..." />
+          </Form.Group>
+          <div className="d-grid">
+            <Button type="submit" className="btn-theme-primary">
+              {productoEditando ? "Actualizar Producto" : "Crear Producto"}
+            </Button>
+          </div>
+        </Form>
+      </Modal.Body>
+    </Modal>
       <style>{`
         .modal-product-c {
           background: var(--bg-3) !important;
