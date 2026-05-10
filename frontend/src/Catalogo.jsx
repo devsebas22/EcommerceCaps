@@ -13,12 +13,13 @@ export default function Catalogo({ usuario, onCarritoChange, esAdmin = false }) 
   const [error, setError] = useState(null);
   const [sel, setSel] = useState(null);
   const [agregando, setAgregando] = useState(false);
-  const [agregadoId, setAgregadoId] = useState(null); // id del producto recién agregado
+  const [agregadoId, setAgregadoId] = useState(null);
   const [modalProducto, setModalProducto] = useState(false);
   const [productoEditando, setProductoEditando] = useState(null);
   const [categorias, setCategorias] = useState([]);
+  const [mensajeAdmin, setMensajeAdmin] = useState(null);
   const [form, setForm] = useState({
-    nombre: "", descripcion: "", precio: "", marca: "", stock: "", imagen_url: "", categoria_id: ""
+  nombre: "", descripcion: "", precio: "", marca: "", stock: "", imagen_url: "", categoria_id: "", archivo: null
   });
   const navigate = useNavigate();
 
@@ -49,53 +50,47 @@ export default function Catalogo({ usuario, onCarritoChange, esAdmin = false }) 
     }
   };
 
-  if (cargando) return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "55vh", gap: "16px" }}>
-      <Spinner animation="grow" style={{ color: "var(--gold)", width: "2.2rem", height: "2.2rem" }} />
-      <span style={{ color: "var(--t2)", fontSize: "0.82rem", letterSpacing: "0.5px" }}>Cargando colección…</span>
-    </div>
-  );
-
-  if (error) return (
-    <div style={{ textAlign: "center", padding: "60px 0", color: "var(--err)", fontSize: "0.9rem" }}>
-      Error al cargar productos: {error}
-    </div>
-  );
   const cargarCategorias = async () => {
-  const res = await fetch(`${API_BASE}/categorias/`);
-  const data = await res.json();
-  setCategorias(data);
-};
+    const res = await fetch(`${API_BASE}/categorias/`);
+    const data = await res.json();
+    setCategorias(data);
+  };
 
-const abrirEditar = (producto) => {
-  setForm({
-    nombre: producto.nombre,
-    descripcion: producto.descripcion || "",
-    precio: producto.precio,
-    marca: producto.marca,
-    stock: producto.stock,
-    imagen_url: producto.imagen_url || "",
-    categoria_id: producto.categoria_id
-  });
-  setProductoEditando(producto);
-  setModalProducto(true);
-  cargarCategorias();
-};
+  const abrirEditar = (producto) => {
+    setForm({
+      nombre: producto.nombre,
+      descripcion: producto.descripcion || "",
+      precio: producto.precio,
+      marca: producto.marca,
+      stock: producto.stock,
+      imagen_url: "",
+      categoria_id: producto.categoria_id
+    });
+    setProductoEditando(producto);
+    setModalProducto(true);
+    cargarCategorias();
+  };
 
-const abrirNuevo = () => {
-  setForm({ nombre: "", descripcion: "", precio: "", marca: "", stock: "", imagen_url: "", categoria_id: "" });
-  setProductoEditando(null);
-  setModalProducto(true);
-  cargarCategorias();
-};
+  const abrirNuevo = () => {
+    setForm({ nombre: "", descripcion: "", precio: "", marca: "", stock: "", imagen_url: "", categoria_id: "" });
+    setProductoEditando(null);
+    setModalProducto(true);
+    cargarCategorias();
+  };
 
-const eliminarProducto = async (id) => {
-  if (!confirm("¿Eliminar este producto?")) return;
-  await fetch(`${API_BASE}/productos/${id}`, { method: "DELETE" });
-  setProductos(productos.filter(p => p.id !== id));
-};
+  const eliminarProducto = async (id) => {
+    if (!confirm("¿Eliminar este producto?")) return;
+    await fetch(`${API_BASE}/productos/${id}`, { method: "DELETE" });
+    setProductos(productos.filter(p => p.id !== id));
+  };
 
-const handleSubmitProducto = async (e) => {
+  const recargarProductos = async () => {
+    const res = await fetch(`${API_BASE}/productos/`);
+    const data = await res.json();
+    setProductos(data);
+  };
+
+  const handleSubmitProducto = async (e) => {
   e.preventDefault();
   const body = {
     ...form,
@@ -103,6 +98,9 @@ const handleSubmitProducto = async (e) => {
     stock: parseInt(form.stock),
     categoria_id: parseInt(form.categoria_id)
   };
+  delete body.archivo;
+  delete body.imagen_url;
+
   const url = productoEditando
     ? `${API_BASE}/productos/${productoEditando.id}`
     : `${API_BASE}/productos/`;
@@ -116,21 +114,55 @@ const handleSubmitProducto = async (e) => {
 
   if (res.ok) {
     const data = await res.json();
-    if (productoEditando) {
-      setProductos(productos.map(p => p.id === data.id ? data : p));
-    } else {
-      setProductos([...productos, data]);
+
+    if (form.archivo) {
+      const formData = new FormData();
+      formData.append("image", form.archivo);
+      const imgRes = await fetch(
+        `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_KEY}`,
+        { method: "POST", body: formData }
+      );
+      const imgData = await imgRes.json();
+      if (imgData.success) {
+        await fetch(`${API_BASE}/imagenes/`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            url: imgData.data.url,
+            es_principal: true,
+            producto_id: data.id
+          }),
+        });
+      }
     }
+
+    await recargarProductos();
     setModalProducto(false);
+    setMensajeAdmin({ tipo: "ok", texto: productoEditando ? "Producto actualizado" : "Producto creado" });
+    setTimeout(() => setMensajeAdmin(null), 3000);
+  } else {
+    setMensajeAdmin({ tipo: "err", texto: "Error al guardar el producto" });
+    setTimeout(() => setMensajeAdmin(null), 3000);
   }
 };
 
+  if (cargando) return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "55vh", gap: "16px" }}>
+      <Spinner animation="grow" style={{ color: "var(--gold)", width: "2.2rem", height: "2.2rem" }} />
+      <span style={{ color: "var(--t2)", fontSize: "0.82rem", letterSpacing: "0.5px" }}>Cargando colección…</span>
+    </div>
+  );
+
+  if (error) return (
+    <div style={{ textAlign: "center", padding: "60px 0", color: "var(--err)", fontSize: "0.9rem" }}>
+      Error al cargar productos: {error}
+    </div>
+  );
 
   const selImg = sel ? imgPrincipal(sel) : null;
 
   return (
     <>
-      {/* Encabezado */}
       <div style={{ marginBottom: "44px", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
         <div>
           <p style={{ color: "var(--t2)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "1.8px", textTransform: "uppercase", margin: "0 0 6px" }}>
@@ -148,7 +180,20 @@ const handleSubmitProducto = async (e) => {
         )}
       </div>
 
-      {/* Grid */}
+      {esAdmin && mensajeAdmin && (
+        <div style={{
+          position: "fixed", bottom: "24px", right: "24px",
+          background: mensajeAdmin.tipo === "ok" ? "rgba(52,211,153,.12)" : "rgba(248,113,113,.12)",
+          border: `1px solid ${mensajeAdmin.tipo === "ok" ? "rgba(52,211,153,.35)" : "rgba(248,113,113,.35)"}`,
+          color: mensajeAdmin.tipo === "ok" ? "var(--ok)" : "var(--err)",
+          borderRadius: "var(--r2)", padding: "14px 20px",
+          fontWeight: 600, fontSize: "0.88rem",
+          zIndex: 9999, boxShadow: "var(--sh-md)"
+        }}>
+          {mensajeAdmin.tipo === "ok" ? "✓" : "✕"} {mensajeAdmin.texto}
+        </div>
+      )}
+
       {productos.length === 0 ? (
         <p style={{ color: "var(--t2)", textAlign: "center", paddingTop: "60px" }}>
           No hay productos disponibles.
@@ -161,7 +206,6 @@ const handleSubmitProducto = async (e) => {
             return (
               <Col key={p.id}>
                 <Card className="h-100 card-product">
-                  {/* Imagen — clickeable para ver detalles */}
                   <div
                     style={{ height: "215px", background: "var(--bg-1)", overflow: "hidden", position: "relative", cursor: "pointer" }}
                     onClick={() => setSel(p)}
@@ -173,7 +217,6 @@ const handleSubmitProducto = async (e) => {
                     <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "56px", background: "linear-gradient(transparent, var(--bg-2))", pointerEvents: "none" }} />
                   </div>
 
-                  {/* Body */}
                   <Card.Body style={{ display: "flex", flexDirection: "column", padding: "18px 20px" }}>
                     <span className="badge-cat" style={{ marginBottom: "10px", cursor: "pointer" }} onClick={() => setSel(p)}>
                       {p.categoria?.nombre ?? "Colección"}
@@ -193,7 +236,6 @@ const handleSubmitProducto = async (e) => {
                         </span>
                       </div>
 
-                      {/* Dos botones: detalles + agregar */}
                       <div style={{ display: "flex", gap: "8px" }}>
                         <Button
                           variant="outline-secondary"
@@ -239,54 +281,26 @@ const handleSubmitProducto = async (e) => {
         </Row>
       )}
 
-      {/* ── Modal de detalle ── */}
-      <Modal
-        show={!!sel}
-        onHide={() => setSel(null)}
-        centered
-        size="lg"
-        contentClassName="modal-product-c"
-        className="modal-product"
-      >
+      <Modal show={!!sel} onHide={() => setSel(null)} centered size="lg" contentClassName="modal-product-c" className="modal-product">
         {sel && (
           <>
             <Modal.Body>
-              {/* Imagen edge-to-edge */}
               {selImg && (
-                <div style={{ height: "280px", overflow: "hidden" }}>
-                  <img
-                    src={selImg}
-                    alt={sel.nombre}
-                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-                  />
+                <div style={{ height: "220px", overflow: "hidden" }}>
+                  <img src={selImg} alt={sel.nombre} style={{ width: "100%", height: "100%", objectFit: "contain", background: "var(--bg-1)", display: "block" }} />
                 </div>
               )}
-
-              {/* Detalles */}
               <div style={{ padding: "26px 28px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "12px" }}>
                   <div>
                     <span className="badge-cat">{sel.categoria?.nombre}</span>
-                    <h4 style={{ color: "var(--t1)", fontWeight: 800, margin: "10px 0 2px", fontSize: "1.2rem" }}>
-                      {sel.nombre}
-                    </h4>
-                    {sel.marca && (
-                      <p style={{ color: "var(--t2)", fontSize: "0.84rem", margin: 0 }}>{sel.marca}</p>
-                    )}
+                    <h4 style={{ color: "var(--t1)", fontWeight: 800, margin: "10px 0 2px", fontSize: "1.2rem" }}>{sel.nombre}</h4>
+                    {sel.marca && <p style={{ color: "var(--t2)", fontSize: "0.84rem", margin: 0 }}>{sel.marca}</p>}
                   </div>
-                  <span className="text-gold" style={{ fontWeight: 800, fontSize: "1.9rem", lineHeight: 1 }}>
-                    ${sel.precio.toLocaleString()}
-                  </span>
+                  <span className="text-gold" style={{ fontWeight: 800, fontSize: "1.9rem", lineHeight: 1 }}>${sel.precio.toLocaleString()}</span>
                 </div>
-
                 <hr style={{ borderColor: "var(--border)", margin: "20px 0" }} />
-
-                {sel.descripcion && (
-                  <p style={{ color: "var(--t2)", fontSize: "0.88rem", lineHeight: 1.75, margin: "0 0 18px" }}>
-                    {sel.descripcion}
-                  </p>
-                )}
-
+                {sel.descripcion && <p style={{ color: "var(--t2)", fontSize: "0.88rem", lineHeight: 1.75, margin: "0 0 18px" }}>{sel.descripcion}</p>}
                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                   <span className="label-theme" style={{ margin: 0 }}>Stock:</span>
                   <span style={{ fontWeight: 700, fontSize: "0.9rem", color: sel.stock > 5 ? "var(--ok)" : sel.stock > 0 ? "var(--warn)" : "var(--err)" }}>
@@ -295,74 +309,78 @@ const handleSubmitProducto = async (e) => {
                 </div>
               </div>
             </Modal.Body>
-
             <Modal.Footer style={{ background: "var(--bg-3)", borderTop: "1px solid var(--border)", padding: "16px 28px", gap: "12px" }}>
-              <Button
-                className="btn-theme-primary flex-fill"
-                style={{ padding: "12px" }}
-                onClick={() => { agregarAlCarrito(sel); setSel(null); }}
-                disabled={sel.stock === 0}
-              >
-                {sel.stock === 0 ? "Sin stock" : "+ Agregar al carrito"}
-              </Button>
-              <Button
-                variant="link"
-                style={{ color: "var(--t2)", textDecoration: "none", fontSize: "0.87rem", padding: "12px 6px" }}
-                onClick={() => setSel(null)}
-              >
+              {!esAdmin && (
+                <Button className="btn-theme-primary flex-fill" style={{ padding: "12px" }} onClick={() => { agregarAlCarrito(sel); setSel(null); }} disabled={sel.stock === 0}>
+                  {sel.stock === 0 ? "Sin stock" : "+ Agregar al carrito"}
+                </Button>
+              )}
+              <Button variant="link" style={{ color: "var(--t2)", textDecoration: "none", fontSize: "0.87rem", padding: "12px 6px" }} onClick={() => setSel(null)}>
                 Cerrar
               </Button>
             </Modal.Footer>
           </>
         )}
       </Modal>
-          <Modal show={modalProducto} onHide={() => setModalProducto(false)} centered className="modal-admin">
-      <Modal.Header closeButton>
-        <Modal.Title>{productoEditando ? "Editar Producto" : "Nuevo Producto"}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form onSubmit={handleSubmitProducto}>
-          <Form.Group className="mb-3">
-            <Form.Label className="label-theme">Nombre</Form.Label>
-            <Form.Control className="input-theme" value={form.nombre} onChange={(e) => setForm({...form, nombre: e.target.value})} required />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label className="label-theme">Descripción</Form.Label>
-            <Form.Control className="input-theme" as="textarea" rows={2} value={form.descripcion} onChange={(e) => setForm({...form, descripcion: e.target.value})} />
-          </Form.Group>
-          <div className="d-flex gap-3">
-            <Form.Group className="mb-3 flex-fill">
-              <Form.Label className="label-theme">Precio</Form.Label>
-              <Form.Control className="input-theme" type="number" value={form.precio} onChange={(e) => setForm({...form, precio: e.target.value})} required />
+
+      <Modal show={modalProducto} onHide={() => setModalProducto(false)} centered className="modal-admin">
+        <Modal.Header closeButton>
+          <Modal.Title>{productoEditando ? "Editar Producto" : "Nuevo Producto"}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form onSubmit={handleSubmitProducto}>
+            <Form.Group className="mb-3">
+              <Form.Label className="label-theme">Nombre</Form.Label>
+              <Form.Control className="input-theme" value={form.nombre} onChange={(e) => setForm({...form, nombre: e.target.value})} required />
             </Form.Group>
-            <Form.Group className="mb-3 flex-fill">
-              <Form.Label className="label-theme">Stock</Form.Label>
-              <Form.Control className="input-theme" type="number" value={form.stock} onChange={(e) => setForm({...form, stock: e.target.value})} required />
+            <Form.Group className="mb-3">
+              <Form.Label className="label-theme">Descripción</Form.Label>
+              <Form.Control className="input-theme" as="textarea" rows={2} value={form.descripcion} onChange={(e) => setForm({...form, descripcion: e.target.value})} />
             </Form.Group>
-          </div>
-          <Form.Group className="mb-3">
-            <Form.Label className="label-theme">Marca</Form.Label>
-            <Form.Control className="input-theme" value={form.marca} onChange={(e) => setForm({...form, marca: e.target.value})} required />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label className="label-theme">Categoría</Form.Label>
-            <Form.Select className="input-theme" value={form.categoria_id} onChange={(e) => setForm({...form, categoria_id: e.target.value})} required>
-              <option value="">Selecciona una categoría</option>
-              {categorias.map((c) => (<option key={c.id} value={c.id}>{c.nombre}</option>))}
-            </Form.Select>
-          </Form.Group>
-          <Form.Group className="mb-4">
-            <Form.Label className="label-theme">URL Imagen (opcional)</Form.Label>
-            <Form.Control className="input-theme" value={form.imagen_url} onChange={(e) => setForm({...form, imagen_url: e.target.value})} placeholder="https://i.ibb.co/..." />
-          </Form.Group>
-          <div className="d-grid">
-            <Button type="submit" className="btn-theme-primary">
-              {productoEditando ? "Actualizar Producto" : "Crear Producto"}
-            </Button>
-          </div>
-        </Form>
-      </Modal.Body>
-    </Modal>
+            <div className="d-flex gap-3">
+              <Form.Group className="mb-3 flex-fill">
+                <Form.Label className="label-theme">Precio</Form.Label>
+                <Form.Control className="input-theme" type="number" value={form.precio} onChange={(e) => setForm({...form, precio: e.target.value})} required />
+              </Form.Group>
+              <Form.Group className="mb-3 flex-fill">
+                <Form.Label className="label-theme">Stock</Form.Label>
+                <Form.Control className="input-theme" type="number" value={form.stock} onChange={(e) => setForm({...form, stock: e.target.value})} required />
+              </Form.Group>
+            </div>
+            <Form.Group className="mb-3">
+              <Form.Label className="label-theme">Marca</Form.Label>
+              <Form.Control className="input-theme" value={form.marca} onChange={(e) => setForm({...form, marca: e.target.value})} required />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label className="label-theme">Categoría</Form.Label>
+              <Form.Select className="input-theme" value={form.categoria_id} onChange={(e) => setForm({...form, categoria_id: e.target.value})} required>
+                <option value="">Selecciona una categoría</option>
+                {categorias.map((c) => (<option key={c.id} value={c.id}>{c.nombre}</option>))}
+              </Form.Select>
+            </Form.Group>
+            <Form.Group className="mb-4">
+              <Form.Label className="label-theme">Imagen del producto</Form.Label>
+              <Form.Control
+                className="input-theme"
+                type="file"
+                accept="image/*"
+                onChange={(e) => setForm({...form, archivo: e.target.files[0]})}
+              />
+              {form.archivo && (
+                <p style={{ color: "var(--t2)", fontSize: "0.78rem", marginTop: "6px" }}>
+                  Seleccionado: {form.archivo.name}
+                </p>
+              )}
+            </Form.Group>
+            <div className="d-grid">
+              <Button type="submit" className="btn-theme-primary">
+                {productoEditando ? "Actualizar Producto" : "Crear Producto"}
+              </Button>
+            </div>
+          </Form>
+        </Modal.Body>
+      </Modal>
+
       <style>{`
         .modal-product-c {
           background: var(--bg-3) !important;

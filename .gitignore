@@ -5,3 +5,4 @@ __pycache__/
 *.pyc
 *.pyonode_modules/
 node_modules/
+frontend/.env
