@@ -6,3 +6,4 @@ __pycache__/
 *.pyonode_modules/
 node_modules/
 frontend/.env
+.claude/
