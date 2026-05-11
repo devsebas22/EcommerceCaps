@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Row, Col, Card, Spinner, Button, Modal, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-
+import Lightbox from "yet-another-react-lightbox";
+import Zoom from "yet-another-react-lightbox/plugins/zoom";
+import "yet-another-react-lightbox/styles.css";
 const API_BASE = "http://127.0.0.1:8000";
 
 const imgPrincipal = (p) =>
@@ -21,6 +23,8 @@ export default function Catalogo({ usuario, onCarritoChange, esAdmin = false }) 
   const [form, setForm] = useState({
   nombre: "", descripcion: "", precio: "", marca: "", stock: "", imagen_url: "", categoria_id: "", archivo: null
   });
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -286,7 +290,9 @@ export default function Catalogo({ usuario, onCarritoChange, esAdmin = false }) 
           <>
             <Modal.Body>
               {selImg && (
-                <div style={{ height: "220px", overflow: "hidden" }}>
+                <div style={{ height: "220px", overflow: "hidden" }}
+                onClick={() => setLightboxOpen(true)}       
+                >
                   <img src={selImg} alt={sel.nombre} style={{ width: "100%", height: "100%", objectFit: "contain", background: "var(--bg-1)", display: "block" }} />
                 </div>
               )}
@@ -380,7 +386,26 @@ export default function Catalogo({ usuario, onCarritoChange, esAdmin = false }) 
           </Form>
         </Modal.Body>
       </Modal>
-
+      {sel && (
+      <Lightbox
+        open={lightboxOpen}
+        close={() => setLightboxOpen(false)}
+        index={lightboxIndex}
+        slides={sel.imagenes?.map(img => ({ src: img.url })) ?? [{ src: selImg }]}
+        plugins={[Zoom]}
+        zoom={{
+          maxZoomPixelRatio: 3,
+          zoomInMultiplier: 2,
+          doubleTapDelay: 300,
+          doubleClickDelay: 300,
+          doubleClickMaxStops: 2,
+          keyboardMoveDistance: 50,
+          wheelZoomDistanceFactor: 100,
+          pinchZoomDistanceFactor: 100,
+          scrollToZoom: true,
+           }}
+      />
+      )}        
       <style>{`
         .modal-product-c {
           background: var(--bg-3) !important;
