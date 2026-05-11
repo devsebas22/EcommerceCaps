@@ -35,7 +35,6 @@ export default function Login({ onLogin }) {
   return (
     <div className="auth-page">
       <div style={{ width: "100%", maxWidth: "420px" }}>
-        {/* Logo */}
         <div className="text-center mb-5">
           <p className="navbar-brand-theme" style={{ fontSize: "1.1rem", letterSpacing: "2.5px", marginBottom: "8px" }}>
             ECOMMERCE CAPS
@@ -48,7 +47,6 @@ export default function Login({ onLogin }) {
           </p>
         </div>
 
-        {/* Card */}
         <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-hover)", borderRadius: "var(--r-xl)", padding: "36px", boxShadow: "var(--shadow-lg)" }}>
           {error && (
             <Alert variant="danger" className="py-2 text-center mb-4" style={{ fontSize: "0.87rem" }}>

@@ -73,7 +73,6 @@ export default function Registro() {
   return (
     <div className="auth-page">
       <div style={{ width: "100%", maxWidth: "520px" }}>
-        {/* Logo */}
         <div className="text-center mb-5">
           <p className="navbar-brand-theme" style={{ fontSize: "1.1rem", letterSpacing: "2.5px", marginBottom: "8px" }}>
             ECOMMERCE CAPS
@@ -86,7 +85,6 @@ export default function Registro() {
           </p>
         </div>
 
-        {/* Card */}
         <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-hover)", borderRadius: "var(--r-xl)", padding: "36px", boxShadow: "var(--shadow-lg)" }}>
           {message && (
             <Alert variant="danger" className="py-2 text-center mb-4" style={{ fontSize: "0.87rem" }}>

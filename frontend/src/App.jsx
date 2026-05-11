@@ -1,38 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { Navbar, Container, Nav, Button } from "react-bootstrap";
-import Catalogo from "./Catalogo";
-import Registro from "./Registro";
-import Login from "./Login";
-import AdminLogin from "./admin/Login";
+import Catalogo from "./pages/Catalogo";
+import Registro from "./pages/Registro";
+import Login from "./pages/Login";
+import Perfil from "./pages/Perfil";
 import Dashboard from "./admin/Dashboard";
 import CarritoDrawer from "./Carrito";
-
-const API_BASE = "http://127.0.0.1:8000";
+import { useCarritoCount } from "./hooks/useCarrito";
 
 export default function App() {
   const [usuario, setUsuario] = useState(null);
   const [carritoOpen, setCarritoOpen] = useState(false);
-  const [carritoCount, setCarritoCount] = useState(0);
+  const { carritoCount, fetchCarritoCount } = useCarritoCount(usuario);
 
   useEffect(() => {
     const guardado = localStorage.getItem("usuario");
     if (guardado) setUsuario(JSON.parse(guardado));
   }, []);
-
-  useEffect(() => {
-    if (!usuario) { setCarritoCount(0); return; }
-    fetchCarritoCount();
-  }, [usuario]);
-
-  const fetchCarritoCount = async () => {
-    if (!usuario) return;
-    try {
-      const res = await fetch(`${API_BASE}/carrito/${usuario.id}`);
-      const data = await res.json();
-      setCarritoCount(data.items?.length ?? 0);
-    } catch { /* silencioso */ }
-  };
 
   const handleLogin = (data) => {
     localStorage.setItem("usuario", JSON.stringify(data));
@@ -97,10 +82,12 @@ export default function App() {
                             )}
                           </button>
 
-                          <span style={{ color: "var(--t2)", fontSize: "0.85rem" }}>
-                            Hola,{" "}
-                            <span className="text-gold fw-semibold">{usuario.nombre.split(" ")[0]}</span>
-                          </span>
+                          <Nav.Link as={Link} to="/perfil" className="nav-link-theme" style={{ padding: 0 }}>
+                            <span style={{ color: "var(--t2)", fontSize: "0.85rem" }}>
+                              Hola,{" "}
+                              <span className="text-gold fw-semibold">{usuario.nombre.split(" ")[0]}</span>
+                            </span>
+                          </Nav.Link>
                           <Button
                             variant="outline-danger"
                             size="sm"
@@ -140,6 +127,7 @@ export default function App() {
                 />
                 <Route path="/login"    element={<Login onLogin={handleLogin} />} />
                 <Route path="/registro" element={<Registro />} />
+                <Route path="/perfil"   element={<Perfil usuario={usuario} onLogout={handleLogout} />} />
               </Routes>
 
               {/* Carrito drawer — nivel raíz para el overlay correcto */}
