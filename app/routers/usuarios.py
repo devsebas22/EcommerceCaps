@@ -53,10 +53,15 @@ def actualizar_usuario(id: int, datos: UsuarioCreate, db: Session = Depends(get_
     db.refresh(usuario)
     return usuario
 @router.delete("/{id}")
-def eliminar_usuario(id: int, db: Session = Depends(get_db)):
+def eliminar_usuario(id: int, admin_id: int, db: Session = Depends(get_db)):
+    admin = db.query(Usuario).filter(Usuario.id == admin_id).first()
+    if not admin or not admin.es_admin:
+        raise HTTPException(status_code=403, detail="Se requieren permisos de administrador")
     usuario = db.query(Usuario).filter(Usuario.id == id).first()
     if not usuario:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    if usuario.es_admin:
+        raise HTTPException(status_code=400, detail="No se puede eliminar a otro administrador")
     db.delete(usuario)
     db.commit()
     return {"mensaje": "Usuario eliminado correctamente"}
