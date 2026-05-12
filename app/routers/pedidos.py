@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.models.pedido import Pedido, PedidoItem
+from app.models.pedido import Pedido, PedidoItem, EstadoPedido
 from app.models.carrito import Carrito, CarritoItem
 from app.models.usuario import Usuario
 from app.models.producto import Producto
@@ -70,7 +70,7 @@ def actualizar_estado(pedido_id: int, datos: ActualizarEstado, db: Session = Dep
         raise HTTPException(status_code=404, detail="Pedido no encontrado")
     estado_anterior = pedido.estado
     usuario = db.query(Usuario).filter(Usuario.id == pedido.usuario_id).first()
-    if datos.estado == "pagado" and estado_anterior != "pagado":
+    if datos.estado == "pagado" and estado_anterior != EstadoPedido.pagado:
         for pedido_item in pedido.items:
             producto = db.query(Producto).filter(Producto.id == pedido_item.producto_id).first()
             if producto.stock < pedido_item.cantidad:
@@ -82,7 +82,7 @@ def actualizar_estado(pedido_id: int, datos: ActualizarEstado, db: Session = Dep
             producto.stock -= pedido_item.cantidad
         if usuario:
             usuario.puntos_fidelidad += int(pedido.total)
-    if datos.estado == "cancelado" and estado_anterior in ("pagado", "enviado", "entregado"):
+    if datos.estado == "cancelado" and estado_anterior in (EstadoPedido.pagado, EstadoPedido.enviado, EstadoPedido.entregado):
         for pedido_item in pedido.items:
             producto = db.query(Producto).filter(Producto.id == pedido_item.producto_id).first()
             producto.stock += pedido_item.cantidad
