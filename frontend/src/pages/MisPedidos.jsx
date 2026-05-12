@@ -123,6 +123,20 @@ export default function MisPedidos({ usuario }) {
 
                 {expandido === p.id && (
                   <div style={{ marginTop: "12px", paddingTop: "12px", borderTop: "1px solid var(--border)" }}>
+                    {p.estado === "cancelado" && (
+                      <div style={{
+                        background: "rgba(248,113,113,.08)",
+                        border: "1px solid rgba(248,113,113,.25)",
+                        borderRadius: "var(--r1)",
+                        padding: "12px 16px",
+                        marginBottom: "12px",
+                        textAlign: "center",
+                      }}>
+                        <span style={{ color: "var(--err)", fontWeight: 700, fontSize: "0.9rem" }}>
+                          Pedido cancelado — Capital devuelto
+                        </span>
+                      </div>
+                    )}
                     <p style={{ color: "var(--t2)", fontSize: "0.8rem", marginBottom: "8px" }}>
                       Dirección de envío: <span style={{ color: "var(--t1)" }}>{p.direccion_envio}</span>
                     </p>
@@ -164,10 +178,17 @@ export default function MisPedidos({ usuario }) {
                 )}
 
                 {expandido !== p.id && (
-                  <p style={{ color: "var(--t3)", fontSize: "0.78rem", margin: "4px 0 0", cursor: "pointer" }}
-                     onClick={() => setExpandido(p.id)}>
-                    Ver detalle ▾
-                  </p>
+                  <>
+                    {p.estado === "cancelado" && (
+                      <p style={{ color: "var(--err)", fontSize: "0.78rem", margin: "4px 0 0" }}>
+                        Pedido cancelado — Capital devuelto
+                      </p>
+                    )}
+                    <p style={{ color: "var(--t3)", fontSize: "0.78rem", margin: p.estado === "cancelado" ? "2px 0 0" : "4px 0 0", cursor: "pointer" }}
+                       onClick={() => setExpandido(p.id)}>
+                      Ver detalle ▾
+                    </p>
+                  </>
                 )}
               </div>
             ))}

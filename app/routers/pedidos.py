@@ -69,6 +69,7 @@ def actualizar_estado(pedido_id: int, datos: ActualizarEstado, db: Session = Dep
     if not pedido:
         raise HTTPException(status_code=404, detail="Pedido no encontrado")
     estado_anterior = pedido.estado
+    usuario = db.query(Usuario).filter(Usuario.id == pedido.usuario_id).first()
     if datos.estado == "pagado" and estado_anterior != "pagado":
         for pedido_item in pedido.items:
             producto = db.query(Producto).filter(Producto.id == pedido_item.producto_id).first()
@@ -79,10 +80,14 @@ def actualizar_estado(pedido_id: int, datos: ActualizarEstado, db: Session = Dep
                            f"disponible {producto.stock}, requerido {pedido_item.cantidad}"
                 )
             producto.stock -= pedido_item.cantidad
+        if usuario:
+            usuario.puntos_fidelidad += int(pedido.total)
     if datos.estado == "cancelado" and estado_anterior in ("pagado", "enviado", "entregado"):
         for pedido_item in pedido.items:
             producto = db.query(Producto).filter(Producto.id == pedido_item.producto_id).first()
             producto.stock += pedido_item.cantidad
+        if usuario:
+            usuario.puntos_fidelidad = max(0, usuario.puntos_fidelidad - int(pedido.total))
     pedido.estado = datos.estado
     db.commit()
     db.refresh(pedido)
