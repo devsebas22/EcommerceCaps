@@ -4,6 +4,7 @@ from app.database import get_db
 from app.models.pedido import Pedido, PedidoItem
 from app.models.carrito import Carrito, CarritoItem
 from app.models.usuario import Usuario
+from app.models.producto import Producto
 from app.schemas.pedido import PedidoCreate, PedidoResponse
 from pydantic import BaseModel
 
@@ -20,6 +21,13 @@ def crear_pedido(usuario_id: int, datos: PedidoCreate, db: Session = Depends(get
     carrito = db.query(Carrito).filter(Carrito.usuario_id == usuario_id).first()
     if not carrito or len(carrito.items) == 0:
         raise HTTPException(status_code=400, detail="El carrito está vacío")
+    for item in carrito.items:
+        if item.producto.stock < item.cantidad:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Stock insuficiente para '{item.producto.nombre}': "
+                       f"disponible {item.producto.stock}, solicitado {item.cantidad}"
+            )
     total = sum(item.producto.precio * item.cantidad for item in carrito.items)
     nuevo_pedido = Pedido(
         usuario_id=usuario_id,
@@ -60,6 +68,21 @@ def actualizar_estado(pedido_id: int, datos: ActualizarEstado, db: Session = Dep
     pedido = db.query(Pedido).filter(Pedido.id == pedido_id).first()
     if not pedido:
         raise HTTPException(status_code=404, detail="Pedido no encontrado")
+    estado_anterior = pedido.estado
+    if datos.estado == "pagado" and estado_anterior != "pagado":
+        for pedido_item in pedido.items:
+            producto = db.query(Producto).filter(Producto.id == pedido_item.producto_id).first()
+            if producto.stock < pedido_item.cantidad:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Stock insuficiente para '{producto.nombre}': "
+                           f"disponible {producto.stock}, requerido {pedido_item.cantidad}"
+                )
+            producto.stock -= pedido_item.cantidad
+    if datos.estado == "cancelado" and estado_anterior in ("pagado", "enviado", "entregado"):
+        for pedido_item in pedido.items:
+            producto = db.query(Producto).filter(Producto.id == pedido_item.producto_id).first()
+            producto.stock += pedido_item.cantidad
     pedido.estado = datos.estado
     db.commit()
     db.refresh(pedido)

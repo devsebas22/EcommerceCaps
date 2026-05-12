@@ -42,8 +42,19 @@ def agregar_item(usuario_id: int, item: CarritoItemCreate, db: Session = Depends
         CarritoItem.producto_id == item.producto_id
     ).first()
     if item_existente:
-        item_existente.cantidad += item.cantidad
+        nueva_cantidad = item_existente.cantidad + item.cantidad
+        if producto.stock < nueva_cantidad:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Stock insuficiente para '{producto.nombre}': disponible {producto.stock}, solicitado {nueva_cantidad}"
+            )
+        item_existente.cantidad = nueva_cantidad
     else:
+        if producto.stock < item.cantidad:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Stock insuficiente para '{producto.nombre}': disponible {producto.stock}, solicitado {item.cantidad}"
+            )
         nuevo_item = CarritoItem(
             carrito_id=carrito.id,
             producto_id=item.producto_id,
@@ -59,6 +70,12 @@ def actualizar_cantidad(usuario_id: int, item_id: int, item: CarritoItemCreate, 
     carrito_item = db.query(CarritoItem).filter(CarritoItem.id == item_id).first()
     if not carrito_item:
         raise HTTPException(status_code=404, detail="Item no encontrado")
+    producto = db.query(Producto).filter(Producto.id == carrito_item.producto_id).first()
+    if producto.stock < item.cantidad:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Stock insuficiente para '{producto.nombre}': disponible {producto.stock}, solicitado {item.cantidad}"
+        )
     carrito_item.cantidad = item.cantidad
     db.commit()
     carrito = obtener_o_crear_carrito(usuario_id, db)
