@@ -9,7 +9,7 @@ class Carrito(Base):
     usuario_id = Column(Integer, ForeignKey("usuarios.id"), nullable=False)
 
     usuario = relationship("Usuario", back_populates="carrito")
-    items = relationship("CarritoItem", back_populates="carrito")
+    items = relationship("CarritoItem", back_populates="carrito", cascade="all, delete-orphan")
 
 
 class CarritoItem(Base):

@@ -20,7 +20,7 @@ class Pedido(Base):
     direccion_envio = Column(String, nullable=False)
 
     usuario = relationship("Usuario", back_populates="pedidos")
-    items = relationship("PedidoItem", back_populates="pedido")
+    items = relationship("PedidoItem", back_populates="pedido", cascade="all, delete-orphan")
 
 
 class PedidoItem(Base):
