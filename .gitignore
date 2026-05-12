@@ -8,3 +8,4 @@ node_modules/
 frontend/.env
 .claude/
 .claude/
+frontend/dist/
