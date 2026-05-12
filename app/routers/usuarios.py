@@ -4,6 +4,7 @@ from app.database import get_db
 from app.models.usuario import Usuario
 from app.models.carrito import Carrito, CarritoItem
 from app.models.pedido import Pedido, PedidoItem
+from app.models.producto import Producto
 from app.schemas.usuario import UsuarioCreate, UsuarioResponse, LoginRequest, LoginResponse
 from passlib.context import CryptContext
 
@@ -64,6 +65,12 @@ def eliminar_usuario(id: int, admin_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     if usuario.es_admin:
         raise HTTPException(status_code=400, detail="No se puede eliminar a otro administrador")
+    for pedido in usuario.pedidos:
+        if pedido.estado.value in ("pagado", "enviado", "entregado"):
+            for item in pedido.items:
+                producto = db.query(Producto).filter(Producto.id == item.producto_id).first()
+                if producto:
+                    producto.stock += item.cantidad
     db.delete(usuario)
     db.commit()
     return {"mensaje": "Usuario eliminado correctamente"}
