@@ -23,7 +23,8 @@ CREATE TABLE usuarios (
     direccion VARCHAR,
     telefono VARCHAR,
     es_admin BOOLEAN DEFAULT FALSE,
-    puntos_fidelidad INTEGER DEFAULT 0
+    puntos_fidelidad INTEGER DEFAULT 0,
+    activo BOOLEAN DEFAULT TRUE
 );
 
 CREATE TABLE carritos (

@@ -70,7 +70,7 @@ export default function Dashboard({ admin, onLogout }) {
         {vista === "productos" && (
           <Catalogo usuario={admin} onCarritoChange={() => {}} esAdmin={true} />
         )}
-        {vista === "usuarios" && <Usuarios />}
+        {vista === "usuarios" && <Usuarios admin={admin} />}
         {vista === "pedidos" && <Pedidos />}
       </Container>
     </div>

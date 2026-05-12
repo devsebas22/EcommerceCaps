@@ -1,11 +1,39 @@
-.env
+# ── Python ──
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+*.egg
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ── Virtual Environment ──
 .venv/
 venv/
-__pycache__/
-*.pyc
-*.pyonode_modules/
-node_modules/
+
+# ── Environment variables ──
+.env
 frontend/.env
-.claude/
-.claude/
+
+# ── Node.js ──
+node_modules/
+frontend/node_modules/
 frontend/dist/
+
+# ── IDE / Editor ──
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.claude/
+
+# ── OS ──
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# ── Logs ──
+*.log
