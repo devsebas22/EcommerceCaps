@@ -5,6 +5,7 @@ import Catalogo from "./pages/Catalogo";
 import Registro from "./pages/Registro";
 import Login from "./pages/Login";
 import Perfil from "./pages/Perfil";
+import MisPedidos from "./pages/MisPedidos";
 import Dashboard from "./admin/Dashboard";
 import CarritoDrawer from "./Carrito";
 import { useCarritoCount } from "./hooks/useCarrito";
@@ -66,6 +67,10 @@ export default function App() {
 
                       {usuario ? (
                         <>
+                          <Nav.Link as={Link} to="/mis-pedidos" className="nav-link-theme">
+                            Mis Pedidos
+                          </Nav.Link>
+
                           {/* Carrito */}
                           <button
                             className="cart-btn"
@@ -128,6 +133,7 @@ export default function App() {
                 <Route path="/login"    element={<Login onLogin={handleLogin} />} />
                 <Route path="/registro" element={<Registro />} />
                 <Route path="/perfil"   element={<Perfil usuario={usuario} onLogout={handleLogout} />} />
+                <Route path="/mis-pedidos" element={<MisPedidos usuario={usuario} />} />
               </Routes>
 
               {/* Carrito drawer — nivel raíz para el overlay correcto */}
