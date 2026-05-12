@@ -8,3 +8,5 @@ node_modules/
 frontend/.env
 .claude/
 .claude/
+node_modules/
+.vite/
