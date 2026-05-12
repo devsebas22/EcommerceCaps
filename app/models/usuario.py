@@ -13,6 +13,7 @@ class Usuario(Base):
     telefono = Column(String)
     es_admin = Column(Boolean, default=False)
     puntos_fidelidad = Column(Integer, default=0)
+    activo = Column(Boolean, default=True)
 
     carrito = relationship("Carrito", back_populates="usuario", uselist=False)
     pedidos = relationship("Pedido", back_populates="usuario")

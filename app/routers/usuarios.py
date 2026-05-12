@@ -17,7 +17,7 @@ def hashear_password(password: str) -> str:
 
 @router.post("/", response_model=UsuarioResponse)
 def crear_usuario(usuario: UsuarioCreate, db: Session = Depends(get_db)):
-    usuario_existente = db.query(Usuario).filter(Usuario.email == usuario.email).first()
+    usuario_existente = db.query(Usuario).filter(Usuario.email == usuario.email, Usuario.activo == True).first()
     if usuario_existente:
         raise HTTPException(status_code=400, detail="El email ya está registrado")
     nuevo_usuario = Usuario(
@@ -34,14 +34,14 @@ def crear_usuario(usuario: UsuarioCreate, db: Session = Depends(get_db)):
 
 @router.get("/{id}", response_model=UsuarioResponse)
 def obtener_usuario(id: int, db: Session = Depends(get_db)):
-    usuario = db.query(Usuario).filter(Usuario.id == id).first()
+    usuario = db.query(Usuario).filter(Usuario.id == id, Usuario.activo == True).first()
     if not usuario:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     return usuario
 
 @router.put("/{id}", response_model=UsuarioResponse)
 def actualizar_usuario(id: int, datos: UsuarioCreate, db: Session = Depends(get_db)):
-    usuario = db.query(Usuario).filter(Usuario.id == id).first()
+    usuario = db.query(Usuario).filter(Usuario.id == id, Usuario.activo == True).first()
     if not usuario:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     usuario.nombre = datos.nombre
@@ -54,26 +54,26 @@ def actualizar_usuario(id: int, datos: UsuarioCreate, db: Session = Depends(get_
     return usuario
 @router.delete("/{id}")
 def eliminar_usuario(id: int, admin_id: int, db: Session = Depends(get_db)):
-    admin = db.query(Usuario).filter(Usuario.id == admin_id).first()
+    admin = db.query(Usuario).filter(Usuario.id == admin_id, Usuario.activo == True).first()
     if not admin or not admin.es_admin:
         raise HTTPException(status_code=403, detail="Se requieren permisos de administrador")
-    usuario = db.query(Usuario).filter(Usuario.id == id).first()
+    usuario = db.query(Usuario).filter(Usuario.id == id, Usuario.activo == True).first()
     if not usuario:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     if usuario.es_admin:
         raise HTTPException(status_code=400, detail="No se puede eliminar a otro administrador")
-    db.delete(usuario)
+    usuario.activo = False
     db.commit()
     return {"mensaje": "Usuario eliminado correctamente"}
 
 @router.get("/", response_model=list[UsuarioResponse])
 def obtener_usuarios(db: Session = Depends(get_db)):
-    usuarios = db.query(Usuario).all()
+    usuarios = db.query(Usuario).filter(Usuario.activo == True).all()
     return usuarios
 
 @router.post("/login", response_model=LoginResponse)
 def login(datos: LoginRequest, db: Session = Depends(get_db)):
-    usuario = db.query(Usuario).filter(Usuario.email == datos.email).first()
+    usuario = db.query(Usuario).filter(Usuario.email == datos.email, Usuario.activo == True).first()
     if not usuario:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     if not pwd_context.verify(datos.password, usuario.password):
