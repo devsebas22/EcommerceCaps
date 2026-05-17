@@ -3,6 +3,7 @@ import { Container, Button } from "react-bootstrap";
 import Catalogo from "../pages/Catalogo";
 import Usuarios from "./Usuarios";
 import Pedidos from "./Pedidos";
+import Categorias from "./Categorias";
 
 const API_BASE = "http://127.0.0.1:8000";
 
@@ -26,13 +27,15 @@ export default function Dashboard({ admin, onLogout }) {
         <div style={{ display: "flex", alignItems: "center" }}>
           <span className="admin-brand">ECOMMERCE CAPS</span>
           <div className="admin-nav-pill">
-            {["productos", "usuarios", "pedidos"].map((v) => (
+            {["productos", "categorias", "usuarios", "pedidos"].map((v) => (
               <button
                 key={v}
                 className={`admin-nav-item${vista === v ? " active" : ""}`}
                 onClick={() => setVista(v)}
               >
-                {v === "productos" ? "📦 Productos" : v === "usuarios" ? "👥 Usuarios" : "📋 Pedidos"}
+                {v === "productos" ? "📦 Productos" : 
+                v === "categorias" ? "🏷️ Categorías" :
+                v === "usuarios" ? "👥 Usuarios" : "📋 Pedidos"}
               </button>
             ))}
           </div>
@@ -72,6 +75,7 @@ export default function Dashboard({ admin, onLogout }) {
         )}
         {vista === "usuarios" && <Usuarios admin={admin} />}
         {vista === "pedidos" && <Pedidos />}
+        {vista === "categorias" && <Categorias admin={admin} />}
       </Container>
     </div>
   );

@@ -11,7 +11,7 @@ router = APIRouter(
 
 @router.get("/", response_model=list[CategoriaResponse])
 def obtener_categorias(db: Session = Depends(get_db)):
-    categorias = db.query(Categoria).all()
+    categorias = db.query(Categoria).order_by(Categoria.id).all()
     return categorias
 
 @router.get("/{id}", response_model=CategoriaResponse)
@@ -37,3 +37,14 @@ def eliminar_categoria(id: int, db: Session = Depends(get_db)):
     db.delete(categoria)
     db.commit()
     return {"mensaje": "Categoría eliminada correctamente"}
+
+@router.put("/{id}", response_model=CategoriaResponse)
+def actualizar_categoria(id: int, datos: CategoriaCreate, db: Session = Depends(get_db)):
+    categoria = db.query(Categoria).filter(Categoria.id == id).first()
+    if not categoria:
+        raise HTTPException(status_code=404, detail="Categoría no encontrada")
+    categoria.nombre = datos.nombre
+    categoria.descripcion = datos.descripcion
+    db.commit()
+    db.refresh(categoria)
+    return categoria
