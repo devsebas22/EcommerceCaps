@@ -24,6 +24,7 @@ export default function Catalogo({ usuario, onCarritoChange, esAdmin = false }) 
   const [categoriaFiltro, setCategoriaFiltro] = useState("");
   const [precioMax, setPrecioMax] = useState("");
   const [categorias, setCategorias] = useState([]);
+  const [busquedaId, setBusquedaId] = useState("");
 
   useEffect(() => {
     fetch(`${API_BASE}/categorias/`)
@@ -89,7 +90,8 @@ export default function Catalogo({ usuario, onCarritoChange, esAdmin = false }) 
     p.descripcion?.toLowerCase().includes(busqueda.toLowerCase());
   const matchCategoria = !categoriaFiltro || p.categoria_id === parseInt(categoriaFiltro);
   const matchPrecio = !precioMax || p.precio <= parseInt(precioMax);
-  return matchBusqueda && matchCategoria && matchPrecio;
+  const matchId = !busquedaId || p.id === parseInt(busquedaId);
+  return matchBusqueda && matchCategoria && matchPrecio && matchId;
 });
 
   if (cargando) return (
@@ -118,14 +120,17 @@ export default function Catalogo({ usuario, onCarritoChange, esAdmin = false }) 
           <div className="heading-line" />
         </div>
         <FiltroProductos
-          busqueda={busqueda}
-          setBusqueda={setBusqueda}
-          categoriaFiltro={categoriaFiltro}
-          setCategoriaFiltro={setCategoriaFiltro}
-          precioMax={precioMax}
-          setPrecioMax={setPrecioMax}
-          categorias={categorias}
-        />
+            busqueda={busqueda}
+            setBusqueda={setBusqueda}
+            categoriaFiltro={categoriaFiltro}
+            setCategoriaFiltro={setCategoriaFiltro}
+            precioMax={precioMax}
+            setPrecioMax={setPrecioMax}
+            categorias={categorias}
+            esAdmin={esAdmin}
+            busquedaId={busquedaId}
+            setBusquedaId={setBusquedaId}
+          />
         {esAdmin && (
           <Button className="btn-theme-primary" onClick={abrirNuevo}>
             + Nuevo Producto

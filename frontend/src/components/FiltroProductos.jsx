@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function FiltroProductos({ busqueda, setBusqueda, categoriaFiltro, setCategoriaFiltro, precioMax, setPrecioMax, categorias }) {
+export default function FiltroProductos({ busqueda, setBusqueda, categoriaFiltro, setCategoriaFiltro, precioMax, setPrecioMax, categorias, esAdmin, busquedaId, setBusquedaId }) {
   return (
     <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "28px", alignItems: "center" }}>
       
@@ -25,6 +25,27 @@ export default function FiltroProductos({ busqueda, setBusqueda, categoriaFiltro
           }}
         />
       </div>
+
+      {/* Buscar por ID - solo admin */}
+      {esAdmin && (
+        <input
+          type="number"
+          placeholder="ID..."
+          value={busquedaId}
+          onChange={(e) => setBusquedaId(e.target.value)}
+          style={{
+            width: "90px",
+            background: "var(--bg-1)",
+            border: "1px solid var(--border-md)",
+            color: "var(--t1)",
+            borderRadius: "var(--r2)",
+            padding: "10px 14px",
+            fontSize: "0.88rem",
+            outline: "none",
+            fontFamily: "inherit"
+          }}
+        />
+      )}
 
       {/* Filtro categoría */}
       <select
@@ -65,9 +86,9 @@ export default function FiltroProductos({ busqueda, setBusqueda, categoriaFiltro
       </div>
 
       {/* Limpiar filtros */}
-      {(busqueda || categoriaFiltro || precioMax) && (
+      {(busqueda || categoriaFiltro || precioMax || busquedaId) && (
         <button
-          onClick={() => { setBusqueda(""); setCategoriaFiltro(""); setPrecioMax(""); }}
+          onClick={() => { setBusqueda(""); setCategoriaFiltro(""); setPrecioMax(""); if(setBusquedaId) setBusquedaId(""); }}
           style={{
             background: "none",
             border: "1px solid var(--border-md)",
@@ -77,7 +98,6 @@ export default function FiltroProductos({ busqueda, setBusqueda, categoriaFiltro
             fontSize: "0.8rem",
             cursor: "pointer",
             fontFamily: "inherit",
-            transition: "all .2s"
           }}
         >
           ✕ Limpiar
