@@ -51,8 +51,8 @@ export default function App() {
             <>
               <Navbar expand="lg" className="navbar-theme sticky-top">
                 <Container>
-                  <Navbar.Brand as={Link} to="/" className="navbar-brand-theme">
-                    ECOMMERCE CAPS
+                  <Navbar.Brand className="navbar-brand-theme">
+                    CAPSCO
                   </Navbar.Brand>
                   <Navbar.Toggle
                     aria-controls="main-navbar"

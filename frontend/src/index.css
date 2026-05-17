@@ -134,6 +134,7 @@ body {
   border-color: var(--border-accent) !important;
   box-shadow: var(--sh-gold) !important;
   transform: translateY(-5px);
+  z-index: 1;
 }
 .card-product:hover .prod-img { transform: scale(1.06); }
 

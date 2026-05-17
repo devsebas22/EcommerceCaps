@@ -25,6 +25,8 @@ export default function Catalogo({ usuario, onCarritoChange, esAdmin = false }) 
   const [precioMax, setPrecioMax] = useState("");
   const [categorias, setCategorias] = useState([]);
   const [busquedaId, setBusquedaId] = useState("");
+  const [vistaLista, setVistaLista] = useState(false);
+  const [ordenLista, setOrdenLista] = useState({ campo: "id", dir: "asc" });
 
   useEffect(() => {
     fetch(`${API_BASE}/categorias/`)
@@ -42,6 +44,7 @@ export default function Catalogo({ usuario, onCarritoChange, esAdmin = false }) 
   }, []);
 
   const agregarAlCarrito = async (producto) => {
+     console.log("usuario:", usuario); // temporal
     if (!usuario) { navigate("/login"); return; }
     setAgregando(true);
     try {
@@ -93,6 +96,21 @@ export default function Catalogo({ usuario, onCarritoChange, esAdmin = false }) 
   const matchId = !busquedaId || p.id === parseInt(busquedaId);
   return matchBusqueda && matchCategoria && matchPrecio && matchId;
 });
+  const ordenarLista = (campo) => {
+  setOrdenLista((prev) => ({
+    campo,
+    dir: prev.campo === campo && prev.dir === "asc" ? "desc" : "asc"
+  }));
+};
+
+const productosOrdenados = [...productosFiltrados].sort((a, b) => {
+  const val = ordenLista.dir === "asc" ? 1 : -1;
+  const aVal = ordenLista.campo === "categoria" ? a.categoria?.nombre : a[ordenLista.campo];
+  const bVal = ordenLista.campo === "categoria" ? b.categoria?.nombre : b[ordenLista.campo];
+  if (aVal < bVal) return -val;
+  if (aVal > bVal) return val;
+  return 0;
+});
 
   if (cargando) return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "55vh", gap: "16px" }}>
@@ -132,18 +150,102 @@ export default function Catalogo({ usuario, onCarritoChange, esAdmin = false }) 
             setBusquedaId={setBusquedaId}
           />
         {esAdmin && (
-          <Button className="btn-theme-primary" onClick={abrirNuevo}>
-            + Nuevo Producto
-          </Button>
-        )}
+            <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+              <button
+                onClick={() => setVistaLista(false)}
+                style={{
+                  background: !vistaLista ? "var(--gold-glow)" : "none",
+                  border: `1px solid ${!vistaLista ? "var(--gold)" : "var(--border-md)"}`,
+                  color: !vistaLista ? "var(--gold)" : "var(--t2)",
+                  borderRadius: "var(--r1)",
+                  padding: "7px 12px",
+                  cursor: "pointer",
+                  fontSize: "0.85rem",
+                  fontFamily: "inherit"
+                }}
+              >
+                🔲 Cards
+              </button>
+              <button
+                onClick={() => setVistaLista(true)}
+                style={{
+                  background: vistaLista ? "var(--gold-glow)" : "none",
+                  border: `1px solid ${vistaLista ? "var(--gold)" : "var(--border-md)"}`,
+                  color: vistaLista ? "var(--gold)" : "var(--t2)",
+                  borderRadius: "var(--r1)",
+                  padding: "7px 12px",
+                  cursor: "pointer",
+                  fontSize: "0.85rem",
+                  fontFamily: "inherit"
+                }}
+              >
+                ☰ Lista
+              </button>
+              <Button className="btn-theme-primary" onClick={abrirNuevo}>
+                + Nuevo Producto
+              </Button>
+            </div>
+          )}  
+        
       </div>
 
       {esAdmin && <Toast mensaje={mensajeAdmin} />}
 
-      {productos.length === 0 ? (
+      {productosFiltrados.length === 0 ? (
         <p style={{ color: "var(--t2)", textAlign: "center", paddingTop: "60px" }}>
           No hay productos disponibles.
         </p>
+      ) : vistaLista && esAdmin ? (
+        <div style={{ background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: "var(--r3)", overflow: "hidden" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", color: "var(--t1)", fontSize: "0.9rem" }}>
+            <thead>
+              <tr style={{ background: "var(--bg-4)" }}>
+                {[["id","ID"],["nombre","Nombre"],["categoria","Categoría"],["precio","Precio"],["stock","Stock"],["marca","Marca"]].map(([campo, label]) => (
+                  <th key={campo} 
+                    onClick={() => ordenarLista(campo)}
+                    style={{ padding: "13px 18px", textAlign: "left", color: "var(--t2)", fontSize: "0.70rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.9px", whiteSpace: "nowrap", cursor: "pointer", userSelect: "none" }}>
+                    {label} {ordenLista.campo === campo ? (ordenLista.dir === "asc" ? "↑" : "↓") : "↕"}
+                  </th>
+                ))}
+                <th style={{ padding: "13px 18px", color: "var(--t2)", fontSize: "0.70rem", fontWeight: 700, textTransform: "uppercase" }}>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {productosOrdenados.map((p) => (
+                <tr key={p.id} style={{ borderBottom: "1px solid var(--border)" }}>
+                  <td style={{ padding: "14px 18px", color: "var(--t2)" }}>#{p.id}</td>
+                  <td style={{ padding: "14px 18px", fontWeight: 600 }}>{p.nombre}</td>
+                  <td style={{ padding: "14px 18px" }}>
+                    <span className="badge-cat">{p.categoria?.nombre}</span>
+                  </td>
+                  <td style={{ padding: "14px 18px" }}>
+                    <span className="text-gold fw-bold">${p.precio.toLocaleString()}</span>
+                  </td>
+                  <td style={{ padding: "14px 18px", color: p.stock > 5 ? "var(--ok)" : p.stock > 0 ? "var(--warn)" : "var(--err)", fontWeight: 700 }}>
+                    {p.stock} uds
+                  </td>
+                  <td style={{ padding: "14px 18px", color: "var(--t2)" }}>{p.marca}</td>
+                  <td style={{ padding: "14px 18px" }}>
+                    <div style={{ display: "flex", gap: "8px" }}>
+                      <button
+                        onClick={() => abrirEditar(p)}
+                        style={{ background: "none", border: "1px solid var(--warn)", color: "var(--warn)", borderRadius: "var(--r1)", padding: "5px 12px", cursor: "pointer", fontSize: "0.78rem", fontFamily: "inherit" }}
+                      >
+                        Editar
+                      </button>
+                      <button
+                        onClick={() => eliminarProducto(p.id)}
+                        style={{ background: "none", border: "1px solid var(--err)", color: "var(--err)", borderRadius: "var(--r1)", padding: "5px 12px", cursor: "pointer", fontSize: "0.78rem", fontFamily: "inherit" }}
+                      >
+                        Eliminar
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       ) : (
         <Row xs={1} sm={2} md={3} lg={4} className="g-4">
           {productosFiltrados.map((p) => (
