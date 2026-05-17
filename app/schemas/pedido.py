@@ -18,10 +18,12 @@ class PedidoCreate(BaseModel):
 class PedidoResponse(BaseModel):
     id: int
     usuario_id: int
+    usuario_nombre: str | None = None   
     total: float
     estado: EstadoPedido
     direccion_envio: str
     items: list[PedidoItemResponse] = []
+
 
     class Config:
         from_attributes = True

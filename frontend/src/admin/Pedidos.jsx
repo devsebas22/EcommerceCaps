@@ -75,7 +75,7 @@ export default function Pedidos() {
           ) : pedidos.map((p) => (
             <tr key={p.id}>
               <td style={{ color: "var(--t2)" }}>#{p.id}</td>
-              <td style={{ fontWeight: 600 }}>Usuario #{p.usuario_id}</td>
+              <td style={{ fontWeight: 600 }}>{p.usuario_nombre || `Usuario #${p.usuario_id}`}</td>
               <td><span className="text-gold fw-bold">${p.total.toLocaleString()}</span></td>
               <td style={{ color: "var(--t2)", fontSize: "0.85rem" }}>{p.direccion_envio}</td>
               <td>

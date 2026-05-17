@@ -21,6 +21,9 @@ class Pedido(Base):
 
     usuario = relationship("Usuario", back_populates="pedidos")
     items = relationship("PedidoItem", back_populates="pedido", cascade="all, delete-orphan")
+    @property
+    def usuario_nombre(self):
+        return self.usuario.nombre if self.usuario else None
 
 
 class PedidoItem(Base):
