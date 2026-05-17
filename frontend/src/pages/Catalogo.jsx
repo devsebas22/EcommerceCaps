@@ -5,6 +5,7 @@ import ProductCard from "../components/ProductCard";
 import ProductModal from "../components/ProductModal";
 import AdminProductForm from "../components/AdminProductForm";
 import Toast from "../components/Toast";
+import FiltroProductos from "../components/FiltroProductos";
 
 const API_BASE = "http://127.0.0.1:8000";
 
@@ -19,7 +20,16 @@ export default function Catalogo({ usuario, onCarritoChange, esAdmin = false }) 
   const [productoEditando, setProductoEditando] = useState(null);
   const [mensajeAdmin, setMensajeAdmin] = useState(null);
   const navigate = useNavigate();
+  const [busqueda, setBusqueda] = useState("");
+  const [categoriaFiltro, setCategoriaFiltro] = useState("");
+  const [precioMax, setPrecioMax] = useState("");
+  const [categorias, setCategorias] = useState([]);
 
+  useEffect(() => {
+    fetch(`${API_BASE}/categorias/`)
+      .then(r => r.json())
+      .then(setCategorias);
+  }, []);
   useEffect(() => {
     let ok = true;
     fetch(`${API_BASE}/productos/`)
@@ -73,6 +83,14 @@ export default function Catalogo({ usuario, onCarritoChange, esAdmin = false }) 
     setMensajeAdmin(mensaje);
     setTimeout(() => setMensajeAdmin(null), 3000);
   };
+  const productosFiltrados = productos.filter((p) => {
+  const matchBusqueda = p.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
+    p.marca?.toLowerCase().includes(busqueda.toLowerCase()) ||
+    p.descripcion?.toLowerCase().includes(busqueda.toLowerCase());
+  const matchCategoria = !categoriaFiltro || p.categoria_id === parseInt(categoriaFiltro);
+  const matchPrecio = !precioMax || p.precio <= parseInt(precioMax);
+  return matchBusqueda && matchCategoria && matchPrecio;
+});
 
   if (cargando) return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "55vh", gap: "16px" }}>
@@ -99,6 +117,15 @@ export default function Catalogo({ usuario, onCarritoChange, esAdmin = false }) 
           </h2>
           <div className="heading-line" />
         </div>
+        <FiltroProductos
+          busqueda={busqueda}
+          setBusqueda={setBusqueda}
+          categoriaFiltro={categoriaFiltro}
+          setCategoriaFiltro={setCategoriaFiltro}
+          precioMax={precioMax}
+          setPrecioMax={setPrecioMax}
+          categorias={categorias}
+        />
         {esAdmin && (
           <Button className="btn-theme-primary" onClick={abrirNuevo}>
             + Nuevo Producto
@@ -114,7 +141,7 @@ export default function Catalogo({ usuario, onCarritoChange, esAdmin = false }) 
         </p>
       ) : (
         <Row xs={1} sm={2} md={3} lg={4} className="g-4">
-          {productos.map((p) => (
+          {productosFiltrados.map((p) => (
             <ProductCard
               key={p.id}
               producto={p}
