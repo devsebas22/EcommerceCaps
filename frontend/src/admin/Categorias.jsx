@@ -10,6 +10,7 @@ export default function Categorias() {
   const [editando, setEditando] = useState(null);
   const [form, setForm] = useState({ nombre: "", descripcion: "" });
   const [mensaje, setMensaje] = useState(null);
+  const [orden, setOrden] = useState({ campo: "id", dir: "asc" });
 
   useEffect(() => { cargarCategorias(); }, []);
 
@@ -58,6 +59,20 @@ export default function Categorias() {
     cargarCategorias();
   };
 
+  const ordenar = (campo) => {
+  setOrden((prev) => ({
+    campo,
+    dir: prev.campo === campo && prev.dir === "asc" ? "desc" : "asc"
+  }));
+};
+
+const categoriasOrdenadas = [...categorias].sort((a, b) => {
+  const val = orden.dir === "asc" ? 1 : -1;
+  if (a[orden.campo] < b[orden.campo]) return -val;
+  if (a[orden.campo] > b[orden.campo]) return val;
+  return 0;
+});
+
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
@@ -80,18 +95,10 @@ export default function Categorias() {
 
       <div style={{ background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: "var(--r3)", overflow: "hidden" }}>
         <Table className="table-admin" responsive>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Nombre</th>
-              <th>Descripción</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
+            <tbody>
             {cargando ? (
               <tr><td colSpan={4} className="text-center py-4"><Spinner animation="grow" style={{ color: "var(--gold)" }} /></td></tr>
-            ) : categorias.map((c) => (
+            ) : categoriasOrdenadas.map((c) => (
               <tr key={c.id}>
                 <td style={{ color: "var(--t2)" }}>#{c.id}</td>
                 <td style={{ fontWeight: 600 }}>{c.nombre}</td>
@@ -103,6 +110,16 @@ export default function Categorias() {
               </tr>
             ))}
           </tbody>
+          <thead>
+            <tr>
+                {[["id", "ID"], ["nombre", "Nombre"], ["descripcion", "Descripción"]].map(([campo, label]) => (
+                <th key={campo} onClick={() => ordenar(campo)} style={{ cursor: "pointer", userSelect: "none" }}>
+                    {label} {orden.campo === campo ? (orden.dir === "asc" ? "↑" : "↓") : "↕"}
+                </th>
+                ))}
+                <th>Acciones</th>
+            </tr>
+            </thead>
         </Table>
       </div>
 

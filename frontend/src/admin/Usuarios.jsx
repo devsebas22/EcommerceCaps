@@ -6,6 +6,7 @@ const API_BASE = "http://127.0.0.1:8000";
 export default function Usuarios({ admin }) {
   const [usuarios, setUsuarios] = useState([]);
   const [cargando, setCargando] = useState(false);
+  const [orden, setOrden] = useState({ campo: "id", dir: "asc" });
 
   useEffect(() => {
     cargarUsuarios();
@@ -17,6 +18,20 @@ export default function Usuarios({ admin }) {
     setUsuarios(await res.json());
     setCargando(false);
   };
+
+  const ordenar = (campo) => {
+    setOrden((prev) => ({
+      campo,
+      dir: prev.campo === campo && prev.dir === "asc" ? "desc" : "asc"
+    }));
+  };
+
+  const usuariosOrdenados = [...usuarios].sort((a, b) => {
+    const val = orden.dir === "asc" ? 1 : -1;
+    if (a[orden.campo] < b[orden.campo]) return -val;
+    if (a[orden.campo] > b[orden.campo]) return val;
+    return 0;
+  });
 
   const eliminar = async (id, nombre) => {
     if (!confirm(`¿Eliminar al usuario "${nombre}"? Esta acción no se puede deshacer.`)) return;
@@ -41,12 +56,11 @@ export default function Usuarios({ admin }) {
         <Table className="table-admin" responsive>
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Nombre</th>
-              <th>Email</th>
-              <th>Teléfono</th>
-              <th>Puntos</th>
-              <th>Rol</th>
+              {[["id","ID"],["nombre","Nombre"],["email","Email"],["telefono","Teléfono"],["puntos_fidelidad","Puntos"],["es_admin","Rol"]].map(([campo, label]) => (
+                <th key={campo} onClick={() => ordenar(campo)} style={{ cursor: "pointer", userSelect: "none" }}>
+                  {label} {orden.campo === campo ? (orden.dir === "asc" ? "↑" : "↓") : "↕"}
+                </th>
+              ))}
               <th>Acciones</th>
             </tr>
           </thead>
@@ -57,7 +71,7 @@ export default function Usuarios({ admin }) {
                   <Spinner animation="grow" style={{ color: "var(--gold)" }} />
                 </td>
               </tr>
-            ) : usuarios.map((u) => (
+            ) : usuariosOrdenados.map((u) => (
               <tr key={u.id}>
                 <td style={{ color: "var(--t2)" }}>#{u.id}</td>
                 <td style={{ fontWeight: 600 }}>{u.nombre}</td>

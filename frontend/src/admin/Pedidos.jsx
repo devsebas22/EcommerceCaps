@@ -32,10 +32,9 @@ const estadoStyle = (estado) => ({
 export default function Pedidos() {
   const [pedidos, setPedidos] = useState([]);
   const [cargando, setCargando] = useState(false);
+  const [orden, setOrden] = useState({ campo: "id", dir: "asc" });
 
-  useEffect(() => {
-    cargarPedidos();
-  }, []);
+  useEffect(() => { cargarPedidos(); }, []);
 
   const cargarPedidos = async () => {
     setCargando(true);
@@ -43,6 +42,20 @@ export default function Pedidos() {
     setPedidos(await res.json());
     setCargando(false);
   };
+
+  const ordenar = (campo) => {
+    setOrden((prev) => ({
+      campo,
+      dir: prev.campo === campo && prev.dir === "asc" ? "desc" : "asc"
+    }));
+  };
+
+  const pedidosOrdenados = [...pedidos].sort((a, b) => {
+    const val = orden.dir === "asc" ? 1 : -1;
+    if (a[orden.campo] < b[orden.campo]) return -val;
+    if (a[orden.campo] > b[orden.campo]) return val;
+    return 0;
+  });
 
   const actualizarEstado = async (pedidoId, estado) => {
     await fetch(`${API_BASE}/pedidos/${pedidoId}/estado`, {
@@ -58,11 +71,11 @@ export default function Pedidos() {
       <Table className="table-admin" responsive>
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Usuario</th>
-            <th>Total</th>
-            <th>Dirección</th>
-            <th>Estado</th>
+            {[["id","ID"],["usuario_nombre","Usuario"],["total","Total"],["direccion_envio","Dirección"],["estado","Estado"]].map(([campo, label]) => (
+              <th key={campo} onClick={() => ordenar(campo)} style={{ cursor: "pointer", userSelect: "none" }}>
+                {label} {orden.campo === campo ? (orden.dir === "asc" ? "↑" : "↓") : "↕"}
+              </th>
+            ))}
           </tr>
         </thead>
         <tbody>
@@ -72,7 +85,7 @@ export default function Pedidos() {
                 <Spinner animation="grow" style={{ color: "var(--gold)" }} />
               </td>
             </tr>
-          ) : pedidos.map((p) => (
+          ) : pedidosOrdenados.map((p) => (
             <tr key={p.id}>
               <td style={{ color: "var(--t2)" }}>#{p.id}</td>
               <td style={{ fontWeight: 600 }}>{p.usuario_nombre || `Usuario #${p.usuario_id}`}</td>
