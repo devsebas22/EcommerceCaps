@@ -44,10 +44,16 @@ export default function ProductModal({ producto, esAdmin, onClose, onAgregarAlCa
               <p style={{ color: "var(--t2)", fontSize: "0.88rem", lineHeight: 1.75, margin: "0 0 18px" }}>{producto.descripcion}</p>
             )}
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <span className="label-theme" style={{ margin: 0 }}>Stock:</span>
-              <span style={{ fontWeight: 700, fontSize: "0.9rem", color: producto.stock > 5 ? "var(--ok)" : producto.stock > 0 ? "var(--warn)" : "var(--err)" }}>
-                {producto.stock > 0 ? `${producto.stock} unidades disponibles` : "Sin stock"}
-              </span>
+              <span className="label-theme" style={{ margin: 0 }}>Disponibilidad:</span>
+              {esAdmin ? (
+                <span style={{ fontWeight: 700, fontSize: "0.9rem", color: producto.stock > 5 ? "var(--ok)" : producto.stock > 0 ? "var(--warn)" : "var(--err)" }}>
+                  {producto.stock > 0 ? `${producto.stock} unidades disponibles` : "Sin stock"}
+                </span>
+              ) : (
+                <span style={{ fontWeight: 700, fontSize: "0.9rem", color: producto.stock > 0 ? "var(--ok)" : "var(--err)" }}>
+                  {producto.stock > 0 ? "Disponible" : "Agotado"}
+                </span>
+              )}
             </div>
           </div>
         </Modal.Body>

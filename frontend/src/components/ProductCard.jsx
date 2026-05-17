@@ -61,6 +61,14 @@ export default function ProductCard({
                 ${p.precio.toLocaleString()}
               </span>
             </div>
+          {esAdmin && (
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+              <span style={{ color: "var(--t3)", fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.6px" }}>Stock</span>
+              <span style={{ fontWeight: 700, fontSize: "0.9rem", color: p.stock > 5 ? "var(--ok)" : p.stock > 0 ? "var(--warn)" : "var(--err)" }}>
+                {p.stock} uds
+              </span>
+            </div>
+          )}  
 
             <div style={{ display: "flex", gap: "8px" }}>
               <Button
@@ -91,10 +99,10 @@ export default function ProductCard({
                 <Button
                   className="btn-theme-primary flex-fill"
                   style={{ padding: "8px", fontSize: "0.82rem" }}
-                  onClick={() => onAgregarAlCarrito(p)}
-                  disabled={agregando}
+                  onClick={() => p.stock > 0 ? onAgregarAlCarrito(p) : null}
+                  disabled={agregando || p.stock === 0}
                 >
-                  {yaAgregado ? "✓ Agregado" : "+ Carrito"}
+                  {p.stock === 0 ? "Agotado" : yaAgregado ? "✓ Agregado" : "+ Carrito"}
                 </Button>
               )}
             </div>
