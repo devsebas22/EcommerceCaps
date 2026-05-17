@@ -71,7 +71,8 @@ export default function AdminProductForm({ show, onHide, productoEditando, onSuc
       onSuccess({ tipo: "ok", texto: productoEditando ? "Producto actualizado" : "Producto creado" });
       onHide();
     } else {
-      onSuccess({ tipo: "err", texto: "Error al guardar el producto" });
+      const errData = await res.json();
+      onSuccess({ tipo: "err", texto: errData.detail || "Error al guardar el producto" });
     }
   };
 
@@ -118,6 +119,7 @@ export default function AdminProductForm({ show, onHide, productoEditando, onSuc
             <Form.Control
               className="input-theme"
               type="file"
+              min="0"
               accept="image/*"
               onChange={(e) => setForm((prev) => ({ ...prev, archivo: e.target.files[0] }))}
             />

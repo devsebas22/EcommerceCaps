@@ -30,6 +30,8 @@ def obtener_producto(id: int, db: Session = Depends(get_db)):
 
 @router.post("/", response_model=ProductoResponse)
 def crear_producto(producto: ProductoCreate, db: Session = Depends(get_db)):
+    if producto.stock < 0:
+        raise HTTPException(status_code=400, detail="El stock no puede ser negativo")
     categoria = db.query(Categoria).filter(Categoria.id == producto.categoria_id).first()
     if not categoria:
         raise HTTPException(status_code=404, detail="Categoría no encontrada")
@@ -41,6 +43,8 @@ def crear_producto(producto: ProductoCreate, db: Session = Depends(get_db)):
 
 @router.put("/{id}", response_model=ProductoResponse)
 def actualizar_producto(id: int, datos: ProductoCreate, db: Session = Depends(get_db)):
+    if datos.stock < 0:
+        raise HTTPException(status_code=400, detail="El stock no puede ser negativo")
     producto = db.query(Producto).filter(Producto.id == id).first()
     if not producto:
         raise HTTPException(status_code=404, detail="Producto no encontrado")

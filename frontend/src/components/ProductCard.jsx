@@ -32,6 +32,18 @@ export default function ProductCard({
         </div>
 
         <Card.Body style={{ display: "flex", flexDirection: "column", padding: "18px 20px" }}>
+          {esAdmin && (
+            <span style={{
+              color: "var(--t3)",
+              fontSize: "0.68rem",
+              fontWeight: 700,
+              letterSpacing: "0.5px",
+              marginBottom: "4px",
+              display: "block"
+              }}>
+              #{p.id}
+            </span>
+              )}
           <span className="badge-cat" style={{ marginBottom: "10px", cursor: "pointer" }} onClick={() => onVer(p)}>
             {p.categoria?.nombre ?? "Colección"}
           </span>
