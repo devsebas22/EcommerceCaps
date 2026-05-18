@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = import.meta.env.VITE_API_URL;
 
 const TIERS = [
   { min: 0,    max: 99,   nombre: "Bronce", color: "#cd7f32", bg: "rgba(205,127,50,0.12)" },

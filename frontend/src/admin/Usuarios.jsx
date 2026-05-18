@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { Table, Badge, Spinner, Button } from "react-bootstrap";
+import ConfirmModal from "../components/ConfirmModal";
+import Toast from "../components/Toast";
 
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = import.meta.env.VITE_API_URL;
 
 export default function Usuarios({ admin }) {
   const [usuarios, setUsuarios] = useState([]);
   const [cargando, setCargando] = useState(false);
   const [orden, setOrden] = useState({ campo: "id", dir: "asc" });
+  const [confirmData, setConfirmData] = useState(null);
+  const [mensaje, setMensaje] = useState(null);
+
+  const flash = (tipo, texto) => { setMensaje({ tipo, texto }); setTimeout(() => setMensaje(null), 3200); };
 
   useEffect(() => {
     cargarUsuarios();
@@ -33,19 +39,30 @@ export default function Usuarios({ admin }) {
     return 0;
   });
 
-  const eliminar = async (id, nombre) => {
-    if (!confirm(`¿Eliminar al usuario "${nombre}"? Esta acción no se puede deshacer.`)) return;
-    const res = await fetch(`${API_BASE}/usuarios/${id}?admin_id=${admin.id}`, { method: "DELETE" });
+  const eliminar = (id, nombre) => setConfirmData({ id, nombre });
+
+  const confirmarEliminar = async () => {
+    const res = await fetch(`${API_BASE}/usuarios/${confirmData.id}?admin_id=${admin.id}`, { method: "DELETE" });
+    setConfirmData(null);
     if (res.ok) {
+      flash("ok", "Usuario eliminado");
       cargarUsuarios();
     } else {
       const err = await res.json();
-      alert(err.detail ?? "Error al eliminar usuario");
+      flash("err", err.detail ?? "Error al eliminar usuario");
     }
   };
 
   return (
     <div>
+      <ConfirmModal
+        show={!!confirmData}
+        titulo="Eliminar Usuario"
+        mensaje={`¿Eliminar al usuario "${confirmData?.nombre}"? Esta acción no se puede deshacer.`}
+        onConfirmar={confirmarEliminar}
+        onCancelar={() => setConfirmData(null)}
+      />
+      <Toast mensaje={mensaje} />
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "28px" }}>
         <div>
           <h4 style={{ color: "var(--t1)", fontWeight: 800, margin: "0 0 6px", fontSize: "1.35rem" }}>Gestión de Usuarios</h4>

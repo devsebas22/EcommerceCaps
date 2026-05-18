@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Button, Form, Alert, Spinner } from "react-bootstrap";
 
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = import.meta.env.VITE_API_URL;
 
 const imgPrincipal = (producto) =>
   producto.imagenes?.find((i) => i.es_principal)?.url ?? producto.imagenes?.[0]?.url ?? null;
@@ -19,7 +19,7 @@ const calcularFirma = async (reference, amountInCents) => {
 };
 
 /* ─── Checkout ─── */
-function Checkout({ usuario, total, onClose, onSuccess }) {
+function Checkout({ usuario, total, items, onClose, onSuccess }) {
   const [direccion, setDireccion] = useState(usuario.direccion || "");
   const [cargando, setCargando] = useState(false);
   const [exitoso, setExitoso] = useState(false);
@@ -154,7 +154,30 @@ function Checkout({ usuario, total, onClose, onSuccess }) {
                   {error}
                 </Alert>
               )}
-              <div style={{ background: "var(--bg-4)", borderRadius: "var(--r2)", padding: "16px 18px", marginBottom: "22px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+
+              {/* Desglose de items */}
+              <div style={{ marginBottom: "18px" }}>
+                <p style={{ color: "var(--t3)", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", margin: "0 0 10px" }}>
+                  Resumen del pedido
+                </p>
+                {items.map((item) => (
+                  <div key={item.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "7px 0", borderBottom: "1px solid var(--border)" }}>
+                    <div style={{ flex: 1, minWidth: 0, paddingRight: "12px" }}>
+                      <span style={{ color: "var(--t1)", fontSize: "0.84rem", fontWeight: 600, display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {item.producto.nombre}
+                      </span>
+                      <span style={{ color: "var(--t3)", fontSize: "0.74rem" }}>
+                        ${item.producto.precio.toLocaleString()} × {item.cantidad}
+                      </span>
+                    </div>
+                    <span style={{ color: "var(--gold)", fontWeight: 700, fontSize: "0.84rem", flexShrink: 0 }}>
+                      ${(item.producto.precio * item.cantidad).toLocaleString()}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ background: "var(--bg-4)", borderRadius: "var(--r2)", padding: "14px 18px", marginBottom: "22px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span style={{ color: "var(--t2)", fontSize: "0.84rem" }}>Total a pagar</span>
                 <span className="text-gold" style={{ fontWeight: 800, fontSize: "1.3rem" }}>${total.toLocaleString()}</span>
               </div>
@@ -300,6 +323,7 @@ export default function CarritoDrawer({ open, onClose, usuario, onChange }) {
         <Checkout
           usuario={usuario}
           total={total}
+          items={items}
           onClose={() => setCheckoutOpen(false)}
           onSuccess={() => {
             setCheckoutOpen(false);

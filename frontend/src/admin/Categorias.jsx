@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Table, Button, Modal, Form, Spinner } from "react-bootstrap";
+import ConfirmModal from "../components/ConfirmModal";
 
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = import.meta.env.VITE_API_URL;
 
 export default function Categorias() {
   const [categorias, setCategorias] = useState([]);
@@ -11,6 +12,7 @@ export default function Categorias() {
   const [form, setForm] = useState({ nombre: "", descripcion: "" });
   const [mensaje, setMensaje] = useState(null);
   const [orden, setOrden] = useState({ campo: "id", dir: "asc" });
+  const [confirmData, setConfirmData] = useState(null);
 
   useEffect(() => { cargarCategorias(); }, []);
 
@@ -53,9 +55,13 @@ export default function Categorias() {
     setTimeout(() => setMensaje(null), 3000);
   };
 
-  const eliminar = async (id) => {
-    if (!confirm("¿Eliminar esta categoría? Los productos asociados quedarán sin categoría.")) return;
-    await fetch(`${API_BASE}/categorias/${id}`, { method: "DELETE" });
+  const eliminar = (id, nombre) => setConfirmData({ id, nombre });
+
+  const confirmarEliminar = async () => {
+    await fetch(`${API_BASE}/categorias/${confirmData.id}`, { method: "DELETE" });
+    setConfirmData(null);
+    setMensaje({ tipo: "ok", texto: "Categoría eliminada" });
+    setTimeout(() => setMensaje(null), 3000);
     cargarCategorias();
   };
 
@@ -105,7 +111,7 @@ const categoriasOrdenadas = [...categorias].sort((a, b) => {
                 <td style={{ color: "var(--t2)", fontSize: "0.85rem" }}>{c.descripcion || "—"}</td>
                 <td>
                   <Button size="sm" variant="outline-warning" className="me-2" onClick={() => abrirEditar(c)}>Editar</Button>
-                  <Button size="sm" variant="outline-danger" onClick={() => eliminar(c.id)}>Eliminar</Button>
+                  <Button size="sm" variant="outline-danger" onClick={() => eliminar(c.id, c.nombre)}>Eliminar</Button>
                 </td>
               </tr>
             ))}
@@ -122,6 +128,14 @@ const categoriasOrdenadas = [...categorias].sort((a, b) => {
             </thead>
         </Table>
       </div>
+
+      <ConfirmModal
+        show={!!confirmData}
+        titulo="Eliminar Categoría"
+        mensaje={`¿Eliminar "${confirmData?.nombre}"? Los productos asociados quedarán sin categoría.`}
+        onConfirmar={confirmarEliminar}
+        onCancelar={() => setConfirmData(null)}
+      />
 
       <Modal show={showModal} onHide={() => setShowModal(false)} centered className="modal-admin">
         <Modal.Header closeButton>

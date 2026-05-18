@@ -5,9 +5,10 @@ import ProductCard from "../components/ProductCard";
 import ProductModal from "../components/ProductModal";
 import AdminProductForm from "../components/AdminProductForm";
 import Toast from "../components/Toast";
+import ConfirmModal from "../components/ConfirmModal";
 import FiltroProductos from "../components/FiltroProductos";
 
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = import.meta.env.VITE_API_URL;
 
 export default function Catalogo({ usuario, onCarritoChange, esAdmin = false }) {
   const [productos, setProductos] = useState([]);
@@ -27,6 +28,8 @@ export default function Catalogo({ usuario, onCarritoChange, esAdmin = false }) 
   const [busquedaId, setBusquedaId] = useState("");
   const [vistaLista, setVistaLista] = useState(false);
   const [ordenLista, setOrdenLista] = useState({ campo: "id", dir: "asc" });
+  const [confirmEliminar, setConfirmEliminar] = useState(null);
+  const [toastCarrito, setToastCarrito] = useState(null);
 
   useEffect(() => {
     fetch(`${API_BASE}/categorias/`)
@@ -44,7 +47,6 @@ export default function Catalogo({ usuario, onCarritoChange, esAdmin = false }) 
   }, []);
 
   const agregarAlCarrito = async (producto) => {
-     console.log("usuario:", usuario); // temporal
     if (!usuario) { navigate("/login"); return; }
     setAgregando(true);
     try {
@@ -55,7 +57,9 @@ export default function Catalogo({ usuario, onCarritoChange, esAdmin = false }) 
       });
       setAgregadoId(producto.id);
       onCarritoChange?.();
+      setToastCarrito({ tipo: "ok", texto: `${producto.nombre} agregado al carrito` });
       setTimeout(() => setAgregadoId(null), 2000);
+      setTimeout(() => setToastCarrito(null), 2500);
     } finally {
       setAgregando(false);
     }
@@ -71,10 +75,15 @@ export default function Catalogo({ usuario, onCarritoChange, esAdmin = false }) 
     setModalProducto(true);
   };
 
-  const eliminarProducto = async (id) => {
-    if (!confirm("¿Eliminar este producto?")) return;
-    await fetch(`${API_BASE}/productos/${id}`, { method: "DELETE" });
-    setProductos((prev) => prev.filter((p) => p.id !== id));
+  const eliminarProducto = (id) => {
+    const producto = productos.find((p) => p.id === id);
+    setConfirmEliminar({ id, nombre: producto?.nombre ?? `#${id}` });
+  };
+
+  const confirmarEliminarProducto = async () => {
+    await fetch(`${API_BASE}/productos/${confirmEliminar.id}`, { method: "DELETE" });
+    setProductos((prev) => prev.filter((p) => p.id !== confirmEliminar.id));
+    setConfirmEliminar(null);
   };
 
   const recargarProductos = async () => {
@@ -190,6 +199,15 @@ const productosOrdenados = [...productosFiltrados].sort((a, b) => {
       </div>
 
       {esAdmin && <Toast mensaje={mensajeAdmin} />}
+      {!esAdmin && <Toast mensaje={toastCarrito} />}
+
+      <ConfirmModal
+        show={!!confirmEliminar}
+        titulo="Eliminar Producto"
+        mensaje={`¿Eliminar "${confirmEliminar?.nombre}"? Esta acción no se puede deshacer.`}
+        onConfirmar={confirmarEliminarProducto}
+        onCancelar={() => setConfirmEliminar(null)}
+      />
 
       {productosFiltrados.length === 0 ? (
         <p style={{ color: "var(--t2)", textAlign: "center", paddingTop: "60px" }}>

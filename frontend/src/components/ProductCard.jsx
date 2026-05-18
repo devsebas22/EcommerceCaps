@@ -99,10 +99,7 @@ export default function ProductCard({
                 <Button
                   className="btn-theme-primary flex-fill"
                   style={{ padding: "8px", fontSize: "0.82rem" }}
-                   onClick={() => {
-                    console.log("click carrito", p.nombre); // temporal
-                    onAgregarAlCarrito(p);
-                  }}
+                   onClick={() => onAgregarAlCarrito(p)}
                   disabled={agregando || p.stock === 0}
                 >
                   {p.stock === 0 ? "Agotado" : yaAgregado ? "✓ Agregado" : "+ Carrito"}

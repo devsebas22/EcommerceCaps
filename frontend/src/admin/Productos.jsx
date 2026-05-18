@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Table, Button, Modal, Form, Alert, Row, Col } from "react-bootstrap";
+import ConfirmModal from "../components/ConfirmModal";
 
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = import.meta.env.VITE_API_URL;
 const FORM0 = { nombre: "", descripcion: "", precio: "", marca: "", stock: "", imagen_url: "", categoria_id: "" };
 
 export default function AdminProductos() {
@@ -11,6 +12,7 @@ export default function AdminProductos() {
   const [editando, setEditando]     = useState(null);
   const [form, setForm]             = useState(FORM0);
   const [mensaje, setMensaje]       = useState(null);
+  const [confirmData, setConfirmData] = useState(null);
 
   useEffect(() => { cargar(); }, []);
 
@@ -42,9 +44,11 @@ export default function AdminProductos() {
     else        { const err = await res.json(); flash("danger", err.detail ?? "Error al guardar"); }
   };
 
-  const eliminar = async (id, nombre) => {
-    if (!confirm(`¿Eliminar "${nombre}"? Esta acción no se puede deshacer.`)) return;
-    await fetch(`${API_BASE}/productos/${id}`, { method: "DELETE" });
+  const eliminar = (id, nombre) => setConfirmData({ id, nombre });
+
+  const confirmarEliminar = async () => {
+    await fetch(`${API_BASE}/productos/${confirmData.id}`, { method: "DELETE" });
+    setConfirmData(null);
     flash("success", "Producto eliminado");
     cargar();
   };
@@ -180,24 +184,13 @@ export default function AdminProductos() {
         </Modal.Body>
       </Modal>
 
-      <style>{`
-        .modal-admin-c {
-          background: var(--bg-3) !important;
-          border: 1px solid rgba(255,255,255,.12) !important;
-          border-radius: 22px !important;
-          overflow: hidden !important;
-          box-shadow: 0 20px 60px rgba(0,0,0,.70) !important;
-        }
-        .modal-admin .modal-header {
-          background: var(--bg-4) !important;
-          border-bottom: 1px solid rgba(255,255,255,.07) !important;
-          padding: 18px 24px !important;
-        }
-        .modal-admin .modal-title { color: var(--t1) !important; font-weight: 700 !important; font-size: .95rem !important; }
-        .modal-admin .modal-body  { background: var(--bg-3) !important; padding: 24px !important; }
-        .modal-admin .btn-close   { filter: invert(1) opacity(.4) !important; }
-        .modal-admin .btn-close:hover { filter: invert(1) opacity(.85) !important; }
-      `}</style>
+      <ConfirmModal
+        show={!!confirmData}
+        titulo="Eliminar Producto"
+        mensaje={`¿Eliminar "${confirmData?.nombre}"? Esta acción no se puede deshacer.`}
+        onConfirmar={confirmarEliminar}
+        onCancelar={() => setConfirmData(null)}
+      />
     </div>
   );
 }

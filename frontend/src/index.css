@@ -287,6 +287,14 @@ body {
   transition: opacity .2s;
 }
 .modal-admin .btn-close:hover { filter: invert(1) opacity(.85) !important; }
+.modal-admin .modal-footer {
+  background: var(--bg-4) !important;
+  border-top: 1px solid var(--border) !important;
+  padding: 14px 20px !important;
+  display: flex !important;
+  gap: 8px !important;
+  justify-content: flex-end !important;
+}
 
 /* ══════════════════════════════════
    TABLA ADMIN

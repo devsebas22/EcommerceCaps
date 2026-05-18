@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Form, Button } from "react-bootstrap";
 
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = import.meta.env.VITE_API_URL;
 const FORM_VACIO = { nombre: "", descripcion: "", precio: "", marca: "", stock: "", categoria_id: "", archivo: null };
 
 export default function AdminProductForm({ show, onHide, productoEditando, onSuccess }) {
