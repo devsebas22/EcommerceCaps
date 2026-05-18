@@ -43,11 +43,15 @@ const iconos = {
   ),
 };
 
-export default function Perfil({ usuario, onLogout }) {
+export default function Perfil({ usuario, onLogout, onUsuarioActualizado }) {
   const navigate = useNavigate();
   const [perfil, setPerfil] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
+  const [editando, setEditando] = useState(false);
+  const [formEdit, setFormEdit] = useState({ telefono: "", direccion: "" });
+  const [guardando, setGuardando] = useState(false);
+  const [mensajeEdit, setMensajeEdit] = useState(null);
 
   useEffect(() => {
     if (!usuario) { navigate("/login"); return; }
@@ -91,6 +95,39 @@ export default function Perfil({ usuario, onLogout }) {
     { label: "Teléfono", value: perfil.telefono, icon: iconos.phone, pendiente: !perfil.telefono },
     { label: "Dirección", value: perfil.direccion, icon: iconos.location, pendiente: !perfil.direccion },
   ];
+  const abrirEdicion = () => {
+  setFormEdit({ telefono: perfil.telefono || "", direccion: perfil.direccion || "" });
+  setEditando(true);
+};
+
+const guardarEdicion = async () => {
+  setGuardando(true);
+  const res = await fetch(`${API_BASE}/usuarios/${perfil.id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      nombre: perfil.nombre,
+      email: perfil.email,
+      direccion: formEdit.direccion,
+      telefono: formEdit.telefono,
+    }),
+  });
+  if (res.ok) {
+    const data = await res.json();
+    setPerfil(data);
+    // Sincronizar estado global y localStorage con los campos editables
+    const actualizado = { ...usuario, direccion: data.direccion, telefono: data.telefono };
+    localStorage.setItem("usuario", JSON.stringify(actualizado));
+    onUsuarioActualizado?.(actualizado);
+    setEditando(false);
+    setMensajeEdit({ tipo: "ok", texto: "Perfil actualizado correctamente" });
+    setTimeout(() => setMensajeEdit(null), 3000);
+  } else {
+    setMensajeEdit({ tipo: "err", texto: "Error al actualizar perfil" });
+    setTimeout(() => setMensajeEdit(null), 3000);
+  }
+  setGuardando(false);
+};
 
   return (
     <div className="auth-page">
@@ -141,8 +178,11 @@ export default function Perfil({ usuario, onLogout }) {
               <h5 style={{ color: "var(--t1)", fontWeight: 700, margin: "0 0 4px", fontSize: "1.1rem" }}>
                 {perfil.nombre}
               </h5>
-              <p style={{ color: "var(--t2)", fontSize: "0.84rem", margin: 0 }}>
+              <p style={{ color: "var(--t2)", fontSize: "0.84rem", margin: "0 0 2px" }}>
                 {perfil.email}
+              </p>
+              <p style={{ color: "var(--t3)", fontSize: "0.75rem", margin: 0, letterSpacing: "0.5px" }}>
+                ID: #{perfil.id}
               </p>
             </div>
           </div>
@@ -193,6 +233,95 @@ export default function Perfil({ usuario, onLogout }) {
               </div>
             </div>
           ))}
+
+          {/* Toast de confirmación */}
+          {mensajeEdit && (
+            <div style={{
+              marginTop: "16px",
+              padding: "10px 16px",
+              borderRadius: "var(--r2)",
+              background: mensajeEdit.tipo === "ok" ? "rgba(52,211,153,.07)" : "rgba(248,113,113,.07)",
+              border: `1px solid ${mensajeEdit.tipo === "ok" ? "rgba(52,211,153,.22)" : "rgba(248,113,113,.22)"}`,
+              color: mensajeEdit.tipo === "ok" ? "#34d399" : "#f87171",
+              fontSize: "0.84rem",
+              textAlign: "center",
+            }}>
+              {mensajeEdit.texto}
+            </div>
+          )}
+
+          {/* Botón editar / Formulario inline */}
+          {!editando ? (
+            <button
+              onClick={abrirEdicion}
+              style={{
+                marginTop: "20px",
+                background: "none",
+                border: "1px solid var(--border-md)",
+                color: "var(--t2)",
+                borderRadius: "var(--r2)",
+                padding: "9px 18px",
+                fontSize: "0.83rem",
+                cursor: "pointer",
+                fontFamily: "inherit",
+                width: "100%",
+                transition: "all .18s var(--ease)",
+              }}
+            >
+              ✏️ Editar contacto
+            </button>
+          ) : (
+            <div style={{ marginTop: "20px" }}>
+              <div style={{ marginBottom: "14px" }}>
+                <label className="label-theme" style={{ fontSize: "0.7rem" }}>Teléfono</label>
+                <input
+                  className="input-theme"
+                  type="tel"
+                  value={formEdit.telefono}
+                  onChange={(e) => setFormEdit(f => ({ ...f, telefono: e.target.value }))}
+                  placeholder="Ej: +57 300 000 0000"
+                  style={{ width: "100%", marginTop: "6px" }}
+                />
+              </div>
+              <div style={{ marginBottom: "18px" }}>
+                <label className="label-theme" style={{ fontSize: "0.7rem" }}>Dirección</label>
+                <input
+                  className="input-theme"
+                  type="text"
+                  value={formEdit.direccion}
+                  onChange={(e) => setFormEdit(f => ({ ...f, direccion: e.target.value }))}
+                  placeholder="Calle 123, Ciudad"
+                  style={{ width: "100%", marginTop: "6px" }}
+                />
+              </div>
+              <div style={{ display: "flex", gap: "10px" }}>
+                <Button
+                  className="btn-theme-primary"
+                  style={{ flex: 1, padding: "9px" }}
+                  onClick={guardarEdicion}
+                  disabled={guardando}
+                >
+                  {guardando ? "Guardando…" : "Guardar"}
+                </Button>
+                <button
+                  onClick={() => setEditando(false)}
+                  style={{
+                    flex: "0 0 auto",
+                    background: "none",
+                    border: "1px solid var(--border-md)",
+                    color: "var(--t2)",
+                    borderRadius: "var(--r2)",
+                    padding: "9px 16px",
+                    cursor: "pointer",
+                    fontFamily: "inherit",
+                    fontSize: "0.83rem",
+                  }}
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* ── Tarjeta de Puntos de Fidelidad ── */}

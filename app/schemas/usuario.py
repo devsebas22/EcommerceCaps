@@ -31,3 +31,9 @@ class LoginResponse(BaseModel):
     es_admin: bool
     puntos_fidelidad: int = 0
     mensaje: str
+
+class UsuarioUpdate(BaseModel):
+    nombre: str
+    email: EmailStr
+    direccion: str | None = None
+    telefono: str | None = None

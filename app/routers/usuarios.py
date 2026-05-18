@@ -5,7 +5,7 @@ from app.models.usuario import Usuario
 from app.models.carrito import Carrito, CarritoItem
 from app.models.pedido import Pedido, PedidoItem
 from app.models.producto import Producto
-from app.schemas.usuario import UsuarioCreate, UsuarioResponse, LoginRequest, LoginResponse
+from app.schemas.usuario import UsuarioCreate, UsuarioResponse, UsuarioUpdate, LoginRequest, LoginResponse
 from passlib.context import CryptContext
 
 router = APIRouter(
@@ -43,18 +43,18 @@ def obtener_usuario(id: int, db: Session = Depends(get_db)):
     return usuario
 
 @router.put("/{id}", response_model=UsuarioResponse)
-def actualizar_usuario(id: int, datos: UsuarioCreate, db: Session = Depends(get_db)):
+def actualizar_usuario(id: int, datos: UsuarioUpdate, db: Session = Depends(get_db)):
     usuario = db.query(Usuario).filter(Usuario.id == id).first()
     if not usuario:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     usuario.nombre = datos.nombre
     usuario.email = datos.email
-    usuario.password = hashear_password(datos.password)
     usuario.direccion = datos.direccion
     usuario.telefono = datos.telefono
     db.commit()
     db.refresh(usuario)
     return usuario
+
 @router.delete("/{id}")
 def eliminar_usuario(id: int, admin_id: int, db: Session = Depends(get_db)):
     admin = db.query(Usuario).filter(Usuario.id == admin_id).first()

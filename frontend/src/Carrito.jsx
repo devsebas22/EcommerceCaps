@@ -77,6 +77,19 @@ function Checkout({ usuario, total, onClose, onSuccess }) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ estado: "pagado" }),
           }).then(() => {
+            // Si la dirección ingresada es nueva, guardarla en el perfil
+            if (direccion.trim() && direccion.trim() !== (usuario.direccion || "").trim()) {
+              fetch(`${API_BASE}/usuarios/${usuario.id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  nombre: usuario.nombre,
+                  email: usuario.email,
+                  direccion: direccion.trim(),
+                  telefono: usuario.telefono || "",
+                }),
+              });
+            }
             setExitoso(true);
             setTimeout(onSuccess, 2800);
           });

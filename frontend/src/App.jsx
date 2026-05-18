@@ -31,6 +31,11 @@ export default function App() {
     setCarritoOpen(false);
   };
 
+  const handleUsuarioActualizado = (data) => {
+    localStorage.setItem("usuario", JSON.stringify(data));
+    setUsuario(data);
+  };
+
   return (
     <Router>
       <Routes>
@@ -132,7 +137,7 @@ export default function App() {
                 />
                 <Route path="/login"    element={<Login onLogin={handleLogin} />} />
                 <Route path="/registro" element={<Registro />} />
-                <Route path="/perfil"   element={<Perfil usuario={usuario} onLogout={handleLogout} />} />
+                <Route path="/perfil"   element={<Perfil usuario={usuario} onLogout={handleLogout} onUsuarioActualizado={handleUsuarioActualizado} />} />
                 <Route path="/mis-pedidos" element={<MisPedidos usuario={usuario} />} />
               </Routes>
 
