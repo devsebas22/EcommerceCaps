@@ -58,11 +58,16 @@ export default function Categorias() {
   const eliminar = (id, nombre) => setConfirmData({ id, nombre });
 
   const confirmarEliminar = async () => {
-    await fetch(`${API_BASE}/categorias/${confirmData.id}`, { method: "DELETE" });
+    const res = await fetch(`${API_BASE}/categorias/${confirmData.id}`, { method: "DELETE" });
     setConfirmData(null);
-    setMensaje({ tipo: "ok", texto: "Categoría eliminada" });
-    setTimeout(() => setMensaje(null), 3000);
-    cargarCategorias();
+    if (res.ok) {
+      setMensaje({ tipo: "ok", texto: "Categoría eliminada" });
+      cargarCategorias();
+    } else {
+      const err = await res.json();
+      setMensaje({ tipo: "err", texto: err.detail || "No se puede eliminar la categoría" });
+    }
+    setTimeout(() => setMensaje(null), 4000);
   };
 
   const ordenar = (campo) => {
@@ -132,7 +137,7 @@ const categoriasOrdenadas = [...categorias].sort((a, b) => {
       <ConfirmModal
         show={!!confirmData}
         titulo="Eliminar Categoría"
-        mensaje={`¿Eliminar "${confirmData?.nombre}"? Los productos asociados quedarán sin categoría.`}
+        mensaje={`¿Eliminar "${confirmData?.nombre}"? Esta acción no se puede deshacer.`}
         onConfirmar={confirmarEliminar}
         onCancelar={() => setConfirmData(null)}
       />

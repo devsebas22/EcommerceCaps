@@ -13,6 +13,7 @@ import { useCarritoCount } from "./hooks/useCarrito";
 export default function App() {
   const [usuario, setUsuario] = useState(null);
   const [carritoOpen, setCarritoOpen] = useState(false);
+  const [productosKey, setProductosKey] = useState(0);
   const { carritoCount, fetchCarritoCount } = useCarritoCount(usuario);
 
   useEffect(() => {
@@ -131,7 +132,7 @@ export default function App() {
                   path="/"
                   element={
                     <Container className="py-5">
-                      <Catalogo usuario={usuario} onCarritoChange={fetchCarritoCount} />
+                      <Catalogo usuario={usuario} onCarritoChange={fetchCarritoCount} reloadTrigger={productosKey} />
                     </Container>
                   }
                 />
@@ -147,6 +148,8 @@ export default function App() {
                 onClose={() => setCarritoOpen(false)}
                 usuario={usuario}
                 onChange={fetchCarritoCount}
+                onUsuarioActualizado={handleUsuarioActualizado}
+                onProductosChange={() => setProductosKey((k) => k + 1)}
               />
             </>
           }

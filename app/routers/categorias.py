@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.categoria import Categoria
+from app.models.producto import Producto
 from app.schemas.categoria import CategoriaCreate, CategoriaResponse
 
 router = APIRouter(
@@ -34,6 +35,12 @@ def eliminar_categoria(id: int, db: Session = Depends(get_db)):
     categoria = db.query(Categoria).filter(Categoria.id == id).first()
     if not categoria:
         raise HTTPException(status_code=404, detail="Categoría no encontrada")
+    productos_count = db.query(Producto).filter(Producto.categoria_id == id).count()
+    if productos_count > 0:
+        raise HTTPException(
+            status_code=400,
+            detail="No se puede eliminar la categoría porque tiene productos asociados"
+        )
     db.delete(categoria)
     db.commit()
     return {"mensaje": "Categoría eliminada correctamente"}

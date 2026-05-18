@@ -10,7 +10,7 @@ import FiltroProductos from "../components/FiltroProductos";
 
 const API_BASE = import.meta.env.VITE_API_URL;
 
-export default function Catalogo({ usuario, onCarritoChange, esAdmin = false }) {
+export default function Catalogo({ usuario, onCarritoChange, esAdmin = false, reloadTrigger = 0 }) {
   const [productos, setProductos] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
@@ -45,6 +45,14 @@ export default function Catalogo({ usuario, onCarritoChange, esAdmin = false }) 
       .finally(() => ok && setCargando(false));
     return () => (ok = false);
   }, []);
+
+  useEffect(() => {
+    if (reloadTrigger === 0) return;
+    fetch(`${API_BASE}/productos/`)
+      .then((r) => r.json())
+      .then(setProductos)
+      .catch(() => {});
+  }, [reloadTrigger]);
 
   const agregarAlCarrito = async (producto) => {
     if (!usuario) { navigate("/login"); return; }

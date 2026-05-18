@@ -19,7 +19,7 @@ const calcularFirma = async (reference, amountInCents) => {
 };
 
 /* ─── Checkout ─── */
-function Checkout({ usuario, total, items, onClose, onSuccess }) {
+function Checkout({ usuario, total, items, onClose, onSuccess, onUsuarioActualizado }) {
   const [direccion, setDireccion] = useState(usuario.direccion || "");
   const [cargando, setCargando] = useState(false);
   const [exitoso, setExitoso] = useState(false);
@@ -88,6 +88,10 @@ function Checkout({ usuario, total, items, onClose, onSuccess }) {
                   direccion: direccion.trim(),
                   telefono: usuario.telefono || "",
                 }),
+              }).then(() => {
+                const actualizado = { ...usuario, direccion: direccion.trim() };
+                localStorage.setItem("usuario", JSON.stringify(actualizado));
+                onUsuarioActualizado?.(actualizado);
               });
             }
             setExitoso(true);
@@ -203,7 +207,7 @@ function Checkout({ usuario, total, items, onClose, onSuccess }) {
 }
 
 /* ─── Drawer del carrito ─── */
-export default function CarritoDrawer({ open, onClose, usuario, onChange }) {
+export default function CarritoDrawer({ open, onClose, usuario, onChange, onUsuarioActualizado, onProductosChange }) {
   const [carrito, setCarrito] = useState(null);
   const [cargando, setCargando] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
@@ -324,12 +328,14 @@ export default function CarritoDrawer({ open, onClose, usuario, onChange }) {
           usuario={usuario}
           total={total}
           items={items}
+          onUsuarioActualizado={onUsuarioActualizado}
           onClose={() => setCheckoutOpen(false)}
           onSuccess={() => {
             setCheckoutOpen(false);
             setCarrito(null);
             fetchCarrito();
             onChange();
+            onProductosChange?.();
             onClose();
           }}
         />
