@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Table, Spinner } from "react-bootstrap";
+import Toast from "../components/Toast";
 
 const API_BASE = import.meta.env.VITE_API_URL;
 
@@ -33,14 +34,23 @@ export default function Pedidos() {
   const [pedidos, setPedidos] = useState([]);
   const [cargando, setCargando] = useState(false);
   const [orden, setOrden] = useState({ campo: "id", dir: "asc" });
+  const [mensaje, setMensaje] = useState(null);
+
+  const flash = (tipo, texto) => { setMensaje({ tipo, texto }); setTimeout(() => setMensaje(null), 4000); };
 
   useEffect(() => { cargarPedidos(); }, []);
 
   const cargarPedidos = async () => {
     setCargando(true);
-    const res = await fetch(`${API_BASE}/pedidos/todos/`);
-    setPedidos(await res.json());
-    setCargando(false);
+    try {
+      const res = await fetch(`${API_BASE}/pedidos/todos/`);
+      if (!res.ok) throw new Error(`Error ${res.status}`);
+      setPedidos(await res.json());
+    } catch {
+      flash("err", "Error al cargar pedidos");
+    } finally {
+      setCargando(false);
+    }
   };
 
   const ordenar = (campo) => {
@@ -58,15 +68,21 @@ export default function Pedidos() {
   });
 
   const actualizarEstado = async (pedidoId, estado) => {
-    await fetch(`${API_BASE}/pedidos/${pedidoId}/estado`, {
+    const res = await fetch(`${API_BASE}/pedidos/${pedidoId}/estado`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ estado }),
     });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      flash("err", err.detail || "Error al actualizar el estado");
+    }
     cargarPedidos();
   };
 
   return (
+    <div>
+    <Toast mensaje={mensaje} />
     <div style={{ background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: "var(--r3)", overflow: "hidden" }}>
       <Table className="table-admin" responsive>
         <thead>
@@ -108,6 +124,7 @@ export default function Pedidos() {
           ))}
         </tbody>
       </Table>
+    </div>
     </div>
   );
 }

@@ -72,14 +72,14 @@ function Checkout({ usuario, total, items, onClose, onSuccess, onUsuarioActualiz
         procesando.current = false;
         setOculto(false);
         if (result.transaction.status === "APPROVED") {
-          fetch(`${API_BASE}/pedidos/${pedido.id}/estado`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ estado: "pagado" }),
-          }).then(() => {
-            // Si la dirección ingresada es nueva, guardarla en el perfil
+          (async () => {
+            await fetch(`${API_BASE}/pedidos/${pedido.id}/estado`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ estado: "pagado" }),
+            });
             if (direccion.trim() && direccion.trim() !== (usuario.direccion || "").trim()) {
-              fetch(`${API_BASE}/usuarios/${usuario.id}`, {
+              await fetch(`${API_BASE}/usuarios/${usuario.id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -88,15 +88,15 @@ function Checkout({ usuario, total, items, onClose, onSuccess, onUsuarioActualiz
                   direccion: direccion.trim(),
                   telefono: usuario.telefono || "",
                 }),
-              }).then(() => {
-                const actualizado = { ...usuario, direccion: direccion.trim() };
-                localStorage.setItem("usuario", JSON.stringify(actualizado));
-                onUsuarioActualizado?.(actualizado);
               });
             }
+            const res = await fetch(`${API_BASE}/usuarios/${usuario.id}`);
+            const actualizado = await res.json();
+            localStorage.setItem("usuario", JSON.stringify(actualizado));
+            onUsuarioActualizado?.(actualizado);
             setExitoso(true);
             setTimeout(onSuccess, 2800);
-          });
+          })();
         } else {
           setError("El pago no fue aprobado. Intenta de nuevo.");
         }

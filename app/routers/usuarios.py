@@ -76,9 +76,11 @@ def eliminar_usuario(id: int, admin_id: int, db: Session = Depends(get_db)):
     return {"mensaje": "Usuario eliminado correctamente"}
 
 @router.get("/", response_model=list[UsuarioResponse])
-def obtener_usuarios(db: Session = Depends(get_db)):
-    usuarios = db.query(Usuario).all()
-    return usuarios
+def obtener_usuarios(admin_id: int, db: Session = Depends(get_db)):
+    admin = db.query(Usuario).filter(Usuario.id == admin_id).first()
+    if not admin or not admin.es_admin:
+        raise HTTPException(status_code=403, detail="Se requieren permisos de administrador")
+    return db.query(Usuario).all()
 
 @router.post("/login", response_model=LoginResponse)
 def login(datos: LoginRequest, db: Session = Depends(get_db)):

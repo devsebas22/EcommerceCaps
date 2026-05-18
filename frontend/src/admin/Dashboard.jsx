@@ -16,8 +16,11 @@ export default function Dashboard({ admin, onLogout }) {
   }, []);
 
   const cargarStats = async () => {
-    const res = await fetch(`${API_BASE}/stats/`);
-    setStats(await res.json());
+    try {
+      const res = await fetch(`${API_BASE}/stats/`);
+      if (!res.ok) return;
+      setStats(await res.json());
+    } catch {}
   };
 
   return (

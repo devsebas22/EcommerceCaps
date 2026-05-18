@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Float, String, ForeignKey, Enum
+from sqlalchemy import Column, Integer, Numeric, String, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 from app.database import Base
 import enum
@@ -15,7 +15,7 @@ class Pedido(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     usuario_id = Column(Integer, ForeignKey("usuarios.id"), nullable=False)
-    total = Column(Float, nullable=False)
+    total = Column(Numeric(10, 2), nullable=False)
     estado = Column(Enum(EstadoPedido), default=EstadoPedido.pendiente)
     direccion_envio = Column(String, nullable=False)
 
@@ -33,7 +33,7 @@ class PedidoItem(Base):
     pedido_id = Column(Integer, ForeignKey("pedidos.id"), nullable=False)
     producto_id = Column(Integer, ForeignKey("productos.id"), nullable=False)
     cantidad = Column(Integer, nullable=False)
-    precio_unitario = Column(Float, nullable=False)
+    precio_unitario = Column(Numeric(10, 2), nullable=False)
 
     pedido = relationship("Pedido", back_populates="items")
     producto = relationship("Producto")

@@ -153,13 +153,10 @@ export default function MisPedidos({ usuario }) {
                                 background: "var(--bg-4)", overflow: "hidden", flexShrink: 0,
                               }}
                             >
-                              {item.producto?.imagen_url && (
-                                <img
-                                  src={item.producto.imagen_url}
-                                  alt={item.producto.nombre}
-                                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                                />
-                              )}
+                              {(() => {
+                                const img = item.producto?.imagenes?.find(i => i.es_principal)?.url ?? item.producto?.imagenes?.[0]?.url;
+                                return img ? <img src={img} alt={item.producto.nombre} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : null;
+                              })()}
                             </div>
                             <div style={{ flex: 1 }}>
                               <span style={{ color: "var(--t1)", fontSize: "0.88rem", fontWeight: 600 }}>

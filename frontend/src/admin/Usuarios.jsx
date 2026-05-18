@@ -20,7 +20,7 @@ export default function Usuarios({ admin }) {
 
   const cargarUsuarios = async () => {
     setCargando(true);
-    const res = await fetch(`${API_BASE}/usuarios/`);
+    const res = await fetch(`${API_BASE}/usuarios/?admin_id=${admin.id}`);
     setUsuarios(await res.json());
     setCargando(false);
   };

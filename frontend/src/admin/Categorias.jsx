@@ -106,7 +106,17 @@ const categoriasOrdenadas = [...categorias].sort((a, b) => {
 
       <div style={{ background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: "var(--r3)", overflow: "hidden" }}>
         <Table className="table-admin" responsive>
-            <tbody>
+          <thead>
+            <tr>
+              {[["id", "ID"], ["nombre", "Nombre"], ["descripcion", "Descripción"]].map(([campo, label]) => (
+                <th key={campo} onClick={() => ordenar(campo)} style={{ cursor: "pointer", userSelect: "none" }}>
+                  {label} {orden.campo === campo ? (orden.dir === "asc" ? "↑" : "↓") : "↕"}
+                </th>
+              ))}
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
             {cargando ? (
               <tr><td colSpan={4} className="text-center py-4"><Spinner animation="grow" style={{ color: "var(--gold)" }} /></td></tr>
             ) : categoriasOrdenadas.map((c) => (
@@ -121,16 +131,6 @@ const categoriasOrdenadas = [...categorias].sort((a, b) => {
               </tr>
             ))}
           </tbody>
-          <thead>
-            <tr>
-                {[["id", "ID"], ["nombre", "Nombre"], ["descripcion", "Descripción"]].map(([campo, label]) => (
-                <th key={campo} onClick={() => ordenar(campo)} style={{ cursor: "pointer", userSelect: "none" }}>
-                    {label} {orden.campo === campo ? (orden.dir === "asc" ? "↑" : "↓") : "↕"}
-                </th>
-                ))}
-                <th>Acciones</th>
-            </tr>
-            </thead>
         </Table>
       </div>
 

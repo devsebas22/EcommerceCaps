@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, Boolean
+from sqlalchemy import Column, Integer, String, Numeric, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from app.database import Base
 
@@ -8,7 +8,7 @@ class Producto(Base):
     id = Column(Integer, primary_key=True, index=True)
     nombre = Column(String, nullable=False)
     descripcion = Column(String)
-    precio = Column(Float, nullable=False)
+    precio = Column(Numeric(10, 2), nullable=False)
     marca = Column(String, nullable=False)
     stock = Column(Integer, default=0)
     imagen_url = Column(String)

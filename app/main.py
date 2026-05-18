@@ -32,3 +32,7 @@ app.include_router(stats.router)
 @app.get("/")
 def root():
     return {"mensaje": "Bienvenido al API de Ecommerce 🛒"}
+
+@app.get("/health")
+def health():
+    return {"status": "ok", "version": "1.0.0"}

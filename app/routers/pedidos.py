@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from app.database import get_db
 from app.models.pedido import Pedido, PedidoItem, EstadoPedido
 from app.models.carrito import Carrito, CarritoItem
@@ -54,12 +54,22 @@ def historial_pedidos(usuario_id: int, db: Session = Depends(get_db)):
     usuario = db.query(Usuario).filter(Usuario.id == usuario_id).first()
     if not usuario:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
-    pedidos = db.query(Pedido).filter(Pedido.usuario_id == usuario_id).all()
+    pedidos = (
+        db.query(Pedido)
+        .filter(Pedido.usuario_id == usuario_id)
+        .options(joinedload(Pedido.items).joinedload(PedidoItem.producto))
+        .all()
+    )
     return pedidos
 
 @router.get("/todos/", response_model=list[PedidoResponse])
 def obtener_todos_pedidos(db: Session = Depends(get_db)):
-    return db.query(Pedido).order_by(Pedido.id).all()
+    return (
+        db.query(Pedido)
+        .order_by(Pedido.id)
+        .options(joinedload(Pedido.items).joinedload(PedidoItem.producto))
+        .all()
+    )
 class ActualizarEstado(BaseModel):
     estado: str
 
@@ -70,7 +80,7 @@ def actualizar_estado(pedido_id: int, datos: ActualizarEstado, db: Session = Dep
         raise HTTPException(status_code=404, detail="Pedido no encontrado")
     estado_anterior = pedido.estado
     usuario = db.query(Usuario).filter(Usuario.id == pedido.usuario_id).first()
-    if datos.estado == "pagado" and estado_anterior != EstadoPedido.pagado:
+    if datos.estado == "pagado" and estado_anterior == EstadoPedido.pendiente:
         for pedido_item in pedido.items:
             producto = db.query(Producto).filter(Producto.id == pedido_item.producto_id).first()
             if producto.stock < pedido_item.cantidad:
