@@ -5,9 +5,10 @@ import { useNavigate } from "react-router-dom";
 const API_BASE = import.meta.env.VITE_API_URL;
 
 const TIERS = [
-  { min: 0,    max: 99,   nombre: "Bronce", color: "#cd7f32", bg: "rgba(205,127,50,0.12)" },
-  { min: 100,  max: 299,  nombre: "Plata",  color: "#a0a0a0", bg: "rgba(160,160,160,0.12)" },
-  { min: 300,  max: Infinity, nombre: "Oro", color: "#d4af5f", bg: "rgba(212,175,95,0.12)" },
+  { min: 0,    max: 100000,   nombre: "Lite", color: "#ffffff", bg: "rgba(205,127,50,0.12)" },
+  { min: 100000,  max: 300000,  nombre: "Neon",  color: "#00d9ff", bg: "rgba(160,160,160,0.12)" },
+  { min: 300000,  max: 1000000,  nombre: "Black",  color: "#000000", bg: "rgba(160,160,160,0.12)" },
+  { min: 1000000,  max: Infinity, nombre: "VIP", color: "#d4af5f", bg: "rgba(212,175,95,0.12)" },
 ];
 
 function calcularTier(puntos) {
