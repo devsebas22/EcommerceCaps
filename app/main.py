@@ -36,6 +36,6 @@ def health():
     return {"status": "ok", "version": "1.0.0"}
 
 # Serve SPA frontend — must be last to avoid hijacking API routes
-static_dir = Path(__file__).parent / "static"
+static_dir = Path(__file__).resolve().parent.parent / "static"
 if static_dir.exists():
     app.mount("/", StaticFiles(directory=str(static_dir), html=True), name="static")
