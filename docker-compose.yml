@@ -10,17 +10,31 @@ services:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ecommerce_user -d ecommerce_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: ecommerce-pgadmin
+  app:
+    build:
+      context: .
+      args:
+        VITE_API_URL: "/api"
+        VITE_IMGBB_KEY: ${VITE_IMGBB_KEY:-}
+        VITE_WOMPI_PUBLIC_KEY: ${VITE_WOMPI_PUBLIC_KEY:-}
+        VITE_WOMPI_INTEGRITY_KEY: ${VITE_WOMPI_INTEGRITY_KEY:-}
+    container_name: ecommerce-app
+    env_file:
+      - .env
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin123
+      DATABASE_URL: postgresql://ecommerce_user:ecommerce123@postgres:5432/ecommerce_db
+      ALLOWED_ORIGINS: http://localhost:5173,http://localhost:8000
     ports:
-      - "5050:80"
+      - "8000:8000"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
 volumes:
   postgres_data:
