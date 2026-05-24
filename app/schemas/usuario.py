@@ -31,6 +31,7 @@ class LoginResponse(BaseModel):
     es_admin: bool
     puntos_fidelidad: int = 0
     mensaje: str
+    access_token: str
 
 class UsuarioUpdate(BaseModel):
     nombre: str

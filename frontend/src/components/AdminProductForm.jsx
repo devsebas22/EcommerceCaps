@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Form, Button } from "react-bootstrap";
+import { authFetch } from "../utils/api";
 
 const API_BASE = import.meta.env.VITE_API_URL;
 const FORM_VACIO = { nombre: "", descripcion: "", precio: "", marca: "", stock: "", categoria_id: "", archivo: null };
@@ -42,7 +43,7 @@ export default function AdminProductForm({ show, onHide, productoEditando, onSuc
       : `${API_BASE}/productos/`;
     const method = productoEditando ? "PUT" : "POST";
 
-    const res = await fetch(url, {
+    const res = await authFetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
@@ -60,7 +61,7 @@ export default function AdminProductForm({ show, onHide, productoEditando, onSuc
         );
         const imgData = await imgRes.json();
         if (imgData.success) {
-          await fetch(`${API_BASE}/imagenes/`, {
+          await authFetch(`${API_BASE}/imagenes/`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ url: imgData.data.url, es_principal: true, producto_id: data.id }),

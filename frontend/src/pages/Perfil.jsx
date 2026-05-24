@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Button, Spinner } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { authFetch } from "../utils/api";
 
 const API_BASE = import.meta.env.VITE_API_URL;
 
 const TIERS = [
-  { min: 0,    max: 100000,   nombre: "Lite", color: "#ffffff", bg: "rgba(205,127,50,0.12)" },
-  { min: 100000,  max: 300000,  nombre: "Neon",  color: "#00d9ff", bg: "rgba(160,160,160,0.12)" },
-  { min: 300000,  max: 1000000,  nombre: "Black",  color: "#000000", bg: "rgba(160,160,160,0.12)" },
-  { min: 1000000,  max: Infinity, nombre: "VIP", color: "#d4af5f", bg: "rgba(212,175,95,0.12)" },
+  { min: 0,       max: 100000,   nombre: "Bronce", color: "#CD7F32", bg: "#FDF5E6", border: "#CD7F32" },
+  { min: 100000,  max: 300000,   nombre: "Plata",  color: "#8E8E93", bg: "#F5F5F7", border: "#8E8E93" },
+  { min: 300000,  max: 1000000,  nombre: "Oro",    color: "#FF9500", bg: "#FFF8EE", border: "#FF9500" },
+  { min: 1000000, max: Infinity, nombre: "VIP",    color: "#E31837", bg: "#FFF1F3", border: "#E31837" },
 ];
 
 function calcularTier(puntos) {
@@ -20,24 +21,24 @@ function calcularTier(puntos) {
 
 const iconos = {
   person: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
       <circle cx="12" cy="7" r="4"/>
     </svg>
   ),
   mail: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <rect x="2" y="4" width="20" height="16" rx="2"/>
       <path d="m22 7-10 7L2 7"/>
     </svg>
   ),
   phone: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
     </svg>
   ),
   location: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
       <circle cx="12" cy="10" r="3"/>
     </svg>
@@ -56,7 +57,7 @@ export default function Perfil({ usuario, onLogout, onUsuarioActualizado }) {
 
   useEffect(() => {
     if (!usuario) { navigate("/login"); return; }
-    fetch(`${API_BASE}/usuarios/${usuario.id}`)
+    authFetch(`${API_BASE}/usuarios/${usuario.id}`)
       .then(r => { if (!r.ok) throw new Error("Error al obtener perfil"); return r.json(); })
       .then(data => { setPerfil(data); setCargando(false); })
       .catch(err => { setError(err.message); setCargando(false); });
@@ -67,7 +68,21 @@ export default function Perfil({ usuario, onLogout, onUsuarioActualizado }) {
   if (cargando) {
     return (
       <div className="auth-page">
-        <Spinner animation="border" variant="warning" />
+        <div style={{ width: "100%", maxWidth: "560px" }}>
+          <div style={{ height: "32px", width: "120px", borderRadius: "8px", margin: "0 auto 40px" }} className="skeleton-shimmer" />
+          <div style={{ background: "#FFFFFF", border: "1px solid var(--border)", borderRadius: "var(--r3)", padding: "32px" }}>
+            <div style={{ display: "flex", gap: "18px", marginBottom: "28px", paddingBottom: "24px", borderBottom: "1px solid var(--border)" }}>
+              <div style={{ width: "64px", height: "64px", borderRadius: "50%", flexShrink: 0 }} className="skeleton-shimmer" />
+              <div style={{ flex: 1 }}>
+                <div style={{ height: "18px", width: "60%", borderRadius: "6px", marginBottom: "8px" }} className="skeleton-shimmer" />
+                <div style={{ height: "14px", width: "80%", borderRadius: "5px" }} className="skeleton-shimmer" />
+              </div>
+            </div>
+            {[1,2,3,4].map(i => (
+              <div key={i} style={{ height: "14px", width: "100%", borderRadius: "5px", marginBottom: "16px" }} className="skeleton-shimmer" />
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -75,7 +90,7 @@ export default function Perfil({ usuario, onLogout, onUsuarioActualizado }) {
   if (error) {
     return (
       <div className="auth-page">
-        <p style={{ color: "var(--err)" }}>{error}</p>
+        <p style={{ color: "#CC2D22" }}>{error}</p>
       </div>
     );
   }
@@ -96,162 +111,128 @@ export default function Perfil({ usuario, onLogout, onUsuarioActualizado }) {
     { label: "Teléfono", value: perfil.telefono, icon: iconos.phone, pendiente: !perfil.telefono },
     { label: "Dirección", value: perfil.direccion, icon: iconos.location, pendiente: !perfil.direccion },
   ];
-  const abrirEdicion = () => {
-  setFormEdit({ telefono: perfil.telefono || "", direccion: perfil.direccion || "" });
-  setEditando(true);
-};
 
-const guardarEdicion = async () => {
-  setGuardando(true);
-  const res = await fetch(`${API_BASE}/usuarios/${perfil.id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      nombre: perfil.nombre,
-      email: perfil.email,
-      direccion: formEdit.direccion,
-      telefono: formEdit.telefono,
-    }),
-  });
-  if (res.ok) {
-    const data = await res.json();
-    setPerfil(data);
-    // Sincronizar estado global y localStorage con los campos editables
-    const actualizado = { ...usuario, direccion: data.direccion, telefono: data.telefono };
-    localStorage.setItem("usuario", JSON.stringify(actualizado));
-    onUsuarioActualizado?.(actualizado);
-    setEditando(false);
-    setMensajeEdit({ tipo: "ok", texto: "Perfil actualizado correctamente" });
-    setTimeout(() => setMensajeEdit(null), 3000);
-  } else {
-    setMensajeEdit({ tipo: "err", texto: "Error al actualizar perfil" });
-    setTimeout(() => setMensajeEdit(null), 3000);
-  }
-  setGuardando(false);
-};
+  const abrirEdicion = () => {
+    setFormEdit({ telefono: perfil.telefono || "", direccion: perfil.direccion || "" });
+    setEditando(true);
+  };
+
+  const guardarEdicion = async () => {
+    setGuardando(true);
+    const res = await authFetch(`${API_BASE}/usuarios/${perfil.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        nombre: perfil.nombre,
+        email: perfil.email,
+        direccion: formEdit.direccion,
+        telefono: formEdit.telefono,
+      }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setPerfil(data);
+      const actualizado = { ...usuario, direccion: data.direccion, telefono: data.telefono };
+      localStorage.setItem("usuario", JSON.stringify(actualizado));
+      onUsuarioActualizado?.(actualizado);
+      setEditando(false);
+      setMensajeEdit({ tipo: "ok", texto: "Perfil actualizado correctamente" });
+      setTimeout(() => setMensajeEdit(null), 3000);
+    } else {
+      setMensajeEdit({ tipo: "err", texto: "Error al actualizar perfil" });
+      setTimeout(() => setMensajeEdit(null), 3000);
+    }
+    setGuardando(false);
+  };
 
   return (
     <div className="auth-page">
       <div style={{ width: "100%", maxWidth: "560px" }}>
         <div className="text-center mb-5">
-          <p className="navbar-brand-theme" style={{ fontSize: "1.1rem", letterSpacing: "2.5px", marginBottom: "8px" }}>
-            ECOMMERCE CAPS
+          <p className="navbar-brand-theme" style={{ fontSize: "1.05rem", letterSpacing: "2px", marginBottom: "10px" }}>
+            CAPSCO
           </p>
-          <h2 className="fw-bold mb-1" style={{ color: "var(--t1)", fontSize: "1.6rem" }}>
+          <h2 style={{ color: "var(--t1)", fontWeight: 700, fontSize: "1.5rem", margin: 0 }}>
             Mi Perfil
           </h2>
         </div>
 
-        {/* ── Tarjeta de información personal ── */}
+        {/* Tarjeta de información */}
         <div style={{
-          background: "var(--bg-2)",
+          background: "#FFFFFF",
           border: "1px solid var(--border)",
           borderRadius: "var(--r3)",
           padding: "32px",
-          boxShadow: "var(--sh-md)",
-          marginBottom: "24px",
+          boxShadow: "var(--sh-sm)",
+          marginBottom: "16px",
         }}>
           {/* Avatar + nombre */}
           <div style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "18px",
-            marginBottom: "28px",
-            paddingBottom: "24px",
+            display: "flex", alignItems: "center", gap: "18px",
+            marginBottom: "28px", paddingBottom: "24px",
             borderBottom: "1px solid var(--border)",
           }}>
             <div style={{
-              width: "64px",
-              height: "64px",
-              borderRadius: "50%",
-              background: "linear-gradient(135deg, var(--gold-dk), var(--gold-lt))",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "1.6rem",
-              color: "#0a0a0a",
-              fontWeight: 800,
-              flexShrink: 0,
+              width: "64px", height: "64px", borderRadius: "50%",
+              background: "var(--bg-1)", border: "1px solid var(--border-md)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: "1.5rem", color: "var(--t1)", fontWeight: 700, flexShrink: 0,
             }}>
               {perfil.nombre.charAt(0).toUpperCase()}
             </div>
             <div>
-              <h5 style={{ color: "var(--t1)", fontWeight: 700, margin: "0 0 4px", fontSize: "1.1rem" }}>
+              <h5 style={{ color: "var(--t1)", fontWeight: 700, margin: "0 0 3px", fontSize: "1.05rem" }}>
                 {perfil.nombre}
               </h5>
-              <p style={{ color: "var(--t2)", fontSize: "0.84rem", margin: "0 0 2px" }}>
-                {perfil.email}
-              </p>
-              <p style={{ color: "var(--t3)", fontSize: "0.75rem", margin: 0, letterSpacing: "0.5px" }}>
-                ID: #{perfil.id}
-              </p>
+              <p style={{ color: "var(--t2)", fontSize: "0.84rem", margin: "0 0 2px" }}>{perfil.email}</p>
+              <p style={{ color: "var(--t3)", fontSize: "0.75rem", margin: 0 }}>#{perfil.id}</p>
             </div>
           </div>
 
-          {/* Campos dinámicos */}
+          {/* Campos */}
           {campos.map(({ label, value, icon, pendiente }) => (
-            <div
-              key={label}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                padding: "14px 0",
-                borderBottom: pendiente ? "1px dashed var(--warn)" : "1px solid var(--border)",
-              }}
-            >
-              <div style={{ flexShrink: 0, width: "20px", display: "flex", justifyContent: "center" }}>
+            <div key={label} style={{
+              display: "flex", alignItems: "center", gap: "12px",
+              padding: "14px 0",
+              borderBottom: pendiente ? "1px dashed #FF9F0A" : "1px solid var(--border)",
+            }}>
+              <div style={{ flexShrink: 0, width: "20px", color: "var(--t3)", display: "flex", justifyContent: "center" }}>
                 {icon}
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <span className="label-theme" style={{ margin: 0, fontSize: "0.7rem" }}>
-                    {label}
-                  </span>
+                  <span className="label-theme" style={{ margin: 0, fontSize: "0.68rem" }}>{label}</span>
                   {pendiente && (
                     <span style={{
-                      fontSize: "0.6rem",
-                      fontWeight: 700,
-                      textTransform: "uppercase",
-                      letterSpacing: "0.5px",
-                      color: "var(--warn)",
-                      background: "rgba(251,191,36,0.1)",
-                      padding: "1px 8px",
-                      borderRadius: "4px",
-                      border: "1px solid rgba(251,191,36,0.2)",
+                      fontSize: "0.6rem", fontWeight: 700, textTransform: "uppercase",
+                      color: "#BF6900", background: "#FFF8EE",
+                      padding: "1px 8px", borderRadius: "4px",
+                      border: "1px solid #FF9F0A",
                     }}>
                       Pendiente
                     </span>
                   )}
                 </div>
-                <span style={{
-                  color: pendiente ? "var(--t3)" : "var(--t1)",
-                  fontSize: "0.9rem",
-                  fontStyle: pendiente ? "italic" : "normal",
-                }}>
+                <span style={{ color: pendiente ? "var(--t3)" : "var(--t1)", fontSize: "0.9rem", fontStyle: pendiente ? "italic" : "normal" }}>
                   {value || (label === "Teléfono" ? "No registrado" : "No registrada")}
                 </span>
               </div>
             </div>
           ))}
 
-          {/* Toast de confirmación */}
           {mensajeEdit && (
             <div style={{
-              marginTop: "16px",
-              padding: "10px 16px",
-              borderRadius: "var(--r2)",
-              background: mensajeEdit.tipo === "ok" ? "rgba(52,211,153,.07)" : "rgba(248,113,113,.07)",
-              border: `1px solid ${mensajeEdit.tipo === "ok" ? "rgba(52,211,153,.22)" : "rgba(248,113,113,.22)"}`,
-              color: mensajeEdit.tipo === "ok" ? "#34d399" : "#f87171",
-              fontSize: "0.84rem",
-              textAlign: "center",
+              marginTop: "16px", padding: "10px 16px", borderRadius: "var(--r2)",
+              background: mensajeEdit.tipo === "ok" ? "#F0FAF4" : "#FFF2F1",
+              border: `1px solid ${mensajeEdit.tipo === "ok" ? "#30D158" : "#FF3B30"}`,
+              color: mensajeEdit.tipo === "ok" ? "#1A7F37" : "#CC2D22",
+              fontSize: "0.84rem", textAlign: "center",
             }}>
               {mensajeEdit.texto}
             </div>
           )}
 
-          {/* Botón editar / Formulario inline */}
+          {/* Editar */}
           {!editando ? (
             <button
               onClick={abrirEdicion}
@@ -261,31 +242,33 @@ const guardarEdicion = async () => {
                 border: "1px solid var(--border-md)",
                 color: "var(--t2)",
                 borderRadius: "var(--r2)",
-                padding: "9px 18px",
-                fontSize: "0.83rem",
+                padding: "10px 18px",
+                fontSize: "0.84rem",
                 cursor: "pointer",
                 fontFamily: "inherit",
                 width: "100%",
-                transition: "all .18s var(--ease)",
+                transition: "border-color .15s, color .15s",
               }}
+              onMouseOver={e => { e.currentTarget.style.color = "#E31837"; e.currentTarget.style.borderColor = "#E31837"; }}
+              onMouseOut={e => { e.currentTarget.style.color = "var(--t2)"; e.currentTarget.style.borderColor = "var(--border-md)"; }}
             >
-              ✏️ Editar contacto
+              Editar contacto
             </button>
           ) : (
             <div style={{ marginTop: "20px" }}>
               <div style={{ marginBottom: "14px" }}>
-                <label className="label-theme" style={{ fontSize: "0.7rem" }}>Teléfono</label>
+                <label className="label-theme" style={{ fontSize: "0.68rem" }}>Teléfono</label>
                 <input
                   className="input-theme"
                   type="tel"
                   value={formEdit.telefono}
                   onChange={(e) => setFormEdit(f => ({ ...f, telefono: e.target.value }))}
-                  placeholder="Ej: +57 300 000 0000"
+                  placeholder="+57 300 000 0000"
                   style={{ width: "100%", marginTop: "6px" }}
                 />
               </div>
               <div style={{ marginBottom: "18px" }}>
-                <label className="label-theme" style={{ fontSize: "0.7rem" }}>Dirección</label>
+                <label className="label-theme" style={{ fontSize: "0.68rem" }}>Dirección</label>
                 <input
                   className="input-theme"
                   type="text"
@@ -298,7 +281,7 @@ const guardarEdicion = async () => {
               <div style={{ display: "flex", gap: "10px" }}>
                 <Button
                   className="btn-theme-primary"
-                  style={{ flex: 1, padding: "9px" }}
+                  style={{ flex: 1, padding: "10px" }}
                   onClick={guardarEdicion}
                   disabled={guardando}
                 >
@@ -312,10 +295,10 @@ const guardarEdicion = async () => {
                     border: "1px solid var(--border-md)",
                     color: "var(--t2)",
                     borderRadius: "var(--r2)",
-                    padding: "9px 16px",
+                    padding: "10px 16px",
                     cursor: "pointer",
                     fontFamily: "inherit",
-                    fontSize: "0.83rem",
+                    fontSize: "0.84rem",
                   }}
                 >
                   Cancelar
@@ -325,44 +308,34 @@ const guardarEdicion = async () => {
           )}
         </div>
 
-        {/* ── Tarjeta de Puntos de Fidelidad ── */}
+        {/* Tarjeta puntos de fidelidad */}
         <div style={{
-          background: "linear-gradient(135deg, rgba(52,211,153,0.04), rgba(52,211,153,0.01))",
-          border: "1px solid rgba(52,211,153,0.25)",
+          background: "#FFFFFF",
+          border: "1px solid var(--border)",
           borderRadius: "var(--r3)",
           padding: "32px",
-          boxShadow: "0 0 30px rgba(52,211,153,0.06), var(--sh-md)",
-          marginBottom: "24px",
+          boxShadow: "var(--sh-sm)",
+          marginBottom: "16px",
         }}>
-          <div style={{ textAlign: "center", marginBottom: "24px" }}>
-            <span className="label-theme" style={{ fontSize: "0.7rem", marginBottom: "12px" }}>
-              Puntos de Fidelidad
+          <div style={{ textAlign: "center", marginBottom: "20px" }}>
+            <span className="label-theme" style={{ fontSize: "0.68rem", display: "block", marginBottom: "12px" }}>
+              Puntos de fidelidad
             </span>
-            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "center", gap: "4px" }}>
-              <span style={{
-                fontSize: "3rem",
-                fontWeight: 800,
-                background: "linear-gradient(135deg, #34d399, #059669)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-                lineHeight: 1.1,
-              }}>
-                {perfil.puntos_fidelidad}
-              </span>
-              <span style={{ color: "var(--t2)", fontSize: "0.85rem", fontWeight: 600 }}>pts</span>
-            </div>
+            <span style={{ fontSize: "3rem", fontWeight: 800, color: "#34C759", lineHeight: 1 }}>
+              {perfil.puntos_fidelidad}
+            </span>
+            <span style={{ color: "var(--t2)", fontSize: "0.85rem", fontWeight: 600, marginLeft: "4px" }}>pts</span>
           </div>
 
-          {/* Badge de Tier */}
+          {/* Tier badge */}
           <div style={{ textAlign: "center", marginBottom: "20px" }}>
             <span style={{
               display: "inline-block",
               background: tier.bg,
               color: tier.color,
-              border: `1px solid ${tier.color}33`,
+              border: `1px solid ${tier.border}`,
               borderRadius: "20px",
-              fontSize: "0.75rem",
+              fontSize: "0.72rem",
               fontWeight: 700,
               letterSpacing: "0.6px",
               padding: "4px 16px",
@@ -375,44 +348,43 @@ const guardarEdicion = async () => {
           {/* Barra de progreso */}
           {siguienteTier ? (
             <>
-              <div style={{
-                width: "100%",
-                height: "8px",
-                background: "var(--bg-4)",
-                borderRadius: "4px",
-                overflow: "hidden",
-                marginBottom: "10px",
-              }}>
+              <div style={{ width: "100%", height: "6px", background: "var(--bg-1)", borderRadius: "3px", overflow: "hidden", marginBottom: "10px" }}>
                 <div style={{
-                  width: `${progreso}%`,
-                  height: "100%",
-                  background: "linear-gradient(90deg, #34d399, #059669)",
-                  borderRadius: "4px",
-                  transition: "width 0.6s ease",
+                  width: `${progreso}%`, height: "100%",
+                  background: tier.color, borderRadius: "3px",
+                  transition: "width .6s ease",
                 }} />
               </div>
               <p style={{ color: "var(--t2)", fontSize: "0.8rem", textAlign: "center", margin: 0 }}>
-                Te faltan{" "}
-                <strong style={{ color: "var(--t1)" }}>{puntosFaltantes}</strong> pts para llegar a{" "}
-                <strong style={{ color: tier.color }}>{siguienteTier.nombre}</strong>
+                Te faltan <strong style={{ color: "var(--t1)" }}>{puntosFaltantes}</strong> pts para alcanzar{" "}
+                <strong style={{ color: siguienteTier.color }}>{siguienteTier.nombre}</strong>
               </p>
             </>
           ) : (
-            <p style={{ color: "var(--ok)", fontSize: "0.85rem", textAlign: "center", margin: 0, fontWeight: 600 }}>
-              ¡Has alcanzado el nivel más alto!
+            <p style={{ color: "#1A7F37", fontSize: "0.85rem", textAlign: "center", margin: 0, fontWeight: 600 }}>
+              Has alcanzado el nivel más alto
             </p>
           )}
         </div>
 
-        {/* ── Botón Cerrar Sesión ── */}
-        <Button
-          variant="outline-danger"
-          className="w-100"
-          style={{ borderRadius: "var(--r2)", padding: "12px" }}
+        {/* Cerrar sesión */}
+        <button
           onClick={onLogout}
+          style={{
+            width: "100%",
+            background: "none",
+            border: "1px solid var(--border-md)",
+            color: "#CC2D22",
+            borderRadius: "var(--r2)",
+            padding: "13px",
+            fontSize: "0.88rem",
+            fontWeight: 600,
+            cursor: "pointer",
+            fontFamily: "inherit",
+          }}
         >
-          Cerrar Sesión
-        </Button>
+          Cerrar sesión
+        </button>
       </div>
     </div>
   );

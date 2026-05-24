@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Modal, Button } from "react-bootstrap";
+import { Modal } from "react-bootstrap";
 import Lightbox from "yet-another-react-lightbox";
 import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import "yet-another-react-lightbox/styles.css";
@@ -20,61 +20,106 @@ export default function ProductModal({ producto, esAdmin, onClose, onAgregarAlCa
       <Modal show={!!producto} onHide={onClose} centered size="lg" contentClassName="modal-product-c" className="modal-product">
         <Modal.Body>
           {selImg && (
-            <div style={{ height: "220px", overflow: "hidden" }} onClick={() => setLightboxOpen(true)}>
+            <div
+              style={{ height: "240px", overflow: "hidden", cursor: "zoom-in", background: "var(--bg-1)" }}
+              onClick={() => setLightboxOpen(true)}
+            >
               <img
                 src={selImg}
                 alt={producto.nombre}
-                style={{ width: "100%", height: "100%", objectFit: "contain", background: "var(--bg-1)", display: "block" }}
+                style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
               />
             </div>
           )}
-          <div style={{ padding: "26px 28px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "12px" }}>
+
+          <div style={{ padding: "28px 32px" }}>
+            {/* Header */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "16px", marginBottom: "20px" }}>
               <div>
-                <span className="badge-cat">{producto.categoria?.nombre}</span>
-                <h4 style={{ color: "var(--t1)", fontWeight: 800, margin: "10px 0 2px", fontSize: "1.2rem" }}>{producto.nombre}</h4>
-                {producto.marca && <p style={{ color: "var(--t2)", fontSize: "0.84rem", margin: 0 }}>{producto.marca}</p>}
+                <span style={{ color: "var(--t2)", fontSize: "0.72rem", textTransform: "uppercase", letterSpacing: "0.5px", fontWeight: 500 }}>
+                  {producto.categoria?.nombre}
+                </span>
+                <h4 style={{ color: "var(--t1)", fontWeight: 800, margin: "6px 0 4px", fontSize: "1.25rem" }}>
+                  {producto.nombre}
+                </h4>
+                {producto.marca && (
+                  <p style={{ color: "var(--t2)", fontSize: "0.85rem", margin: 0 }}>{producto.marca}</p>
+                )}
               </div>
-              <span className="text-gold" style={{ fontWeight: 800, fontSize: "1.9rem", lineHeight: 1 }}>
+              <span style={{ color: "var(--t1)", fontWeight: 800, fontSize: "2rem", lineHeight: 1, flexShrink: 0 }}>
                 ${producto.precio.toLocaleString()}
               </span>
             </div>
-            <hr style={{ borderColor: "var(--border)", margin: "20px 0" }} />
+
+            <hr style={{ borderColor: "var(--border)", margin: "0 0 20px" }} />
+
             {producto.descripcion && (
-              <p style={{ color: "var(--t2)", fontSize: "0.88rem", lineHeight: 1.75, margin: "0 0 18px" }}>{producto.descripcion}</p>
+              <p style={{ color: "var(--t2)", fontSize: "0.9rem", lineHeight: 1.75, margin: "0 0 20px" }}>
+                {producto.descripcion}
+              </p>
             )}
+
+            {/* Disponibilidad */}
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <span className="label-theme" style={{ margin: 0 }}>Disponibilidad:</span>
+              <span style={{ color: "var(--t3)", fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.5px", fontWeight: 600 }}>
+                Disponibilidad
+              </span>
               {esAdmin ? (
-                <span style={{ fontWeight: 700, fontSize: "0.9rem", color: producto.stock > 5 ? "var(--ok)" : producto.stock > 0 ? "var(--warn)" : "var(--err)" }}>
-                  {producto.stock > 0 ? `${producto.stock} unidades disponibles` : "Sin stock"}
+                <span style={{
+                  fontWeight: 600,
+                  fontSize: "0.88rem",
+                  color: producto.stock > 5 ? "#1A7F37" : producto.stock > 0 ? "#BF6900" : "#CC2D22",
+                }}>
+                  {producto.stock > 0 ? `${producto.stock} unidades` : "Sin stock"}
                 </span>
               ) : (
-                <span style={{ fontWeight: 700, fontSize: "0.9rem", color: producto.stock > 0 ? "var(--ok)" : "var(--err)" }}>
+                <span style={{
+                  fontWeight: 600,
+                  fontSize: "0.88rem",
+                  color: producto.stock > 0 ? "#1A7F37" : "#CC2D22",
+                }}>
                   {producto.stock > 0 ? "Disponible" : "Agotado"}
                 </span>
               )}
             </div>
           </div>
         </Modal.Body>
-        <Modal.Footer style={{ background: "var(--bg-3)", borderTop: "1px solid var(--border)", padding: "16px 28px", gap: "12px" }}>
+
+        <Modal.Footer style={{ background: "#FFFFFF", borderTop: "1px solid var(--border)", padding: "16px 32px", gap: "12px" }}>
           {!esAdmin && (
-            <Button
-              className="btn-theme-primary flex-fill"
-              style={{ padding: "12px" }}
+            <button
               onClick={() => { onAgregarAlCarrito(producto); onClose(); }}
               disabled={producto.stock === 0}
+              style={{
+                flex: 1,
+                background: producto.stock === 0 ? "var(--bg-1)" : "#1D1D1F",
+                border: "none",
+                color: producto.stock === 0 ? "var(--t3)" : "#FFFFFF",
+                borderRadius: "var(--r2)",
+                padding: "13px",
+                fontSize: "0.9rem",
+                fontWeight: 600,
+                cursor: producto.stock === 0 ? "not-allowed" : "pointer",
+                fontFamily: "inherit",
+              }}
             >
-              {producto.stock === 0 ? "Sin stock" : "+ Agregar al carrito"}
-            </Button>
+              {producto.stock === 0 ? "Sin stock" : "Agregar al carrito"}
+            </button>
           )}
-          <Button
-            variant="link"
-            style={{ color: "var(--t2)", textDecoration: "none", fontSize: "0.87rem", padding: "12px 6px" }}
+          <button
             onClick={onClose}
+            style={{
+              background: "none",
+              border: "none",
+              color: "var(--t2)",
+              fontSize: "0.88rem",
+              cursor: "pointer",
+              padding: "13px 8px",
+              fontFamily: "inherit",
+            }}
           >
             Cerrar
-          </Button>
+          </button>
         </Modal.Footer>
       </Modal>
 
@@ -83,29 +128,19 @@ export default function ProductModal({ producto, esAdmin, onClose, onAgregarAlCa
         close={() => setLightboxOpen(false)}
         slides={slides}
         plugins={[Zoom]}
-        zoom={{
-          maxZoomPixelRatio: 3,
-          zoomInMultiplier: 2,
-          doubleTapDelay: 300,
-          doubleClickDelay: 300,
-          doubleClickMaxStops: 2,
-          keyboardMoveDistance: 50,
-          wheelZoomDistanceFactor: 100,
-          pinchZoomDistanceFactor: 100,
-          scrollToZoom: true,
-        }}
+        zoom={{ maxZoomPixelRatio: 3, scrollToZoom: true }}
       />
 
       <style>{`
         .modal-product-c {
-          background: var(--bg-3) !important;
-          border: 1px solid rgba(255,255,255,.12) !important;
-          border-radius: 22px !important;
+          background: #FFFFFF !important;
+          border: 1px solid #E8E8ED !important;
+          border-radius: 20px !important;
           overflow: hidden !important;
-          box-shadow: 0 20px 60px rgba(0,0,0,.70) !important;
+          box-shadow: 0 12px 48px rgba(0,0,0,.10) !important;
         }
-        .modal-product .modal-body  { padding: 0 !important; background: var(--bg-3) !important; }
-        .modal-product .modal-footer { background: var(--bg-3) !important; border-top: 1px solid var(--border) !important; }
+        .modal-product .modal-body  { padding: 0 !important; background: #FFFFFF !important; }
+        .modal-product .modal-footer { background: #FFFFFF !important; border-top: 1px solid #E8E8ED !important; }
       `}</style>
     </>
   );

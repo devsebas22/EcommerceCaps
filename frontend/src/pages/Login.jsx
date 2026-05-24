@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Form, Button, Alert } from "react-bootstrap";
+import { Form, Button } from "react-bootstrap";
 import { useNavigate, Link } from "react-router-dom";
 
 const API_BASE = import.meta.env.VITE_API_URL;
@@ -34,24 +34,41 @@ export default function Login({ onLogin }) {
 
   return (
     <div className="auth-page">
-      <div style={{ width: "100%", maxWidth: "420px" }}>
+      <div style={{ width: "100%", maxWidth: "400px" }}>
+        {/* Logo */}
         <div className="text-center mb-5">
-          <p className="navbar-brand-theme" style={{ fontSize: "1.1rem", letterSpacing: "2.5px", marginBottom: "8px" }}>
-            ECOMMERCE CAPS
+          <p className="navbar-brand-theme" style={{ fontSize: "1.05rem", letterSpacing: "2px", marginBottom: "10px" }}>
+            CAPSCO
           </p>
-          <h2 className="fw-bold mb-1" style={{ color: "var(--text-primary)", fontSize: "1.6rem" }}>
+          <h2 style={{ color: "var(--t1)", fontWeight: 700, fontSize: "1.5rem", margin: "0 0 6px" }}>
             Bienvenido de nuevo
           </h2>
-          <p style={{ color: "var(--text-secondary)", fontSize: "0.88rem" }}>
+          <p style={{ color: "var(--t2)", fontSize: "0.88rem", margin: 0 }}>
             Ingresa a tu cuenta para continuar
           </p>
         </div>
 
-        <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-hover)", borderRadius: "var(--r-xl)", padding: "36px", boxShadow: "var(--shadow-lg)" }}>
+        {/* Card */}
+        <div style={{
+          background: "#FFFFFF",
+          border: "1px solid var(--border)",
+          borderRadius: "var(--r3)",
+          padding: "36px",
+          boxShadow: "var(--sh-sm)",
+        }}>
           {error && (
-            <Alert variant="danger" className="py-2 text-center mb-4" style={{ fontSize: "0.87rem" }}>
+            <div style={{
+              background: "#FFF2F1",
+              border: "1px solid #FF3B30",
+              color: "#CC2D22",
+              borderRadius: "var(--r2)",
+              padding: "10px 14px",
+              fontSize: "0.85rem",
+              marginBottom: "20px",
+              textAlign: "center",
+            }}>
               {error}
-            </Alert>
+            </div>
           )}
 
           <Form onSubmit={handleSubmit}>
@@ -79,14 +96,19 @@ export default function Login({ onLogin }) {
               />
             </Form.Group>
 
-            <Button type="submit" className="btn-theme-primary w-100" style={{ padding: "14px" }} disabled={cargando}>
+            <Button
+              type="submit"
+              className="btn-theme-primary w-100"
+              style={{ padding: "14px" }}
+              disabled={cargando}
+            >
               {cargando ? "Ingresando…" : "Iniciar Sesión"}
             </Button>
           </Form>
 
-          <p className="text-center mt-4 mb-0" style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
+          <p className="text-center mt-4 mb-0" style={{ color: "var(--t2)", fontSize: "0.85rem" }}>
             ¿No tienes cuenta?{" "}
-            <Link to="/registro" className="text-gold fw-semibold text-decoration-none">
+            <Link to="/registro" style={{ color: "var(--t1)", fontWeight: 600, textDecoration: "none" }}>
               Crear cuenta
             </Link>
           </p>

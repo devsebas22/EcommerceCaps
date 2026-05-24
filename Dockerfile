@@ -13,12 +13,9 @@ COPY frontend/ ./
 ARG VITE_API_URL=/api
 ARG VITE_IMGBB_KEY
 ARG VITE_WOMPI_PUBLIC_KEY
-ARG VITE_WOMPI_INTEGRITY_KEY
-# Establece las variables de entorno con los valores de los argumentos
 ENV VITE_API_URL=$VITE_API_URL
 ENV VITE_IMGBB_KEY=$VITE_IMGBB_KEY
 ENV VITE_WOMPI_PUBLIC_KEY=$VITE_WOMPI_PUBLIC_KEY
-ENV VITE_WOMPI_INTEGRITY_KEY=$VITE_WOMPI_INTEGRITY_KEY
 # Ejecuta el script de construcción de Vite para generar los archivos estáticos optimizados
 RUN npm run build
 
@@ -32,7 +29,7 @@ ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
 WORKDIR /app
 # Actualiza los índices de paquetes e instala las dependencias del sistema necesarias para PostgreSQL y compilación
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libpq-dev gcc && rm -rf /var/lib/apt/lists/*
+    libpq-dev gcc curl && rm -rf /var/lib/apt/lists/*
 # Copia el archivo de requisitos de Python al contenedor
 COPY requirements.txt .
 # Instala las dependencias de Python especificadas en requirements.txt sin caché

@@ -121,11 +121,30 @@ cd ..
 
 ### 5. Configurar Variables de Entorno
 
-Crea un archivo `.env` en la raíz del proyecto:
+Todas las variables (backend y frontend) viven en un único `.env` en la raíz del proyecto. Copia el ejemplo y completa los valores:
+
+```bash
+cp .env.example .env
+```
+
+El archivo debe quedar así (ajusta los valores a tu entorno):
 
 ```env
+# Backend
 DATABASE_URL=postgresql://ecommerce_user:ecommerce123@127.0.0.1:5433/ecommerce_db
+SECRET_KEY=una_clave_secreta_larga_y_aleatoria
+ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+WOMPI_PRIVATE_KEY=prv_test_...
+WOMPI_EVENTS_SECRET=
+
+# Frontend — Vite los lee desde la raíz gracias a envDir en vite.config.js
+VITE_API_URL=http://127.0.0.1:8000
+VITE_IMGBB_KEY=tu_key_de_imgbb
+VITE_WOMPI_PUBLIC_KEY=pub_test_...
+VITE_WOMPI_INTEGRITY_KEY=test_integrity_...
 ```
+
+> **Nota:** `frontend/vite.config.js` tiene `envDir: '..'`, lo que hace que Vite lea el `.env` de la raíz tanto en desarrollo local como al construir con Docker. No es necesario un `frontend/.env` separado.
 
 ### 6. Levantar la Base de Datos
 

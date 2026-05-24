@@ -2,7 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.producto import Producto, ProductoImagen
+from app.models.usuario import Usuario
 from app.schemas.producto_imagen import ProductoImagenCreate, ProductoImagenResponse
+from app.auth import get_admin_actual
 
 router = APIRouter(
     prefix="/imagenes",
@@ -10,7 +12,7 @@ router = APIRouter(
 )
 
 @router.post("/", response_model=ProductoImagenResponse)
-def agregar_imagen(imagen: ProductoImagenCreate, db: Session = Depends(get_db)):
+def agregar_imagen(imagen: ProductoImagenCreate, db: Session = Depends(get_db), admin: Usuario = Depends(get_admin_actual)):
     producto = db.query(Producto).filter(Producto.id == imagen.producto_id).first()
     if not producto:
         raise HTTPException(status_code=404, detail="Producto no encontrado")
@@ -33,7 +35,7 @@ def obtener_imagenes(producto_id: int, db: Session = Depends(get_db)):
     return db.query(ProductoImagen).filter(ProductoImagen.producto_id == producto_id).all()
 
 @router.delete("/{imagen_id}")
-def eliminar_imagen(imagen_id: int, db: Session = Depends(get_db)):
+def eliminar_imagen(imagen_id: int, db: Session = Depends(get_db), admin: Usuario = Depends(get_admin_actual)):
     imagen = db.query(ProductoImagen).filter(ProductoImagen.id == imagen_id).first()
     if not imagen:
         raise HTTPException(status_code=404, detail="Imagen no encontrada")

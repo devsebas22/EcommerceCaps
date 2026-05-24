@@ -4,11 +4,16 @@ from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 from app.database import Base
 from app import models
-from app.routers import categorias, productos, usuarios, carrito, pedidos, imagenes, stats
+from app.routers import categorias, productos, usuarios, carrito, pedidos, imagenes, stats, webhook, firma
 import os
+import sentry_sdk
 from dotenv import load_dotenv
 
 load_dotenv()
+
+_sentry_dsn = os.getenv("SENTRY_DSN", "")
+if _sentry_dsn:
+    sentry_sdk.init(dsn=_sentry_dsn, traces_sample_rate=0.2)
 
 app = FastAPI()
 
@@ -30,6 +35,8 @@ app.include_router(carrito.router, prefix="/api")
 app.include_router(pedidos.router, prefix="/api")
 app.include_router(imagenes.router, prefix="/api")
 app.include_router(stats.router, prefix="/api")
+app.include_router(webhook.router, prefix="/api")
+app.include_router(firma.router, prefix="/api")
 
 @app.get("/health")
 def health():

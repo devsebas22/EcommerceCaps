@@ -6,6 +6,7 @@ from app.models.carrito import Carrito, CarritoItem
 from app.models.usuario import Usuario
 from app.models.producto import Producto
 from app.schemas.pedido import PedidoCreate, PedidoResponse
+from app.auth import get_usuario_actual, get_admin_actual
 from pydantic import BaseModel
 
 router = APIRouter(
@@ -14,21 +15,32 @@ router = APIRouter(
 )
 
 @router.post("/{usuario_id}", response_model=PedidoResponse)
-def crear_pedido(usuario_id: int, datos: PedidoCreate, db: Session = Depends(get_db)):
+def crear_pedido(usuario_id: int, datos: PedidoCreate, db: Session = Depends(get_db), usuario_actual: Usuario = Depends(get_usuario_actual)):
+    if usuario_actual.id != usuario_id:
+        raise HTTPException(status_code=403, detail="No autorizado")
     usuario = db.query(Usuario).filter(Usuario.id == usuario_id).first()
     if not usuario:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     carrito = db.query(Carrito).filter(Carrito.usuario_id == usuario_id).first()
     if not carrito or len(carrito.items) == 0:
         raise HTTPException(status_code=400, detail="El carrito está vacío")
+    # Lock product rows to prevent concurrent overselling
+    productos_ids = [item.producto_id for item in carrito.items]
+    locked = {
+        p.id: p for p in db.query(Producto)
+        .filter(Producto.id.in_(productos_ids))
+        .with_for_update()
+        .all()
+    }
     for item in carrito.items:
-        if item.producto.stock < item.cantidad:
+        prod = locked[item.producto_id]
+        if prod.stock < item.cantidad:
             raise HTTPException(
                 status_code=400,
-                detail=f"Stock insuficiente para '{item.producto.nombre}': "
-                       f"disponible {item.producto.stock}, solicitado {item.cantidad}"
+                detail=f"Stock insuficiente para '{prod.nombre}': "
+                       f"disponible {prod.stock}, solicitado {item.cantidad}"
             )
-    total = sum(item.producto.precio * item.cantidad for item in carrito.items)
+    total = sum(locked[item.producto_id].precio * item.cantidad for item in carrito.items)
     nuevo_pedido = Pedido(
         usuario_id=usuario_id,
         total=total,
@@ -50,7 +62,9 @@ def crear_pedido(usuario_id: int, datos: PedidoCreate, db: Session = Depends(get
     return nuevo_pedido
 
 @router.get("/historial/{usuario_id}", response_model=list[PedidoResponse])
-def historial_pedidos(usuario_id: int, db: Session = Depends(get_db)):
+def historial_pedidos(usuario_id: int, db: Session = Depends(get_db), usuario_actual: Usuario = Depends(get_usuario_actual)):
+    if usuario_actual.id != usuario_id:
+        raise HTTPException(status_code=403, detail="No autorizado")
     usuario = db.query(Usuario).filter(Usuario.id == usuario_id).first()
     if not usuario:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
@@ -63,7 +77,7 @@ def historial_pedidos(usuario_id: int, db: Session = Depends(get_db)):
     return pedidos
 
 @router.get("/todos/", response_model=list[PedidoResponse])
-def obtener_todos_pedidos(db: Session = Depends(get_db)):
+def obtener_todos_pedidos(db: Session = Depends(get_db), admin: Usuario = Depends(get_admin_actual)):
     return (
         db.query(Pedido)
         .order_by(Pedido.id)
@@ -74,10 +88,21 @@ class ActualizarEstado(BaseModel):
     estado: str
 
 @router.put("/{pedido_id}/estado")
-def actualizar_estado(pedido_id: int, datos: ActualizarEstado, db: Session = Depends(get_db)):
+def actualizar_estado(pedido_id: int, datos: ActualizarEstado, db: Session = Depends(get_db), usuario_actual: Usuario = Depends(get_usuario_actual)):
     pedido = db.query(Pedido).filter(Pedido.id == pedido_id).first()
     if not pedido:
         raise HTTPException(status_code=404, detail="Pedido no encontrado")
+
+    # El dueño del pedido puede marcarlo como "pagado" (tras pago en Wompi).
+    # Cualquier otro cambio de estado requiere ser admin.
+    es_propietario_pagando = (
+        pedido.usuario_id == usuario_actual.id
+        and datos.estado == "pagado"
+        and pedido.estado == EstadoPedido.pendiente
+    )
+    if not usuario_actual.es_admin and not es_propietario_pagando:
+        raise HTTPException(status_code=403, detail="Se requieren permisos de administrador")
+
     estado_anterior = pedido.estado
     usuario = db.query(Usuario).filter(Usuario.id == pedido.usuario_id).first()
     if datos.estado == "pagado" and estado_anterior == EstadoPedido.pendiente:

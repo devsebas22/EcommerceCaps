@@ -32,27 +32,26 @@ export default function AdminLogin({ onLogin }) {
   };
 
   return (
-    <div className="auth-page" style={{ background: "var(--bg-primary)" }}>
+    <div className="auth-page">
       <div style={{ width: "100%", maxWidth: "420px" }}>
-        {/* Header */}
         <div className="text-center mb-5">
-          <p className="navbar-brand-theme" style={{ fontSize: "1.1rem", letterSpacing: "2.5px", marginBottom: "8px" }}>
-            ECOMMERCE CAPS
+          <p className="navbar-brand-theme" style={{ fontSize: "1.05rem", letterSpacing: "2px", marginBottom: "10px" }}>
+            CAPSCO
           </p>
-          <h2 className="fw-bold mb-1" style={{ color: "var(--text-primary)", fontSize: "1.6rem" }}>
+          <h2 style={{ color: "var(--t1)", fontWeight: 700, fontSize: "1.5rem", margin: "0 0 6px" }}>
             Panel de Administración
           </h2>
-          <p style={{ color: "var(--text-secondary)", fontSize: "0.88rem" }}>
+          <p style={{ color: "var(--t2)", fontSize: "0.88rem", margin: 0 }}>
             Acceso restringido al personal autorizado
           </p>
         </div>
 
-        {/* Card */}
-        <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-hover)", borderRadius: "var(--r-xl)", padding: "36px", boxShadow: "var(--shadow-lg)" }}>
-          {/* Indicador de admin */}
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "12px 16px", background: "var(--gold-glow)", border: "1px solid var(--border-accent)", borderRadius: "var(--r-md)", marginBottom: "28px" }}>
-            <span style={{ fontSize: "1rem" }}>🔐</span>
-            <span style={{ color: "var(--gold)", fontSize: "0.82rem", fontWeight: 600, letterSpacing: "0.3px" }}>
+        <div style={{ background: "#FFFFFF", border: "1px solid var(--border)", borderRadius: "var(--r3)", padding: "36px", boxShadow: "var(--sh-sm)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "12px 16px", background: "var(--bg-1)", border: "1px solid var(--border-md)", borderRadius: "var(--r2)", marginBottom: "28px" }}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>
+            </svg>
+            <span style={{ color: "var(--t2)", fontSize: "0.82rem", fontWeight: 500 }}>
               Solo administradores
             </span>
           </div>

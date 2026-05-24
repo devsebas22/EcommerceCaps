@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Form, Button, Alert, Row, Col } from "react-bootstrap";
+import { Form, Button, Row, Col } from "react-bootstrap";
 import { useNavigate, Link } from "react-router-dom";
 
 const API_BASE = import.meta.env.VITE_API_URL;
@@ -54,14 +54,31 @@ export default function Registro() {
   if (exitoso) {
     return (
       <div className="auth-page">
-        <div style={{ width: "100%", maxWidth: "420px", textAlign: "center" }}>
-          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-accent)", borderRadius: "var(--r-xl)", padding: "48px 36px", boxShadow: "var(--shadow-gold)" }}>
-            <div style={{ fontSize: "3rem", marginBottom: "16px" }}>✓</div>
-            <h4 className="fw-bold mb-2" style={{ color: "var(--text-primary)" }}>¡Cuenta creada!</h4>
-            <p style={{ color: "var(--text-secondary)", fontSize: "0.88rem", marginBottom: "32px" }}>
-              Tu cuenta ha sido creada correctamente. Ya puedes iniciar sesión.
+        <div style={{ width: "100%", maxWidth: "400px", textAlign: "center" }}>
+          <div style={{
+            background: "#FFFFFF",
+            border: "1px solid var(--border)",
+            borderRadius: "var(--r3)",
+            padding: "52px 36px",
+            boxShadow: "var(--sh-sm)",
+          }}>
+            <div style={{
+              width: "56px", height: "56px",
+              background: "#F0FAF4",
+              border: "1px solid #30D158",
+              borderRadius: "50%",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              margin: "0 auto 20px",
+            }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1A7F37" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+            <h4 style={{ color: "var(--t1)", fontWeight: 700, margin: "0 0 8px" }}>Cuenta creada</h4>
+            <p style={{ color: "var(--t2)", fontSize: "0.88rem", margin: "0 0 32px" }}>
+              Tu cuenta fue creada correctamente. Ya puedes iniciar sesión.
             </p>
-            <Button className="btn-theme-primary px-5" style={{ padding: "12px 40px" }} onClick={() => navigate("/login")}>
+            <Button className="btn-theme-primary w-100" style={{ padding: "13px" }} onClick={() => navigate("/login")}>
               Iniciar Sesión
             </Button>
           </div>
@@ -70,26 +87,45 @@ export default function Registro() {
     );
   }
 
+  const fieldError = (key) => errors[key] ? (
+    <div style={{ color: "#CC2D22", fontSize: "0.78rem", marginTop: "5px" }}>{errors[key]}</div>
+  ) : null;
+
   return (
     <div className="auth-page">
-      <div style={{ width: "100%", maxWidth: "520px" }}>
+      <div style={{ width: "100%", maxWidth: "500px" }}>
         <div className="text-center mb-5">
-          <p className="navbar-brand-theme" style={{ fontSize: "1.1rem", letterSpacing: "2.5px", marginBottom: "8px" }}>
-            ECOMMERCE CAPS
+          <p className="navbar-brand-theme" style={{ fontSize: "1.05rem", letterSpacing: "2px", marginBottom: "10px" }}>
+            CAPSCO
           </p>
-          <h2 className="fw-bold mb-1" style={{ color: "var(--text-primary)", fontSize: "1.6rem" }}>
+          <h2 style={{ color: "var(--t1)", fontWeight: 700, fontSize: "1.5rem", margin: "0 0 6px" }}>
             Crea tu cuenta
           </h2>
-          <p style={{ color: "var(--text-secondary)", fontSize: "0.88rem" }}>
+          <p style={{ color: "var(--t2)", fontSize: "0.88rem", margin: 0 }}>
             Únete y empieza a explorar la colección
           </p>
         </div>
 
-        <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-hover)", borderRadius: "var(--r-xl)", padding: "36px", boxShadow: "var(--shadow-lg)" }}>
+        <div style={{
+          background: "#FFFFFF",
+          border: "1px solid var(--border)",
+          borderRadius: "var(--r3)",
+          padding: "36px",
+          boxShadow: "var(--sh-sm)",
+        }}>
           {message && (
-            <Alert variant="danger" className="py-2 text-center mb-4" style={{ fontSize: "0.87rem" }}>
+            <div style={{
+              background: "#FFF2F1",
+              border: "1px solid #FF3B30",
+              color: "#CC2D22",
+              borderRadius: "var(--r2)",
+              padding: "10px 14px",
+              fontSize: "0.85rem",
+              marginBottom: "20px",
+              textAlign: "center",
+            }}>
               {message}
-            </Alert>
+            </div>
           )}
 
           <Form onSubmit={handleSubmit}>
@@ -102,7 +138,7 @@ export default function Registro() {
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
               />
-              {errors.nombre && <div style={{ color: "var(--danger)", fontSize: "0.78rem", marginTop: "6px" }}>{errors.nombre}</div>}
+              {fieldError("nombre")}
             </Form.Group>
 
             <Row className="g-3 mb-4">
@@ -115,7 +151,7 @@ export default function Registro() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
-                {errors.email && <div style={{ color: "var(--danger)", fontSize: "0.78rem", marginTop: "6px" }}>{errors.email}</div>}
+                {fieldError("email")}
               </Col>
               <Col md={6}>
                 <Form.Label className="label-theme">Contraseña</Form.Label>
@@ -126,13 +162,15 @@ export default function Registro() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
-                {errors.password && <div style={{ color: "var(--danger)", fontSize: "0.78rem", marginTop: "6px" }}>{errors.password}</div>}
+                {fieldError("password")}
               </Col>
             </Row>
 
             <Row className="g-3 mb-5">
               <Col md={7}>
-                <Form.Label className="label-theme">Dirección <span style={{ color: "var(--text-muted)", textTransform: "none", letterSpacing: 0 }}>(opcional)</span></Form.Label>
+                <Form.Label className="label-theme">
+                  Dirección <span style={{ color: "var(--t3)", textTransform: "none", letterSpacing: 0, fontWeight: 400 }}>(opcional)</span>
+                </Form.Label>
                 <Form.Control
                   type="text"
                   className="input-theme"
@@ -142,7 +180,9 @@ export default function Registro() {
                 />
               </Col>
               <Col md={5}>
-                <Form.Label className="label-theme">Teléfono <span style={{ color: "var(--text-muted)", textTransform: "none", letterSpacing: 0 }}>(opcional)</span></Form.Label>
+                <Form.Label className="label-theme">
+                  Teléfono <span style={{ color: "var(--t3)", textTransform: "none", letterSpacing: 0, fontWeight: 400 }}>(opcional)</span>
+                </Form.Label>
                 <Form.Control
                   type="text"
                   className="input-theme"
@@ -154,13 +194,13 @@ export default function Registro() {
             </Row>
 
             <Button type="submit" className="btn-theme-primary w-100" style={{ padding: "14px" }} disabled={submitting}>
-              {submitting ? "Creando cuenta…" : "Registrarme"}
+              {submitting ? "Creando cuenta…" : "Crear cuenta"}
             </Button>
           </Form>
 
-          <p className="text-center mt-4 mb-0" style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
+          <p className="text-center mt-4 mb-0" style={{ color: "var(--t2)", fontSize: "0.85rem" }}>
             ¿Ya tienes cuenta?{" "}
-            <Link to="/login" className="text-gold fw-semibold text-decoration-none">
+            <Link to="/login" style={{ color: "var(--t1)", fontWeight: 600, textDecoration: "none" }}>
               Iniciar Sesión
             </Link>
           </p>

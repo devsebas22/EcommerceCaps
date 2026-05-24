@@ -5,6 +5,7 @@ from app.models.carrito import Carrito, CarritoItem
 from app.models.usuario import Usuario
 from app.models.producto import Producto
 from app.schemas.carrito import CarritoItemCreate, CarritoResponse
+from app.auth import get_usuario_actual
 
 router = APIRouter(
     prefix="/carrito",
@@ -29,7 +30,9 @@ def obtener_carrito(usuario_id: int, db: Session = Depends(get_db)):
     return carrito
 
 @router.post("/{usuario_id}", response_model=CarritoResponse)
-def agregar_item(usuario_id: int, item: CarritoItemCreate, db: Session = Depends(get_db)):
+def agregar_item(usuario_id: int, item: CarritoItemCreate, db: Session = Depends(get_db), usuario_actual: Usuario = Depends(get_usuario_actual)):
+    if usuario_actual.id != usuario_id:
+        raise HTTPException(status_code=403, detail="No autorizado")
     usuario = db.query(Usuario).filter(Usuario.id == usuario_id).first()
     if not usuario:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
@@ -66,7 +69,9 @@ def agregar_item(usuario_id: int, item: CarritoItemCreate, db: Session = Depends
     return carrito
 
 @router.put("/{usuario_id}/item/{item_id}", response_model=CarritoResponse)
-def actualizar_cantidad(usuario_id: int, item_id: int, item: CarritoItemCreate, db: Session = Depends(get_db)):
+def actualizar_cantidad(usuario_id: int, item_id: int, item: CarritoItemCreate, db: Session = Depends(get_db), usuario_actual: Usuario = Depends(get_usuario_actual)):
+    if usuario_actual.id != usuario_id:
+        raise HTTPException(status_code=403, detail="No autorizado")
     carrito_item = db.query(CarritoItem).filter(CarritoItem.id == item_id).first()
     if not carrito_item:
         raise HTTPException(status_code=404, detail="Item no encontrado")
@@ -82,7 +87,9 @@ def actualizar_cantidad(usuario_id: int, item_id: int, item: CarritoItemCreate, 
     return carrito
 
 @router.delete("/{usuario_id}/item/{item_id}")
-def eliminar_item(usuario_id: int, item_id: int, db: Session = Depends(get_db)):
+def eliminar_item(usuario_id: int, item_id: int, db: Session = Depends(get_db), usuario_actual: Usuario = Depends(get_usuario_actual)):
+    if usuario_actual.id != usuario_id:
+        raise HTTPException(status_code=403, detail="No autorizado")
     carrito_item = db.query(CarritoItem).filter(CarritoItem.id == item_id).first()
     if not carrito_item:
         raise HTTPException(status_code=404, detail="Item no encontrado")

@@ -8,7 +8,7 @@ export default function ConfirmModal({ show, titulo, mensaje, onConfirmar, onCan
         <Modal.Title>{titulo}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p style={{ color: "var(--t2)", fontSize: "0.88rem", margin: 0 }}>{mensaje}</p>
+        <p style={{ color: "var(--t2)", fontSize: "0.88rem", margin: 0, lineHeight: 1.6 }}>{mensaje}</p>
       </Modal.Body>
       <Modal.Footer>
         <button
@@ -18,9 +18,9 @@ export default function ConfirmModal({ show, titulo, mensaje, onConfirmar, onCan
             border: "1px solid var(--border-md)",
             color: "var(--t2)",
             borderRadius: "8px",
-            padding: "8px 18px",
+            padding: "9px 20px",
             cursor: "pointer",
-            fontSize: "0.82rem",
+            fontSize: "0.84rem",
             fontFamily: "inherit",
           }}
         >
@@ -29,13 +29,13 @@ export default function ConfirmModal({ show, titulo, mensaje, onConfirmar, onCan
         <button
           onClick={onConfirmar}
           style={{
-            background: "rgba(248,113,113,.10)",
-            border: "1px solid rgba(248,113,113,.40)",
-            color: "var(--err)",
+            background: "none",
+            border: "none",
+            color: "#CC2D22",
             borderRadius: "8px",
-            padding: "8px 20px",
+            padding: "9px 20px",
             cursor: "pointer",
-            fontSize: "0.82rem",
+            fontSize: "0.84rem",
             fontFamily: "inherit",
             fontWeight: 600,
           }}

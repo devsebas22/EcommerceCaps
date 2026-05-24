@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { Row, Spinner, Button } from "react-bootstrap";
+import React, { useState, useEffect, useRef } from "react";
+import { Row, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { authFetch } from "../utils/api";
 import ProductCard from "../components/ProductCard";
 import ProductModal from "../components/ProductModal";
 import AdminProductForm from "../components/AdminProductForm";
@@ -30,6 +31,9 @@ export default function Catalogo({ usuario, onCarritoChange, esAdmin = false, re
   const [ordenLista, setOrdenLista] = useState({ campo: "id", dir: "asc" });
   const [confirmEliminar, setConfirmEliminar] = useState(null);
   const [toastCarrito, setToastCarrito] = useState(null);
+  const [filtrandoSkeleton, setFiltrandoSkeleton] = useState(false);
+  const filterTimer = useRef(null);
+  const filterInitialized = useRef(false);
 
   useEffect(() => {
     fetch(`${API_BASE}/categorias/`)
@@ -54,11 +58,20 @@ export default function Catalogo({ usuario, onCarritoChange, esAdmin = false, re
       .catch(() => {});
   }, [reloadTrigger]);
 
+  useEffect(() => {
+    if (!filterInitialized.current) { filterInitialized.current = true; return; }
+    if (cargando) return;
+    clearTimeout(filterTimer.current);
+    setFiltrandoSkeleton(true);
+    filterTimer.current = setTimeout(() => setFiltrandoSkeleton(false), 350);
+    return () => clearTimeout(filterTimer.current);
+  }, [busqueda, categoriaFiltro, precioMax, busquedaId]);
+
   const agregarAlCarrito = async (producto) => {
     if (!usuario) { navigate("/login"); return; }
     setAgregando(true);
     try {
-      await fetch(`${API_BASE}/carrito/${usuario.id}`, {
+      await authFetch(`${API_BASE}/carrito/${usuario.id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ producto_id: producto.id, cantidad: 1 }),
@@ -89,7 +102,7 @@ export default function Catalogo({ usuario, onCarritoChange, esAdmin = false, re
   };
 
   const confirmarEliminarProducto = async () => {
-    await fetch(`${API_BASE}/productos/${confirmEliminar.id}`, { method: "DELETE" });
+    await authFetch(`${API_BASE}/productos/${confirmEliminar.id}`, { method: "DELETE" });
     setProductos((prev) => prev.filter((p) => p.id !== confirmEliminar.id));
     setConfirmEliminar(null);
   };
@@ -130,10 +143,21 @@ const productosOrdenados = [...productosFiltrados].sort((a, b) => {
 });
 
   if (cargando) return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "55vh", gap: "16px" }}>
-      <Spinner animation="grow" style={{ color: "var(--gold)", width: "2.2rem", height: "2.2rem" }} />
-      <span style={{ color: "var(--t2)", fontSize: "0.82rem", letterSpacing: "0.5px" }}>Cargando colección…</span>
-    </div>
+    <Row xs={1} sm={2} md={3} lg={4} className="g-4">
+      {Array.from({ length: 8 }).map((_, i) => (
+        <div key={i} className="col">
+          <div style={{ background: "#FFFFFF", border: "1px solid #E8E8ED", borderRadius: "16px", overflow: "hidden" }}>
+            <div style={{ height: "215px" }} className="skeleton-shimmer" />
+            <div style={{ padding: "18px 20px" }}>
+              <div style={{ height: "10px", width: "55px", borderRadius: "5px", marginBottom: "12px" }} className="skeleton-shimmer" />
+              <div style={{ height: "16px", width: "80%", borderRadius: "6px", marginBottom: "6px" }} className="skeleton-shimmer" />
+              <div style={{ height: "12px", width: "45%", borderRadius: "5px", marginBottom: "24px" }} className="skeleton-shimmer" />
+              <div style={{ height: "38px", borderRadius: "10px" }} className="skeleton-shimmer" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </Row>
   );
 
   if (error) return (
@@ -171,32 +195,40 @@ const productosOrdenados = [...productosFiltrados].sort((a, b) => {
               <button
                 onClick={() => setVistaLista(false)}
                 style={{
-                  background: !vistaLista ? "var(--gold-glow)" : "none",
-                  border: `1px solid ${!vistaLista ? "var(--gold)" : "var(--border-md)"}`,
-                  color: !vistaLista ? "var(--gold)" : "var(--t2)",
+                  background: !vistaLista ? "#1D1D1F" : "#FFFFFF",
+                  border: `1px solid ${!vistaLista ? "#1D1D1F" : "var(--border-md)"}`,
+                  color: !vistaLista ? "#FFFFFF" : "var(--t2)",
                   borderRadius: "var(--r1)",
                   padding: "7px 12px",
                   cursor: "pointer",
                   fontSize: "0.85rem",
-                  fontFamily: "inherit"
+                  fontFamily: "inherit",
+                  fontWeight: !vistaLista ? 600 : 400,
+                  transition: "all .15s",
                 }}
+                onMouseOver={e => { if (vistaLista) { e.currentTarget.style.borderColor = "#1D1D1F"; e.currentTarget.style.color = "var(--t1)"; } }}
+                onMouseOut={e => { if (vistaLista) { e.currentTarget.style.borderColor = "var(--border-md)"; e.currentTarget.style.color = "var(--t2)"; } }}
               >
-                🔲 Cards
+                Cards
               </button>
               <button
                 onClick={() => setVistaLista(true)}
                 style={{
-                  background: vistaLista ? "var(--gold-glow)" : "none",
-                  border: `1px solid ${vistaLista ? "var(--gold)" : "var(--border-md)"}`,
-                  color: vistaLista ? "var(--gold)" : "var(--t2)",
+                  background: vistaLista ? "#1D1D1F" : "#FFFFFF",
+                  border: `1px solid ${vistaLista ? "#1D1D1F" : "var(--border-md)"}`,
+                  color: vistaLista ? "#FFFFFF" : "var(--t2)",
                   borderRadius: "var(--r1)",
                   padding: "7px 12px",
                   cursor: "pointer",
                   fontSize: "0.85rem",
-                  fontFamily: "inherit"
+                  fontFamily: "inherit",
+                  fontWeight: vistaLista ? 600 : 400,
+                  transition: "all .15s",
                 }}
+                onMouseOver={e => { if (!vistaLista) { e.currentTarget.style.borderColor = "#1D1D1F"; e.currentTarget.style.color = "var(--t1)"; } }}
+                onMouseOut={e => { if (!vistaLista) { e.currentTarget.style.borderColor = "var(--border-md)"; e.currentTarget.style.color = "var(--t2)"; } }}
               >
-                ☰ Lista
+                Lista
               </button>
               <Button className="btn-theme-primary" onClick={abrirNuevo}>
                 + Nuevo Producto
@@ -217,7 +249,23 @@ const productosOrdenados = [...productosFiltrados].sort((a, b) => {
         onCancelar={() => setConfirmEliminar(null)}
       />
 
-      {productosFiltrados.length === 0 ? (
+      {filtrandoSkeleton ? (
+        <Row xs={1} sm={2} md={3} lg={4} className="g-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="col">
+              <div style={{ background: "#FFFFFF", border: "1px solid #E8E8ED", borderRadius: "16px", overflow: "hidden" }}>
+                <div style={{ height: "215px" }} className="skeleton-shimmer" />
+                <div style={{ padding: "18px 20px" }}>
+                  <div style={{ height: "10px", width: "55px", borderRadius: "5px", marginBottom: "12px" }} className="skeleton-shimmer" />
+                  <div style={{ height: "16px", width: "80%", borderRadius: "6px", marginBottom: "6px" }} className="skeleton-shimmer" />
+                  <div style={{ height: "12px", width: "45%", borderRadius: "5px", marginBottom: "24px" }} className="skeleton-shimmer" />
+                  <div style={{ height: "38px", borderRadius: "10px" }} className="skeleton-shimmer" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </Row>
+      ) : productosFiltrados.length === 0 ? (
         <p style={{ color: "var(--t2)", textAlign: "center", paddingTop: "60px" }}>
           No hay productos disponibles.
         </p>
@@ -245,7 +293,7 @@ const productosOrdenados = [...productosFiltrados].sort((a, b) => {
                     <span className="badge-cat">{p.categoria?.nombre}</span>
                   </td>
                   <td style={{ padding: "14px 18px" }}>
-                    <span className="text-gold fw-bold">${p.precio.toLocaleString()}</span>
+                    <span style={{ color: "var(--t1)", fontWeight: 700 }}>${p.precio.toLocaleString()}</span>
                   </td>
                   <td style={{ padding: "14px 18px", color: p.stock > 5 ? "var(--ok)" : p.stock > 0 ? "var(--warn)" : "var(--err)", fontWeight: 700 }}>
                     {p.stock} uds

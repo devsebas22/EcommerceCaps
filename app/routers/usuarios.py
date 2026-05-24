@@ -6,6 +6,7 @@ from app.models.carrito import Carrito, CarritoItem
 from app.models.pedido import Pedido, PedidoItem
 from app.models.producto import Producto
 from app.schemas.usuario import UsuarioCreate, UsuarioResponse, UsuarioUpdate, LoginRequest, LoginResponse
+from app.auth import crear_token, get_usuario_actual, get_admin_actual
 from passlib.context import CryptContext
 
 router = APIRouter(
@@ -36,14 +37,18 @@ def crear_usuario(usuario: UsuarioCreate, db: Session = Depends(get_db)):
     return nuevo_usuario
 
 @router.get("/{id}", response_model=UsuarioResponse)
-def obtener_usuario(id: int, db: Session = Depends(get_db)):
+def obtener_usuario(id: int, db: Session = Depends(get_db), usuario_actual: Usuario = Depends(get_usuario_actual)):
+    if usuario_actual.id != id and not usuario_actual.es_admin:
+        raise HTTPException(status_code=403, detail="No autorizado")
     usuario = db.query(Usuario).filter(Usuario.id == id).first()
     if not usuario:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     return usuario
 
 @router.put("/{id}", response_model=UsuarioResponse)
-def actualizar_usuario(id: int, datos: UsuarioUpdate, db: Session = Depends(get_db)):
+def actualizar_usuario(id: int, datos: UsuarioUpdate, db: Session = Depends(get_db), usuario_actual: Usuario = Depends(get_usuario_actual)):
+    if usuario_actual.id != id:
+        raise HTTPException(status_code=403, detail="No autorizado para modificar este usuario")
     usuario = db.query(Usuario).filter(Usuario.id == id).first()
     if not usuario:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
@@ -56,10 +61,7 @@ def actualizar_usuario(id: int, datos: UsuarioUpdate, db: Session = Depends(get_
     return usuario
 
 @router.delete("/{id}")
-def eliminar_usuario(id: int, admin_id: int, db: Session = Depends(get_db)):
-    admin = db.query(Usuario).filter(Usuario.id == admin_id).first()
-    if not admin or not admin.es_admin:
-        raise HTTPException(status_code=403, detail="Se requieren permisos de administrador")
+def eliminar_usuario(id: int, db: Session = Depends(get_db), admin: Usuario = Depends(get_admin_actual)):
     usuario = db.query(Usuario).filter(Usuario.id == id).first()
     if not usuario:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
@@ -76,10 +78,7 @@ def eliminar_usuario(id: int, admin_id: int, db: Session = Depends(get_db)):
     return {"mensaje": "Usuario eliminado correctamente"}
 
 @router.get("/", response_model=list[UsuarioResponse])
-def obtener_usuarios(admin_id: int, db: Session = Depends(get_db)):
-    admin = db.query(Usuario).filter(Usuario.id == admin_id).first()
-    if not admin or not admin.es_admin:
-        raise HTTPException(status_code=403, detail="Se requieren permisos de administrador")
+def obtener_usuarios(db: Session = Depends(get_db), admin: Usuario = Depends(get_admin_actual)):
     return db.query(Usuario).all()
 
 @router.post("/login", response_model=LoginResponse)
@@ -89,6 +88,11 @@ def login(datos: LoginRequest, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     if not pwd_context.verify(datos.password, usuario.password):
         raise HTTPException(status_code=400, detail="Contraseña incorrecta")
+    token = crear_token({
+        "usuario_id": usuario.id,
+        "es_admin": usuario.es_admin,
+        "email": usuario.email,
+    })
     return LoginResponse(
         id=usuario.id,
         nombre=usuario.nombre,
@@ -97,5 +101,6 @@ def login(datos: LoginRequest, db: Session = Depends(get_db)):
         direccion=usuario.direccion,
         es_admin=usuario.es_admin,
         puntos_fidelidad=usuario.puntos_fidelidad,
-        mensaje="Login exitoso"
+        mensaje="Login exitoso",
+        access_token=token,
     )

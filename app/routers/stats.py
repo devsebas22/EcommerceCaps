@@ -5,6 +5,7 @@ from app.models.producto import Producto
 from app.models.usuario import Usuario
 from app.models.pedido import Pedido
 from app.models.carrito import CarritoItem
+from app.auth import get_admin_actual
 
 router = APIRouter(
     prefix="/stats",
@@ -12,7 +13,7 @@ router = APIRouter(
 )
 
 @router.get("/")
-def obtener_stats(db: Session = Depends(get_db)):
+def obtener_stats(db: Session = Depends(get_db), admin: Usuario = Depends(get_admin_actual)):
     total_productos = db.query(Producto).count()
     total_usuarios = db.query(Usuario).count()
     total_pedidos = db.query(Pedido).count()
