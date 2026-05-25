@@ -29,6 +29,9 @@ services:
     environment:
       DATABASE_URL: "postgresql://${POSTGRES_USER:-ecommerce_user}:${POSTGRES_PASSWORD:-ecommerce123}@postgres:5432/${POSTGRES_DB:-ecommerce_db}"
       ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:8000}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8000}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-onboarding@resend.dev}
     ports:
       - "8000:8000"
     depends_on:

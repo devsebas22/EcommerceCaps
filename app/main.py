@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pathlib import Path
 from app.database import Base
 from app import models
-from app.routers import categorias, productos, usuarios, carrito, pedidos, imagenes, stats, webhook, firma
+from app.routers import categorias, productos, usuarios, carrito, pedidos, imagenes, stats, webhook, firma, auth_recovery
 import os
 import sentry_sdk
 from dotenv import load_dotenv
@@ -37,12 +37,20 @@ app.include_router(imagenes.router, prefix="/api")
 app.include_router(stats.router, prefix="/api")
 app.include_router(webhook.router, prefix="/api")
 app.include_router(firma.router, prefix="/api")
+app.include_router(auth_recovery.router, prefix="/api")
 
 @app.get("/health")
 def health():
     return {"status": "ok", "version": "1.0.0"}
 
-# Serve SPA frontend — must be last to avoid hijacking API routes
-static_dir = Path(__file__).resolve().parent.parent / "static"
-if static_dir.exists():
-    app.mount("/", StaticFiles(directory=str(static_dir), html=True), name="static")
+# SPA fallback — registrar DESPUÉS de todas las rutas /api/*
+# Sirve archivos estáticos si existen; de lo contrario index.html para React Router
+_static_dir = Path(__file__).resolve().parent.parent / "static"
+
+if _static_dir.exists():
+    @app.get("/{full_path:path}")
+    async def serve_frontend(full_path: str):
+        candidate = _static_dir / full_path
+        if candidate.is_file():
+            return FileResponse(str(candidate))
+        return FileResponse(str(_static_dir / "index.html"))

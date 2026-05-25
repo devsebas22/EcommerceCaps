@@ -49,3 +49,4 @@ uvloop==0.22.1
 watchfiles==1.1.1
 websockets==16.0
 aiofiles>=24.1.0
+resend>=2.0.0

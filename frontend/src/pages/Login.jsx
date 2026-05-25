@@ -84,8 +84,15 @@ export default function Login({ onLogin }) {
               />
             </Form.Group>
 
-            <Form.Group className="mb-5">
-              <Form.Label className="label-theme">Contraseña</Form.Label>
+            <Form.Group className="mb-4">
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "7px" }}>
+                <Form.Label className="label-theme" style={{ margin: 0 }}>Contraseña</Form.Label>
+                <Link to="/forgot-password" style={{ color: "var(--t2)", fontSize: "0.78rem", textDecoration: "none" }}
+                  onMouseOver={e => e.currentTarget.style.color = "var(--t1)"}
+                  onMouseOut={e => e.currentTarget.style.color = "var(--t2)"}>
+                  ¿Olvidaste tu contraseña?
+                </Link>
+              </div>
               <Form.Control
                 type="password"
                 className="input-theme"
@@ -95,6 +102,7 @@ export default function Login({ onLogin }) {
                 required
               />
             </Form.Group>
+            <div style={{ marginBottom: "20px" }} />
 
             <Button
               type="submit"
