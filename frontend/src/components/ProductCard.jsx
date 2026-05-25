@@ -1,8 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
 import { Col } from "react-bootstrap";
-
-const imgPrincipal = (p) =>
-  p.imagenes?.find((i) => i.es_principal)?.url ?? p.imagenes?.[0]?.url ?? null;
 
 export default function ProductCard({
   producto: p,
@@ -14,8 +11,50 @@ export default function ProductCard({
   onEditar,
   onEliminar,
 }) {
-  const img = imgPrincipal(p);
+  const imgs = p.imagenes ?? [];
+
+  const [imgIdx, setImgIdx] = useState(() => {
+    const idx = imgs.findIndex((i) => i.es_principal);
+    return idx >= 0 ? idx : 0;
+  });
+  const [hovered, setHovered] = useState(false);
+
+  const safeIdx = imgs.length > 0 ? imgIdx % imgs.length : 0;
+  const currentImg = imgs.length > 0 ? imgs[safeIdx]?.url : null;
+  const multiImg = imgs.length > 1;
+
   const yaAgregado = agregadoId === p.id;
+
+  const prev = (e) => {
+    e.stopPropagation();
+    setImgIdx((i) => (i - 1 + imgs.length) % imgs.length);
+  };
+  const next = (e) => {
+    e.stopPropagation();
+    setImgIdx((i) => (i + 1) % imgs.length);
+  };
+
+  const arrowStyle = (side) => ({
+    position: "absolute",
+    top: "50%",
+    [side]: "8px",
+    transform: "translateY(-50%)",
+    background: "rgba(255,255,255,0.88)",
+    border: "none",
+    borderRadius: "50%",
+    width: "30px",
+    height: "30px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "pointer",
+    zIndex: 2,
+    boxShadow: "0 1px 6px rgba(0,0,0,.18)",
+    padding: 0,
+    opacity: hovered && multiImg ? 1 : 0,
+    transition: "opacity .18s",
+    pointerEvents: hovered && multiImg ? "auto" : "none",
+  });
 
   return (
     <Col>
@@ -31,10 +70,12 @@ export default function ProductCard({
             flexShrink: 0,
           }}
           onClick={() => onVer(p)}
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
         >
-          {img ? (
+          {currentImg ? (
             <img
-              src={img}
+              src={currentImg}
               alt={p.nombre}
               className="prod-img"
               style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform .5s var(--ease)" }}
@@ -42,6 +83,47 @@ export default function ProductCard({
           ) : (
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "var(--t3)", fontSize: "0.72rem", letterSpacing: "1px" }}>
               SIN IMAGEN
+            </div>
+          )}
+
+          {/* Flecha izquierda */}
+          <button style={arrowStyle("left")} onClick={prev} aria-label="Imagen anterior">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1D1D1F" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="15 18 9 12 15 6"/>
+            </svg>
+          </button>
+
+          {/* Flecha derecha */}
+          <button style={arrowStyle("right")} onClick={next} aria-label="Imagen siguiente">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1D1D1F" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </button>
+
+          {/* Indicadores de puntos */}
+          {multiImg && (
+            <div style={{
+              position: "absolute",
+              bottom: "8px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              display: "flex",
+              gap: "4px",
+              opacity: hovered ? 1 : 0.55,
+              transition: "opacity .18s",
+            }}>
+              {imgs.map((_, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    width: idx === safeIdx ? "14px" : "6px",
+                    height: "6px",
+                    borderRadius: "3px",
+                    background: idx === safeIdx ? "#FFFFFF" : "rgba(255,255,255,0.55)",
+                    transition: "width .2s, background .2s",
+                  }}
+                />
+              ))}
             </div>
           )}
         </div>
@@ -54,7 +136,6 @@ export default function ProductCard({
             </span>
           )}
 
-          {/* Categoría — texto gris pequeño, sin badge */}
           <span
             className="badge-cat"
             style={{ marginBottom: "8px", cursor: "pointer" }}
@@ -63,7 +144,6 @@ export default function ProductCard({
             {p.categoria?.nombre ?? "Colección"}
           </span>
 
-          {/* Nombre */}
           <p
             style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--t1)", margin: "0 0 3px", lineHeight: 1.3, cursor: "pointer" }}
             onClick={() => onVer(p)}
@@ -71,14 +151,11 @@ export default function ProductCard({
             {p.nombre}
           </p>
 
-          {/* Marca */}
           {p.marca && (
             <p style={{ fontSize: "0.78rem", color: "var(--t2)", margin: 0 }}>{p.marca}</p>
           )}
 
-          {/* Pie de la card */}
           <div style={{ marginTop: "auto", paddingTop: "16px" }}>
-            {/* Precio */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
               <span style={{ color: "var(--t3)", fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.5px" }}>
                 Precio
@@ -88,7 +165,6 @@ export default function ProductCard({
               </span>
             </div>
 
-            {/* Stock (solo admin) */}
             {esAdmin && (
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
                 <span style={{ color: "var(--t3)", fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.5px" }}>
@@ -104,7 +180,6 @@ export default function ProductCard({
               </div>
             )}
 
-            {/* Acciones */}
             <div style={{ display: "flex", gap: "8px" }}>
               <button
                 onClick={() => onVer(p)}

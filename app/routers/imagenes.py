@@ -42,3 +42,17 @@ def eliminar_imagen(imagen_id: int, db: Session = Depends(get_db), admin: Usuari
     db.delete(imagen)
     db.commit()
     return {"mensaje": "Imagen eliminada correctamente"}
+
+@router.put("/{imagen_id}/principal", response_model=ProductoImagenResponse)
+def marcar_principal(imagen_id: int, db: Session = Depends(get_db), admin: Usuario = Depends(get_admin_actual)):
+    imagen = db.query(ProductoImagen).filter(ProductoImagen.id == imagen_id).first()
+    if not imagen:
+        raise HTTPException(status_code=404, detail="Imagen no encontrada")
+    db.query(ProductoImagen).filter(
+        ProductoImagen.producto_id == imagen.producto_id,
+        ProductoImagen.es_principal == True,
+    ).update({"es_principal": False})
+    imagen.es_principal = True
+    db.commit()
+    db.refresh(imagen)
+    return imagen

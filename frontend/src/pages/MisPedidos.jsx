@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { authFetch } from "../utils/api";
 import { calcularFirma } from "../utils/wompi";
+import ConfirmModal from "../components/ConfirmModal";
 
 const API_BASE = import.meta.env.VITE_API_URL;
 
@@ -34,11 +35,18 @@ export default function MisPedidos({ usuario }) {
   const [expandido, setExpandido] = useState(null);
   const [pagandoId, setPagandoId] = useState(null);
   const [errorPagoId, setErrorPagoId] = useState(null);
+  const [confirmCancelar, setConfirmCancelar] = useState(null);
 
   useEffect(() => {
     if (!usuario) { navigate("/login"); return; }
     cargarPedidos();
   }, [usuario]);
+
+  const cancelarPedido = async () => {
+    const res = await authFetch(`${API_BASE}/pedidos/${confirmCancelar.id}`, { method: "DELETE" });
+    setConfirmCancelar(null);
+    if (res.ok) cargarPedidos();
+  };
 
   const cargarPedidos = async () => {
     setCargando(true);
@@ -100,6 +108,14 @@ export default function MisPedidos({ usuario }) {
 
   return (
     <div className="auth-page">
+      <ConfirmModal
+        show={!!confirmCancelar}
+        titulo="Cancelar Pedido"
+        mensaje={`¿Cancelar el pedido #${confirmCancelar?.id}? Esta acción no se puede deshacer.`}
+        labelConfirmar="Cancelar pedido"
+        onConfirmar={cancelarPedido}
+        onCancelar={() => setConfirmCancelar(null)}
+      />
       <div style={{ width: "100%", maxWidth: "820px" }}>
         <div className="text-center mb-5">
           <p className="navbar-brand-theme" style={{ fontSize: "1.05rem", letterSpacing: "2px", marginBottom: "10px" }}>
@@ -162,25 +178,44 @@ export default function MisPedidos({ usuario }) {
                     <span style={estadoStyle(p.estado)}>{p.estado}</span>
                     <span style={{ color: "var(--t1)", fontWeight: 800, fontSize: "1rem" }}>${p.total.toLocaleString()}</span>
                     {p.estado === "pendiente" && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); pagarPedido(p); }}
-                        disabled={pagandoId === p.id}
-                        style={{
-                          background: "#1D1D1F",
-                          border: "none",
-                          color: "#FFFFFF",
-                          borderRadius: "8px",
-                          padding: "6px 14px",
-                          fontSize: "0.78rem",
-                          fontWeight: 600,
-                          cursor: pagandoId === p.id ? "not-allowed" : "pointer",
-                          opacity: pagandoId === p.id ? 0.6 : 1,
-                          fontFamily: "inherit",
-                          whiteSpace: "nowrap",
-                        }}
-                      >
-                        {pagandoId === p.id ? "Abriendo…" : "Pagar ahora"}
-                      </button>
+                      <>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); pagarPedido(p); }}
+                          disabled={pagandoId === p.id}
+                          style={{
+                            background: "#1D1D1F",
+                            border: "none",
+                            color: "#FFFFFF",
+                            borderRadius: "8px",
+                            padding: "6px 14px",
+                            fontSize: "0.78rem",
+                            fontWeight: 600,
+                            cursor: pagandoId === p.id ? "not-allowed" : "pointer",
+                            opacity: pagandoId === p.id ? 0.6 : 1,
+                            fontFamily: "inherit",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {pagandoId === p.id ? "Abriendo…" : "Pagar ahora"}
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setConfirmCancelar({ id: p.id }); }}
+                          style={{
+                            background: "none",
+                            border: "1px solid #FF3B30",
+                            color: "#CC2D22",
+                            borderRadius: "8px",
+                            padding: "6px 12px",
+                            fontSize: "0.78rem",
+                            fontWeight: 600,
+                            cursor: "pointer",
+                            fontFamily: "inherit",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          Cancelar
+                        </button>
+                      </>
                     )}
                   </div>
                 </div>

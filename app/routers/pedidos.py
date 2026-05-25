@@ -84,6 +84,38 @@ def obtener_todos_pedidos(db: Session = Depends(get_db), admin: Usuario = Depend
         .options(joinedload(Pedido.items).joinedload(PedidoItem.producto))
         .all()
     )
+@router.delete("/{pedido_id}")
+def eliminar_pedido(pedido_id: int, db: Session = Depends(get_db), usuario_actual: Usuario = Depends(get_usuario_actual)):
+    pedido = (
+        db.query(Pedido)
+        .filter(Pedido.id == pedido_id)
+        .options(joinedload(Pedido.items))
+        .first()
+    )
+    if not pedido:
+        raise HTTPException(status_code=404, detail="Pedido no encontrado")
+
+    es_propietario = pedido.usuario_id == usuario_actual.id
+    if not usuario_actual.es_admin and not es_propietario:
+        raise HTTPException(status_code=403, detail="No autorizado")
+    if not usuario_actual.es_admin and pedido.estado != EstadoPedido.pendiente:
+        raise HTTPException(status_code=400, detail="Solo puedes cancelar pedidos pendientes")
+
+    # Restaurar stock si el pedido ya había reducido el inventario
+    if pedido.estado in (EstadoPedido.pagado, EstadoPedido.enviado):
+        for item in pedido.items:
+            prod = db.query(Producto).filter(Producto.id == item.producto_id).first()
+            if prod:
+                prod.stock += item.cantidad
+        owner = db.query(Usuario).filter(Usuario.id == pedido.usuario_id).first()
+        if owner:
+            owner.puntos_fidelidad = max(0, owner.puntos_fidelidad - int(pedido.total))
+
+    db.delete(pedido)
+    db.commit()
+    return {"mensaje": "Pedido eliminado"}
+
+
 class ActualizarEstado(BaseModel):
     estado: str
 

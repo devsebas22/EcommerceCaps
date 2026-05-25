@@ -6,6 +6,8 @@ import Registro from "./pages/Registro";
 import Login from "./pages/Login";
 import Perfil from "./pages/Perfil";
 import MisPedidos from "./pages/MisPedidos";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./admin/Dashboard";
 import CarritoDrawer from "./Carrito";
 import { useCarritoCount } from "./hooks/useCarrito";
@@ -146,8 +148,10 @@ function AppContent() {
                   </Container>
                 }
               />
-              <Route path="/login"    element={<Login onLogin={handleLogin} />} />
-              <Route path="/registro" element={<Registro />} />
+              <Route path="/login"           element={<Login onLogin={handleLogin} />} />
+              <Route path="/registro"        element={<Registro />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password"  element={<ResetPassword />} />
               <Route path="/perfil"   element={<Perfil usuario={usuario} onLogout={handleLogout} onUsuarioActualizado={handleUsuarioActualizado} />} />
               <Route path="/mis-pedidos" element={<MisPedidos usuario={usuario} />} />
             </Routes>
