@@ -1,0 +1,50 @@
+name: CI
+on:
+  pull_request:
+    branches: [master]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ecommerce_user
+          POSTGRES_PASSWORD: ecommerce123
+          POSTGRES_DB: ecommerce_db_test
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - run: pip install -r requirements.txt pytest pytest-cov httpx ruff
+      - run: ruff check app/
+      - run: pytest --cov=app/ -v -x
+        env:
+          DATABASE_URL: postgresql://ecommerce_user:ecommerce123@localhost:5433/ecommerce_db_test
+          SECRET_KEY: test_secret_key_no_usar_en_produccion
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run build
+      - run: npx vitest run
