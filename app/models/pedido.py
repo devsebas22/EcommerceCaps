@@ -4,11 +4,12 @@ from app.database import Base
 import enum
 
 class EstadoPedido(enum.Enum):
-    pendiente = "pendiente"
-    pagado = "pagado"
-    enviado = "enviado"
-    entregado = "entregado"
-    cancelado = "cancelado"
+    pendiente  = "pendiente"
+    pagado     = "pagado"
+    preparando = "preparando"
+    enviado    = "enviado"
+    entregado  = "entregado"
+    cancelado  = "cancelado"
 
 class Pedido(Base):
     __tablename__ = "pedidos"

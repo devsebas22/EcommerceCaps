@@ -344,8 +344,8 @@ body {
   height: 60px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: 0 28px;
+  gap: 4px;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -357,9 +357,11 @@ body {
   color: var(--t1);
   -webkit-text-fill-color: var(--t1);
   background: none;
-  margin-right: 32px;
+  margin-right: 28px;
+  flex-shrink: 0;
 }
 .admin-nav-pill { display: flex; gap: 2px; }
+.admin-topbar-user { display: flex; align-items: center; gap: 16px; margin-left: auto; flex-shrink: 0; }
 .admin-nav-item {
   background: none;
   border: none;
@@ -371,9 +373,111 @@ body {
   cursor: pointer;
   transition: all .15s var(--ease);
   font-family: inherit;
+  white-space: nowrap;
 }
 .admin-nav-item:hover  { color: var(--t1); background: var(--bg-1); }
 .admin-nav-item.active { color: var(--t1); background: var(--bg-1); font-weight: 600; }
+
+/* ══════════════════════════════════
+   ADMIN STATS GRID
+══════════════════════════════════ */
+.admin-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  padding: 24px 28px 0;
+}
+
+/* ══════════════════════════════════
+   TABLE SCROLL WRAPPER
+══════════════════════════════════ */
+.table-scroll-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ══════════════════════════════════
+   FILTROS PRODUCTO
+══════════════════════════════════ */
+.filtro-toggle-btn { display: none; }
+.filtros-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+/* Cart button only visible on mobile (inside navbar brand area) */
+.cart-btn-mobile { display: none !important; }
+
+/* ══════════════════════════════════
+   RESPONSIVE — MOBILE (< 768px)
+══════════════════════════════════ */
+@media (max-width: 767px) {
+  /* Admin topbar: brand + user on row 1, nav pills on row 2 */
+  .admin-topbar {
+    height: auto !important;
+    flex-wrap: wrap;
+    padding: 10px 14px !important;
+    gap: 0;
+  }
+  .admin-brand { order: 1; margin-right: 0 !important; }
+  .admin-topbar-user { order: 2; }
+  .admin-nav-pill {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding: 8px 0 2px;
+    scrollbar-width: none;
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
+  }
+  .admin-nav-pill::-webkit-scrollbar { display: none; }
+  .admin-nav-item { font-size: .80rem; padding: 7px 12px; }
+
+  /* Stats: 2 columns */
+  .admin-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    padding: 12px 12px 0 !important;
+    gap: 10px !important;
+  }
+
+  /* Hide secondary columns */
+  .hide-mobile { display: none !important; }
+
+  /* Filtros collapse */
+  .filtro-toggle-btn {
+    display: flex !important;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    background: #FFFFFF;
+    border: 1px solid var(--border-md);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.88rem;
+    color: var(--t2);
+    cursor: pointer;
+    font-family: inherit;
+    margin-bottom: 8px;
+  }
+  .filtros-body {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 12px;
+  }
+  .filtros-body > * { width: 100% !important; min-width: 0 !important; flex: none !important; }
+  .filtros-body.open { display: flex; }
+}
+
+/* Bootstrap lg collapses at 992px — show mobile cart icon before that */
+@media (max-width: 991px) {
+  .cart-btn-mobile { display: flex !important; }
+}
 
 /* ══════════════════════════════════
    FONDO AUTH

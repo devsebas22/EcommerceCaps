@@ -33,21 +33,19 @@ export default function Dashboard({ admin, onLogout }) {
     <div style={{ minHeight: "100vh", background: "var(--bg-1)" }}>
       {/* Topbar */}
       <div className="admin-topbar">
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <span className="admin-brand">CAPSCO</span>
-          <div className="admin-nav-pill">
-            {NAV_ITEMS.map(({ key, label }) => (
-              <button
-                key={key}
-                className={`admin-nav-item${vista === key ? " active" : ""}`}
-                onClick={() => setVista(key)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+        <span className="admin-brand">CAPSCO</span>
+        <div className="admin-nav-pill">
+          {NAV_ITEMS.map(({ key, label }) => (
+            <button
+              key={key}
+              className={`admin-nav-item${vista === key ? " active" : ""}`}
+              onClick={() => setVista(key)}
+            >
+              {label}
+            </button>
+          ))}
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+        <div className="admin-topbar-user">
           <span style={{ color: "var(--t2)", fontSize: "0.85rem" }}>
             Hola, <strong style={{ color: "var(--t1)", fontWeight: 600 }}>{admin.nombre.split(" ")[0]}</strong>
           </span>
@@ -71,7 +69,7 @@ export default function Dashboard({ admin, onLogout }) {
 
       {/* Stats */}
       {stats && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "16px", padding: "24px 28px 0" }}>
+        <div className="admin-stats-grid">
           {[
             { label: "Productos",  value: stats.total_productos,     color: "#0071E3" },
             { label: "Usuarios",   value: stats.total_usuarios,      color: "#34C759" },
@@ -97,7 +95,7 @@ export default function Dashboard({ admin, onLogout }) {
       )}
 
       {/* Contenido */}
-      <Container fluid className="py-4 px-4">
+      <Container fluid className="py-4 px-3 px-md-4">
         {vista === "productos"  && <Catalogo usuario={admin} onCarritoChange={() => {}} esAdmin={true} />}
         {vista === "usuarios"   && <Usuarios admin={admin} />}
         {vista === "pedidos"    && <Pedidos />}

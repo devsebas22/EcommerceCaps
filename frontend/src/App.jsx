@@ -8,9 +8,90 @@ import Perfil from "./pages/Perfil";
 import MisPedidos from "./pages/MisPedidos";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import PoliticaPrivacidad from "./pages/PoliticaPrivacidad";
+import Terminos from "./pages/Terminos";
 import Dashboard from "./admin/Dashboard";
 import CarritoDrawer from "./Carrito";
 import { useCarritoCount } from "./hooks/useCarrito";
+import WhatsAppButton from "./components/WhatsAppButton";
+
+const IG_URL = (import.meta.env.VITE_INSTAGRAM_URL || "").trim();
+const WA_NUM = import.meta.env.VITE_WHATSAPP_NUMBER || "573154895642";
+const socialLinkStyle = { color: "var(--t3)", textDecoration: "none", display: "flex", transition: "color .15s" };
+
+function FooterSection() {
+  return (
+    <footer style={{ borderTop: "1px solid var(--border)", background: "#FFFFFF", marginTop: "auto" }}>
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "36px 24px 24px" }}>
+        <div style={{ textAlign: "center", marginBottom: "28px" }}>
+          <span style={{ fontWeight: 800, fontSize: "0.78rem", letterSpacing: "2px", color: "var(--t1)" }}>CAPSCO</span>
+          <p style={{ margin: "12px auto 0", fontSize: "0.8rem", color: "var(--t2)", lineHeight: 1.65, maxWidth: "520px" }}>
+            CapsCo nació con una misión simple: traerte los mejores accesorios de moda a precios justos.
+            Somos una tienda 100% colombiana comprometida con la calidad y el servicio.
+          </p>
+        </div>
+
+        <div style={{ borderTop: "1px solid var(--border)", margin: "0 0 22px" }} />
+
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px", marginBottom: "22px" }}>
+          <div style={{ display: "flex", gap: "14px", alignItems: "center" }}>
+            {IG_URL && (
+              <a href={IG_URL} target="_blank" rel="noopener noreferrer"
+                style={socialLinkStyle}
+                onMouseOver={e => e.currentTarget.style.color = "var(--t1)"}
+                onMouseOut={e => e.currentTarget.style.color = "var(--t3)"}
+                aria-label="Instagram"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                </svg>
+              </a>
+            )}
+            <a href={`https://wa.me/${WA_NUM}`} target="_blank" rel="noopener noreferrer"
+              style={socialLinkStyle}
+              onMouseOver={e => e.currentTarget.style.color = "var(--t1)"}
+              onMouseOut={e => e.currentTarget.style.color = "var(--t3)"}
+              aria-label="WhatsApp"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+              </svg>
+            </a>
+          </div>
+          <div style={{ textAlign: "right" }}>
+            <p style={{ fontSize: "0.68rem", color: "var(--t3)", margin: "0 0 3px" }}>Pagos procesados por Wompi</p>
+            <p style={{ fontSize: "0.72rem", color: "var(--t2)", margin: 0, fontWeight: 500 }}>
+              Visa · Mastercard · PSE · Nequi · Bancolombia
+            </p>
+          </div>
+        </div>
+
+        <div style={{ borderTop: "1px solid var(--border)", paddingTop: "18px", display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+          <p style={{ margin: 0, fontSize: "0.75rem", color: "var(--t2)", textAlign: "center" }}>
+            Los precios incluyen IVA. Las imágenes son ilustrativas. Disponibilidad sujeta a stock.
+          </p>
+          <div style={{ display: "flex", gap: "20px", fontSize: "0.73rem" }}>
+            <Link to="/politica-privacidad" style={{ color: "var(--t2)", textDecoration: "none" }}
+              onMouseOver={e => e.currentTarget.style.color = "var(--t1)"}
+              onMouseOut={e => e.currentTarget.style.color = "var(--t2)"}>
+              Política de Privacidad
+            </Link>
+            <Link to="/terminos" style={{ color: "var(--t2)", textDecoration: "none" }}
+              onMouseOver={e => e.currentTarget.style.color = "var(--t1)"}
+              onMouseOut={e => e.currentTarget.style.color = "var(--t2)"}>
+              Términos y Condiciones
+            </Link>
+          </div>
+          <p style={{ margin: 0, fontSize: "0.72rem", color: "var(--t3)" }}>
+            © {new Date().getFullYear()} CapsCo. Todos los derechos reservados.
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
+}
 
 function AppContent() {
   const navigate = useNavigate();
@@ -66,6 +147,31 @@ function AppContent() {
                 <Navbar.Brand className="navbar-brand-theme">
                   CAPSCO
                 </Navbar.Brand>
+                {/* Carrito visible en mobile (antes del toggle) */}
+                {usuario && (
+                  <button
+                    className="cart-btn-mobile"
+                    onClick={() => setCarritoOpen(true)}
+                    style={{
+                      position: "relative",
+                      background: "transparent",
+                      border: "none",
+                      padding: "6px 8px",
+                      cursor: "pointer",
+                      color: "var(--t1)",
+                    }}
+                    aria-label="Carrito"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+                      <line x1="3" y1="6" x2="21" y2="6"/>
+                      <path d="M16 10a4 4 0 01-8 0"/>
+                    </svg>
+                    {carritoCount > 0 && (
+                      <span className="cart-badge" style={{ position: "absolute", top: "2px", right: "2px" }}>{carritoCount}</span>
+                    )}
+                  </button>
+                )}
                 <Navbar.Toggle
                   aria-controls="main-navbar"
                   className="border-0"
@@ -154,6 +260,8 @@ function AppContent() {
               <Route path="/reset-password"  element={<ResetPassword />} />
               <Route path="/perfil"   element={<Perfil usuario={usuario} onLogout={handleLogout} onUsuarioActualizado={handleUsuarioActualizado} />} />
               <Route path="/mis-pedidos" element={<MisPedidos usuario={usuario} />} />
+              <Route path="/politica-privacidad" element={<PoliticaPrivacidad />} />
+              <Route path="/terminos"        element={<Terminos />} />
             </Routes>
 
             {/* Carrito drawer — nivel raíz para el overlay correcto */}
@@ -166,34 +274,9 @@ function AppContent() {
               onProductosChange={() => setProductosKey((k) => k + 1)}
             />
 
-            <footer style={{
-              borderTop: "1px solid var(--border)",
-              background: "#FFFFFF",
-              padding: "28px 0",
-              marginTop: "auto",
-            }}>
-              <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px", display: "flex", flexDirection: "column", alignItems: "center", gap: "10px" }}>
-                <span style={{ fontWeight: 800, fontSize: "0.78rem", letterSpacing: "2px", color: "var(--t1)" }}>CAPSCO</span>
-                <p style={{ margin: 0, fontSize: "0.75rem", color: "var(--t2)", textAlign: "center" }}>
-                  Los precios incluyen IVA. Las imágenes son ilustrativas. Disponibilidad sujeta a stock.
-                </p>
-                <div style={{ display: "flex", gap: "20px", fontSize: "0.73rem" }}>
-                  <a href="/privacidad" style={{ color: "var(--t2)", textDecoration: "none" }}
-                    onMouseOver={e => e.currentTarget.style.color = "var(--t1)"}
-                    onMouseOut={e => e.currentTarget.style.color = "var(--t2)"}>
-                    Política de Privacidad
-                  </a>
-                  <a href="/terminos" style={{ color: "var(--t2)", textDecoration: "none" }}
-                    onMouseOver={e => e.currentTarget.style.color = "var(--t1)"}
-                    onMouseOut={e => e.currentTarget.style.color = "var(--t2)"}>
-                    Términos y Condiciones
-                  </a>
-                </div>
-                <p style={{ margin: 0, fontSize: "0.72rem", color: "var(--t3)" }}>
-                  © {new Date().getFullYear()} CapsCo. Todos los derechos reservados.
-                </p>
-              </div>
-            </footer>
+            <WhatsAppButton />
+
+            <FooterSection />
           </>
         }
       />

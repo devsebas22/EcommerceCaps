@@ -7,11 +7,12 @@ import ConfirmModal from "../components/ConfirmModal";
 const API_BASE = import.meta.env.VITE_API_URL;
 
 const ESTADO_STYLE = {
-  pendiente: { background: "#FFF8EE", border: "1px solid #FF9F0A", color: "#BF6900" },
-  pagado:    { background: "#F0FAF4", border: "1px solid #30D158", color: "#1A7F37" },
-  enviado:   { background: "#EEF4FF", border: "1px solid #0A84FF", color: "#0A6FBB" },
-  entregado: { background: "#E8F8EE", border: "1px solid #25A844", color: "#1A6B30" },
-  cancelado: { background: "#FFF2F1", border: "1px solid #FF3B30", color: "#CC2D22" },
+  pendiente:  { background: "#FFF8EE", border: "1px solid #FF9F0A", color: "#BF6900"  },
+  pagado:     { background: "#F0FAF4", border: "1px solid #30D158", color: "#1A7F37"  },
+  preparando: { background: "#EEF2FF", border: "1px solid #0071E3", color: "#0071E3"  },
+  enviado:    { background: "#EEF4FF", border: "1px solid #0A84FF", color: "#0A6FBB"  },
+  entregado:  { background: "#E8F8EE", border: "1px solid #25A844", color: "#1A6B30"  },
+  cancelado:  { background: "#FFF2F1", border: "1px solid #FF3B30", color: "#CC2D22"  },
 };
 
 const estadoStyle = (estado) => ({
@@ -27,6 +28,134 @@ const productoStyle = {
   display: "flex", alignItems: "center", gap: "12px", padding: "10px 0",
   borderBottom: "1px solid var(--border)",
 };
+
+// ─── Timeline ───────────────────────────────────────────────────────────────
+
+const ClockIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+  </svg>
+);
+const CheckIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="20 6 9 17 4 12"/>
+  </svg>
+);
+const BoxIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+    <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+    <line x1="12" y1="22.08" x2="12" y2="12"/>
+  </svg>
+);
+const TruckIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="1" y="3" width="15" height="13"/>
+    <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+    <circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+  </svg>
+);
+const HomeIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+    <polyline points="9 22 9 12 15 12 15 22"/>
+  </svg>
+);
+
+const TIMELINE_STEPS = [
+  { key: "pendiente",  label: "Pendiente",  Icon: ClockIcon  },
+  { key: "pagado",     label: "Pagado",     Icon: CheckIcon  },
+  { key: "preparando", label: "Preparando", Icon: BoxIcon    },
+  { key: "enviado",    label: "Enviado",    Icon: TruckIcon  },
+  { key: "entregado",  label: "Entregado",  Icon: HomeIcon   },
+];
+
+function OrderTimeline({ estado }) {
+  if (estado === "cancelado") {
+    return (
+      <div style={{ marginTop: "14px" }}>
+        <span style={{
+          display: "inline-flex", alignItems: "center", gap: "6px",
+          background: "#FFF2F1", border: "1px solid #FF3B30", borderRadius: "8px",
+          padding: "7px 14px", color: "#CC2D22", fontWeight: 700, fontSize: "0.82rem",
+        }}>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+          Cancelado
+        </span>
+      </div>
+    );
+  }
+
+  const n = TIMELINE_STEPS.length;
+  const currentIdx = TIMELINE_STEPS.findIndex(s => s.key === estado);
+  // Each step occupies (100/n)% → circle center at (50/n)% from each edge
+  const offset = `${50 / n}%`;
+  // Progress line fills from center of step 0 to center of current step
+  const progressWidth = currentIdx <= 0
+    ? "0%"
+    : `${(currentIdx / (n - 1)) * (100 - 100 / n)}%`;
+
+  return (
+    <div style={{ background: "#F5F5F7", borderRadius: "12px", padding: "16px 12px", marginTop: "14px" }}>
+      <div style={{ position: "relative", display: "flex" }}>
+        {/* Background line (circle-center to circle-center) */}
+        <div style={{
+          position: "absolute", top: "18px",
+          left: offset, right: offset,
+          height: "2px", background: "#D2D2D7", zIndex: 0,
+        }} />
+        {/* Progress line */}
+        {currentIdx > 0 && (
+          <div style={{
+            position: "absolute", top: "18px",
+            left: offset, width: progressWidth,
+            height: "2px", background: "#1D1D1F", zIndex: 0,
+            transition: "width .4s ease",
+          }} />
+        )}
+
+        {TIMELINE_STEPS.map((step, idx) => {
+          const isActive = idx <= currentIdx;
+          const isCurrent = idx === currentIdx;
+          return (
+            <div key={step.key} style={{
+              flex: 1, display: "flex", flexDirection: "column",
+              alignItems: "center", gap: "6px", zIndex: 1,
+            }}>
+              <div style={{
+                width: "36px", height: "36px", borderRadius: "50%",
+                background: isActive ? "#1D1D1F" : "#D2D2D7",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                flexShrink: 0,
+                boxShadow: isCurrent ? "0 0 0 4px rgba(29,29,31,0.10)" : "none",
+                transition: "background .2s, box-shadow .2s",
+              }}>
+                <span style={{ color: isActive ? "#FFFFFF" : "#AEAEB2", display: "flex" }}>
+                  <step.Icon />
+                </span>
+              </div>
+              <span style={{
+                fontSize: "0.65rem",
+                fontWeight: isCurrent ? 700 : 500,
+                color: isActive ? "#1D1D1F" : "#AEAEB2",
+                textAlign: "center",
+                lineHeight: 1.2,
+                maxWidth: "100%",
+                overflowWrap: "break-word",
+              }}>
+                {step.label}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ────────────────────────────────────────────────────────────────────────────
 
 export default function MisPedidos({ usuario }) {
   const navigate = useNavigate();
@@ -220,6 +349,8 @@ export default function MisPedidos({ usuario }) {
                   </div>
                 </div>
 
+                <OrderTimeline estado={p.estado} />
+
                 {errorPagoId === p.id && (
                   <div style={{
                     background: "#FFF2F1",
@@ -283,17 +414,12 @@ export default function MisPedidos({ usuario }) {
                 )}
 
                 {expandido !== p.id && (
-                  <>
-                    {p.estado === "cancelado" && (
-                      <p style={{ color: "#CC2D22", fontSize: "0.78rem", margin: "4px 0 0" }}>
-                        Pedido cancelado — Capital devuelto
-                      </p>
-                    )}
-                    <p style={{ color: "var(--t3)", fontSize: "0.78rem", margin: p.estado === "cancelado" ? "2px 0 0" : "4px 0 0", cursor: "pointer" }}
-                       onClick={() => setExpandido(p.id)}>
-                      Ver detalle ▾
-                    </p>
-                  </>
+                  <p
+                    style={{ color: "var(--t3)", fontSize: "0.78rem", margin: "10px 0 0", cursor: "pointer" }}
+                    onClick={() => setExpandido(p.id)}
+                  >
+                    Ver detalle ▾
+                  </p>
                 )}
               </div>
             ))}

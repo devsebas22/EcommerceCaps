@@ -6,11 +6,12 @@ import { authFetch } from "../utils/api";
 const API_BASE = import.meta.env.VITE_API_URL;
 
 const ESTADO_STYLE = {
-  pendiente: { background: "#FFF8EE", border: "1px solid #FF9F0A", color: "#BF6900" },
-  pagado:    { background: "#F0FAF4", border: "1px solid #30D158", color: "#1A7F37" },
-  enviado:   { background: "#EEF4FF", border: "1px solid #0A84FF", color: "#0A6FBB" },
-  entregado: { background: "#E8F8EE", border: "1px solid #25A844", color: "#1A6B30" },
-  cancelado: { background: "#FFF2F1", border: "1px solid #FF3B30", color: "#CC2D22" },
+  pendiente:  { background: "#FFF8EE", border: "1px solid #FF9F0A", color: "#BF6900" },
+  pagado:     { background: "#F0FAF4", border: "1px solid #30D158", color: "#1A7F37" },
+  preparando: { background: "#EEF2FF", border: "1px solid #0071E3", color: "#0071E3" },
+  enviado:    { background: "#EEF4FF", border: "1px solid #0A84FF", color: "#0A6FBB" },
+  entregado:  { background: "#E8F8EE", border: "1px solid #25A844", color: "#1A6B30" },
+  cancelado:  { background: "#FFF2F1", border: "1px solid #FF3B30", color: "#CC2D22" },
 };
 
 const estadoStyle = (estado) => ({
@@ -99,13 +100,13 @@ export default function Pedidos() {
         onCancelar={() => setConfirmEliminar(null)}
       />
       <Toast mensaje={mensaje} />
-      <div style={{ background: "#FFFFFF", border: "1px solid var(--border)", borderRadius: "var(--r3)", overflow: "hidden", boxShadow: "var(--sh-sm)" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem" }}>
+      <div className="table-scroll-wrap" style={{ background: "#FFFFFF", border: "1px solid var(--border)", borderRadius: "var(--r3)", boxShadow: "var(--sh-sm)" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem", minWidth: "680px" }}>
           <thead>
             <tr>
               <th style={{ ...thStyle, width: "28px", cursor: "default" }} />
-              {[["id","ID"],["usuario_nombre","Usuario"],["total","Total"],["direccion_envio","Dirección"],["estado","Estado"]].map(([campo, label]) => (
-                <th key={campo} style={thStyle} onClick={() => ordenar(campo)}>
+              {[["id","ID",""],["usuario_nombre","Usuario",""],["total","Total",""],["direccion_envio","Dirección","hide-mobile"],["estado","Estado",""]].map(([campo, label, cls]) => (
+                <th key={campo} className={cls} style={thStyle} onClick={() => ordenar(campo)}>
                   {label} {orden.campo === campo ? (orden.dir === "asc" ? "↑" : "↓") : <span style={{ opacity: 0.35 }}>↕</span>}
                 </th>
               ))}
@@ -143,14 +144,14 @@ export default function Pedidos() {
                   <td style={{ ...tdStyle, color: "var(--t2)" }}>#{p.id}</td>
                   <td style={{ ...tdStyle, fontWeight: 600 }}>{p.usuario_nombre || `Usuario #${p.usuario_id}`}</td>
                   <td style={{ ...tdStyle, color: "var(--t1)", fontWeight: 700 }}>${p.total.toLocaleString()}</td>
-                  <td style={{ ...tdStyle, color: "var(--t2)", fontSize: "0.85rem", maxWidth: "200px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.direccion_envio}</td>
+                  <td className="hide-mobile" style={{ ...tdStyle, color: "var(--t2)", fontSize: "0.85rem", maxWidth: "200px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.direccion_envio}</td>
                   <td style={tdStyle} onClick={e => e.stopPropagation()}>
                     <select
                       value={p.estado}
                       onChange={(e) => actualizarEstado(p.id, e.target.value, e)}
                       style={estadoStyle(p.estado)}
                     >
-                      {["pendiente","pagado","enviado","entregado","cancelado"].map((e) => (
+                      {["pendiente","pagado","preparando","enviado","entregado","cancelado"].map((e) => (
                         <option key={e} value={e} style={{ background: "#FFFFFF", color: "#1D1D1F" }}>{e}</option>
                       ))}
                     </select>
