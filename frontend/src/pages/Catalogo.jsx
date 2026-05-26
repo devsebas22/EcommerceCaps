@@ -168,7 +168,8 @@ const productosOrdenados = [...productosFiltrados].sort((a, b) => {
 
   return (
     <>
-      <div style={{ marginBottom: "44px", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+      {/* Fila 1: Heading + botones admin */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "16px", flexWrap: "wrap", gap: "12px" }}>
         <div>
           <p style={{ color: "var(--t2)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "1.8px", textTransform: "uppercase", margin: "0 0 6px" }}>
             Colección actual
@@ -178,65 +179,66 @@ const productosOrdenados = [...productosFiltrados].sort((a, b) => {
           </h2>
           <div className="heading-line" />
         </div>
-        <FiltroProductos
-            busqueda={busqueda}
-            setBusqueda={setBusqueda}
-            categoriaFiltro={categoriaFiltro}
-            setCategoriaFiltro={setCategoriaFiltro}
-            precioMax={precioMax}
-            setPrecioMax={setPrecioMax}
-            categorias={categorias}
-            esAdmin={esAdmin}
-            busquedaId={busquedaId}
-            setBusquedaId={setBusquedaId}
-          />
         {esAdmin && (
-            <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-              <button
-                onClick={() => setVistaLista(false)}
-                style={{
-                  background: !vistaLista ? "#1D1D1F" : "#FFFFFF",
-                  border: `1px solid ${!vistaLista ? "#1D1D1F" : "var(--border-md)"}`,
-                  color: !vistaLista ? "#FFFFFF" : "var(--t2)",
-                  borderRadius: "var(--r1)",
-                  padding: "7px 12px",
-                  cursor: "pointer",
-                  fontSize: "0.85rem",
-                  fontFamily: "inherit",
-                  fontWeight: !vistaLista ? 600 : 400,
-                  transition: "all .15s",
-                }}
-                onMouseOver={e => { if (vistaLista) { e.currentTarget.style.borderColor = "#1D1D1F"; e.currentTarget.style.color = "var(--t1)"; } }}
-                onMouseOut={e => { if (vistaLista) { e.currentTarget.style.borderColor = "var(--border-md)"; e.currentTarget.style.color = "var(--t2)"; } }}
-              >
-                Cards
-              </button>
-              <button
-                onClick={() => setVistaLista(true)}
-                style={{
-                  background: vistaLista ? "#1D1D1F" : "#FFFFFF",
-                  border: `1px solid ${vistaLista ? "#1D1D1F" : "var(--border-md)"}`,
-                  color: vistaLista ? "#FFFFFF" : "var(--t2)",
-                  borderRadius: "var(--r1)",
-                  padding: "7px 12px",
-                  cursor: "pointer",
-                  fontSize: "0.85rem",
-                  fontFamily: "inherit",
-                  fontWeight: vistaLista ? 600 : 400,
-                  transition: "all .15s",
-                }}
-                onMouseOver={e => { if (!vistaLista) { e.currentTarget.style.borderColor = "#1D1D1F"; e.currentTarget.style.color = "var(--t1)"; } }}
-                onMouseOut={e => { if (!vistaLista) { e.currentTarget.style.borderColor = "var(--border-md)"; e.currentTarget.style.color = "var(--t2)"; } }}
-              >
-                Lista
-              </button>
-              <Button className="btn-theme-primary" onClick={abrirNuevo}>
-                + Nuevo Producto
-              </Button>
-            </div>
-          )}  
-        
+          <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
+            <button
+              onClick={() => setVistaLista(false)}
+              style={{
+                background: !vistaLista ? "#1D1D1F" : "#FFFFFF",
+                border: `1px solid ${!vistaLista ? "#1D1D1F" : "var(--border-md)"}`,
+                color: !vistaLista ? "#FFFFFF" : "var(--t2)",
+                borderRadius: "var(--r1)",
+                padding: "7px 12px",
+                cursor: "pointer",
+                fontSize: "0.85rem",
+                fontFamily: "inherit",
+                fontWeight: !vistaLista ? 600 : 400,
+                transition: "all .15s",
+              }}
+              onMouseOver={e => { if (vistaLista) { e.currentTarget.style.borderColor = "#1D1D1F"; e.currentTarget.style.color = "var(--t1)"; } }}
+              onMouseOut={e => { if (vistaLista) { e.currentTarget.style.borderColor = "var(--border-md)"; e.currentTarget.style.color = "var(--t2)"; } }}
+            >
+              Cards
+            </button>
+            <button
+              onClick={() => setVistaLista(true)}
+              style={{
+                background: vistaLista ? "#1D1D1F" : "#FFFFFF",
+                border: `1px solid ${vistaLista ? "#1D1D1F" : "var(--border-md)"}`,
+                color: vistaLista ? "#FFFFFF" : "var(--t2)",
+                borderRadius: "var(--r1)",
+                padding: "7px 12px",
+                cursor: "pointer",
+                fontSize: "0.85rem",
+                fontFamily: "inherit",
+                fontWeight: vistaLista ? 600 : 400,
+                transition: "all .15s",
+              }}
+              onMouseOver={e => { if (!vistaLista) { e.currentTarget.style.borderColor = "#1D1D1F"; e.currentTarget.style.color = "var(--t1)"; } }}
+              onMouseOut={e => { if (!vistaLista) { e.currentTarget.style.borderColor = "var(--border-md)"; e.currentTarget.style.color = "var(--t2)"; } }}
+            >
+              Lista
+            </button>
+            <Button className="btn-theme-primary" onClick={abrirNuevo}>
+              + Nuevo Producto
+            </Button>
+          </div>
+        )}
       </div>
+
+      {/* Fila 2: Filtros */}
+      <FiltroProductos
+        busqueda={busqueda}
+        setBusqueda={setBusqueda}
+        categoriaFiltro={categoriaFiltro}
+        setCategoriaFiltro={setCategoriaFiltro}
+        precioMax={precioMax}
+        setPrecioMax={setPrecioMax}
+        categorias={categorias}
+        esAdmin={esAdmin}
+        busquedaId={busquedaId}
+        setBusquedaId={setBusquedaId}
+      />
 
       {esAdmin && <Toast mensaje={mensajeAdmin} />}
       {!esAdmin && <Toast mensaje={toastCarrito} />}
@@ -270,12 +272,13 @@ const productosOrdenados = [...productosFiltrados].sort((a, b) => {
           No hay productos disponibles.
         </p>
       ) : vistaLista && esAdmin ? (
-        <div style={{ background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: "var(--r3)", overflow: "hidden" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", color: "var(--t1)", fontSize: "0.9rem" }}>
+        <div className="table-scroll-wrap" style={{ background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: "var(--r3)" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", color: "var(--t1)", fontSize: "0.9rem", minWidth: "660px" }}>
             <thead>
               <tr style={{ background: "var(--bg-4)" }}>
-                {[["id","ID"],["nombre","Nombre"],["categoria","Categoría"],["precio","Precio"],["stock","Stock"],["marca","Marca"]].map(([campo, label]) => (
-                  <th key={campo} 
+                {[["id","ID",""],["nombre","Nombre",""],["categoria","Categoría",""],["precio","Precio",""],["stock","Stock",""],["marca","Marca","hide-mobile"]].map(([campo, label, cls]) => (
+                  <th key={campo}
+                    className={cls}
                     onClick={() => ordenarLista(campo)}
                     style={{ padding: "13px 18px", textAlign: "left", color: "var(--t2)", fontSize: "0.70rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.9px", whiteSpace: "nowrap", cursor: "pointer", userSelect: "none" }}>
                     {label} {ordenLista.campo === campo ? (ordenLista.dir === "asc" ? "↑" : "↓") : "↕"}
@@ -298,18 +301,18 @@ const productosOrdenados = [...productosFiltrados].sort((a, b) => {
                   <td style={{ padding: "14px 18px", color: p.stock > 5 ? "var(--ok)" : p.stock > 0 ? "var(--warn)" : "var(--err)", fontWeight: 700 }}>
                     {p.stock} uds
                   </td>
-                  <td style={{ padding: "14px 18px", color: "var(--t2)" }}>{p.marca}</td>
+                  <td className="hide-mobile" style={{ padding: "14px 18px", color: "var(--t2)" }}>{p.marca}</td>
                   <td style={{ padding: "14px 18px" }}>
                     <div style={{ display: "flex", gap: "8px" }}>
                       <button
                         onClick={() => abrirEditar(p)}
-                        style={{ background: "none", border: "1px solid var(--warn)", color: "var(--warn)", borderRadius: "var(--r1)", padding: "5px 12px", cursor: "pointer", fontSize: "0.78rem", fontFamily: "inherit" }}
+                        style={{ background: "none", border: "1px solid var(--warn)", color: "var(--warn)", borderRadius: "var(--r1)", padding: "5px 10px", cursor: "pointer", fontSize: "0.78rem", fontFamily: "inherit" }}
                       >
                         Editar
                       </button>
                       <button
                         onClick={() => eliminarProducto(p.id)}
-                        style={{ background: "none", border: "1px solid var(--err)", color: "var(--err)", borderRadius: "var(--r1)", padding: "5px 12px", cursor: "pointer", fontSize: "0.78rem", fontFamily: "inherit" }}
+                        style={{ background: "none", border: "1px solid var(--err)", color: "var(--err)", borderRadius: "var(--r1)", padding: "5px 10px", cursor: "pointer", fontSize: "0.78rem", fontFamily: "inherit" }}
                       >
                         Eliminar
                       </button>
