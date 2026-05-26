@@ -22,7 +22,9 @@ def obtener_o_crear_carrito(usuario_id: int, db: Session):
     return carrito
 
 @router.get("/{usuario_id}", response_model=CarritoResponse)
-def obtener_carrito(usuario_id: int, db: Session = Depends(get_db)):
+def obtener_carrito(usuario_id: int, db: Session = Depends(get_db), usuario_actual: Usuario = Depends(get_usuario_actual)):
+    if usuario_actual.id != usuario_id:
+        raise HTTPException(status_code=403, detail="No autorizado")
     usuario = db.query(Usuario).filter(Usuario.id == usuario_id).first()
     if not usuario:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
