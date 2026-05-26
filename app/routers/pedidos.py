@@ -102,7 +102,7 @@ def eliminar_pedido(pedido_id: int, db: Session = Depends(get_db), usuario_actua
         raise HTTPException(status_code=400, detail="Solo puedes cancelar pedidos pendientes")
 
     # Restaurar stock si el pedido ya había reducido el inventario
-    if pedido.estado in (EstadoPedido.pagado, EstadoPedido.enviado):
+    if pedido.estado in (EstadoPedido.pagado, EstadoPedido.preparando, EstadoPedido.enviado):
         for item in pedido.items:
             prod = db.query(Producto).filter(Producto.id == item.producto_id).first()
             if prod:
@@ -149,7 +149,7 @@ def actualizar_estado(pedido_id: int, datos: ActualizarEstado, db: Session = Dep
             producto.stock -= pedido_item.cantidad
         if usuario:
             usuario.puntos_fidelidad += int(pedido.total)
-    if datos.estado == "cancelado" and estado_anterior in (EstadoPedido.pagado, EstadoPedido.enviado, EstadoPedido.entregado):
+    if datos.estado == "cancelado" and estado_anterior in (EstadoPedido.pagado, EstadoPedido.preparando, EstadoPedido.enviado, EstadoPedido.entregado):
         for pedido_item in pedido.items:
             producto = db.query(Producto).filter(Producto.id == pedido_item.producto_id).first()
             producto.stock += pedido_item.cantidad

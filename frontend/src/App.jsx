@@ -11,6 +11,7 @@ import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./admin/Dashboard";
 import CarritoDrawer from "./Carrito";
 import { useCarritoCount } from "./hooks/useCarrito";
+import WhatsAppButton from "./components/WhatsAppButton";
 
 function AppContent() {
   const navigate = useNavigate();
@@ -190,6 +191,8 @@ function AppContent() {
               onUsuarioActualizado={handleUsuarioActualizado}
               onProductosChange={() => setProductosKey((k) => k + 1)}
             />
+
+            <WhatsAppButton />
 
             <footer style={{
               borderTop: "1px solid var(--border)",
