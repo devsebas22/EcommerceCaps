@@ -157,10 +157,12 @@ alembic upgrade head
 ### 7. Iniciar el Proyecto
 
 ```bash
-# Opción 1 — Script rápido
+# Opción 1 — Script rápido (inicia PostgreSQL, migraciones, backend y frontend)
 chmod +x iniciar.sh && ./iniciar.sh
 
 # Opción 2 — Manual
+docker compose up -d postgres    # Solo BD
+alembic upgrade head              # Migraciones
 source .venv/bin/activate
 uvicorn app.main:app --reload --env-file .env &   # Backend :8000
 cd frontend && npm run dev                         # Frontend :5173
