@@ -1,13 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from app.database import get_db
-from app.models.usuario import Usuario
-from app.models.carrito import Carrito, CarritoItem
-from app.models.pedido import Pedido, PedidoItem
-from app.models.producto import Producto
-from app.schemas.usuario import UsuarioCreate, UsuarioResponse, UsuarioUpdate, LoginRequest, LoginResponse
-from app.auth import crear_token, get_usuario_actual, get_admin_actual
 from passlib.context import CryptContext
+from sqlalchemy.orm import Session
+
+from app.auth import crear_token, get_admin_actual, get_usuario_actual
+from app.database import get_db
+from app.models.producto import Producto
+from app.models.usuario import Usuario
+from app.schemas.usuario import LoginRequest, LoginResponse, UsuarioCreate, UsuarioResponse, UsuarioUpdate
 
 router = APIRouter(
     prefix="/usuarios",

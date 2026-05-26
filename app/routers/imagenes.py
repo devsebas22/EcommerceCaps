@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+
+from app.auth import get_admin_actual
 from app.database import get_db
 from app.models.producto import Producto, ProductoImagen
 from app.models.usuario import Usuario
 from app.schemas.producto_imagen import ProductoImagenCreate, ProductoImagenResponse
-from app.auth import get_admin_actual
 
 router = APIRouter(
     prefix="/imagenes",
@@ -19,7 +20,7 @@ def agregar_imagen(imagen: ProductoImagenCreate, db: Session = Depends(get_db), 
     if imagen.es_principal:
         db.query(ProductoImagen).filter(
             ProductoImagen.producto_id == imagen.producto_id,
-            ProductoImagen.es_principal == True
+            ProductoImagen.es_principal
         ).update({"es_principal": False})
     nueva_imagen = ProductoImagen(**imagen.model_dump())
     db.add(nueva_imagen)
@@ -50,7 +51,7 @@ def marcar_principal(imagen_id: int, db: Session = Depends(get_db), admin: Usuar
         raise HTTPException(status_code=404, detail="Imagen no encontrada")
     db.query(ProductoImagen).filter(
         ProductoImagen.producto_id == imagen.producto_id,
-        ProductoImagen.es_principal == True,
+        ProductoImagen.es_principal,
     ).update({"es_principal": False})
     imagen.es_principal = True
     db.commit()

@@ -1,7 +1,10 @@
-from sqlalchemy import Column, Integer, Numeric, String, ForeignKey, Enum
-from sqlalchemy.orm import relationship
-from app.database import Base
 import enum
+
+from sqlalchemy import Column, Enum, ForeignKey, Integer, Numeric, String
+from sqlalchemy.orm import relationship
+
+from app.database import Base
+
 
 class EstadoPedido(enum.Enum):
     pendiente  = "pendiente"

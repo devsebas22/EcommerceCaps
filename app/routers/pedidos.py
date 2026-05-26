@@ -1,13 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session, joinedload
-from app.database import get_db
-from app.models.pedido import Pedido, PedidoItem, EstadoPedido
-from app.models.carrito import Carrito, CarritoItem
-from app.models.usuario import Usuario
-from app.models.producto import Producto
-from app.schemas.pedido import PedidoCreate, PedidoResponse
-from app.auth import get_usuario_actual, get_admin_actual
 from pydantic import BaseModel
+from sqlalchemy.orm import Session, joinedload
+
+from app.auth import get_admin_actual, get_usuario_actual
+from app.database import get_db
+from app.models.carrito import Carrito
+from app.models.pedido import EstadoPedido, Pedido, PedidoItem
+from app.models.producto import Producto
+from app.models.usuario import Usuario
+from app.schemas.pedido import PedidoCreate, PedidoResponse
 
 router = APIRouter(
     prefix="/pedidos",
@@ -15,7 +16,12 @@ router = APIRouter(
 )
 
 @router.post("/{usuario_id}", response_model=PedidoResponse)
-def crear_pedido(usuario_id: int, datos: PedidoCreate, db: Session = Depends(get_db), usuario_actual: Usuario = Depends(get_usuario_actual)):
+def crear_pedido(
+    usuario_id: int,
+    datos: PedidoCreate,
+    db: Session = Depends(get_db),
+    usuario_actual: Usuario = Depends(get_usuario_actual),
+):
     if usuario_actual.id != usuario_id:
         raise HTTPException(status_code=403, detail="No autorizado")
     usuario = db.query(Usuario).filter(Usuario.id == usuario_id).first()
@@ -120,7 +126,12 @@ class ActualizarEstado(BaseModel):
     estado: str
 
 @router.put("/{pedido_id}/estado")
-def actualizar_estado(pedido_id: int, datos: ActualizarEstado, db: Session = Depends(get_db), usuario_actual: Usuario = Depends(get_usuario_actual)):
+def actualizar_estado(
+    pedido_id: int,
+    datos: ActualizarEstado,
+    db: Session = Depends(get_db),
+    usuario_actual: Usuario = Depends(get_usuario_actual),
+):
     pedido = db.query(Pedido).filter(Pedido.id == pedido_id).first()
     if not pedido:
         raise HTTPException(status_code=404, detail="Pedido no encontrado")
@@ -149,7 +160,12 @@ def actualizar_estado(pedido_id: int, datos: ActualizarEstado, db: Session = Dep
             producto.stock -= pedido_item.cantidad
         if usuario:
             usuario.puntos_fidelidad += int(pedido.total)
-    if datos.estado == "cancelado" and estado_anterior in (EstadoPedido.pagado, EstadoPedido.preparando, EstadoPedido.enviado, EstadoPedido.entregado):
+    if datos.estado == "cancelado" and estado_anterior in (
+        EstadoPedido.pagado,
+        EstadoPedido.preparando,
+        EstadoPedido.enviado,
+        EstadoPedido.entregado,
+    ):
         for pedido_item in pedido.items:
             producto = db.query(Producto).filter(Producto.id == pedido_item.producto_id).first()
             producto.stock += pedido_item.cantidad

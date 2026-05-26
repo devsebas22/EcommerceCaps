@@ -1,7 +1,6 @@
+from app.models.carrito import Carrito, CarritoItem
 from app.models.categoria import Categoria
 from app.models.producto import Producto
-from app.models.carrito import Carrito, CarritoItem
-from app.models.pedido import Pedido, EstadoPedido
 
 
 def _setup_carrito_con_item(db_session, usuario):

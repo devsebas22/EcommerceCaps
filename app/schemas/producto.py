@@ -1,6 +1,8 @@
 from pydantic import BaseModel
+
 from app.schemas.categoria import CategoriaResponse
 from app.schemas.producto_imagen import ProductoImagenResponse
+
 
 class ProductoBase(BaseModel):
     nombre: str

@@ -1,14 +1,15 @@
 import os
+
 import pytest
 from fastapi.testclient import TestClient
+from passlib.context import CryptContext
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from passlib.context import CryptContext
 
+from app.auth import crear_token
 from app.database import Base, get_db
 from app.main import app
 from app.models.usuario import Usuario
-from app.auth import crear_token
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
@@ -27,8 +28,8 @@ def clean_db(engine):
 
 @pytest.fixture
 def db_session(engine):
-    Session = sessionmaker(bind=engine)
-    session = Session()
+    session_cls = sessionmaker(bind=engine)
+    session = session_cls()
     yield session
     session.close()
 
