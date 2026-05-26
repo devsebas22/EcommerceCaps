@@ -15,7 +15,7 @@ const ChevronRight = () => (
   </svg>
 );
 
-export default function ProductModal({ producto, esAdmin, onClose, onAgregarAlCarrito }) {
+export default function ProductModal({ producto, esAdmin, onClose, onAgregarAlCarrito, relacionados = [], onVerRelacionado }) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [selImgIdx, setSelImgIdx] = useState(0);
   const touchStartX = useRef(null);
@@ -209,6 +209,7 @@ export default function ProductModal({ producto, esAdmin, onClose, onAgregarAlCa
               )}
             </div>
           </div>
+
         </Modal.Body>
 
         <Modal.Footer style={{ background: "#FFFFFF", borderTop: "1px solid var(--border)", padding: "16px 32px", gap: "12px" }}>
@@ -249,6 +250,63 @@ export default function ProductModal({ producto, esAdmin, onClose, onAgregarAlCa
         plugins={[Zoom]}
         zoom={{ maxZoomPixelRatio: 3, scrollToZoom: true }}
       />
+
+      {!esAdmin && relacionados.length > 0 && (
+        <div style={{ maxWidth: "672px", margin: "16px auto 0", padding: "0 8px" }}>
+          <p style={{ color: "var(--t3)", fontSize: "0.68rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", margin: "0 0 10px" }}>
+            También te puede interesar
+          </p>
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            {relacionados.map((p) => {
+              const img = p.imagenes?.find(i => i.es_principal)?.url ?? p.imagenes?.[0]?.url;
+              return (
+                <div key={p.id} style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                  background: "#FFFFFF",
+                  border: "1px solid var(--border)",
+                  borderRadius: "var(--r2)",
+                  overflow: "hidden",
+                  padding: "0",
+                }}>
+                  <div style={{ width: "80px", height: "80px", flexShrink: 0, background: "var(--bg-1)" }}>
+                    {img && (
+                      <img src={img} alt={p.nombre} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                    )}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0, padding: "0 4px" }}>
+                    <p style={{ fontSize: "0.82rem", fontWeight: 600, color: "var(--t1)", margin: "0 0 2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {p.nombre}
+                    </p>
+                    <p style={{ fontSize: "0.8rem", color: "var(--t2)", margin: 0, fontWeight: 500 }}>
+                      ${p.precio.toLocaleString()}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => onVerRelacionado?.(p)}
+                    style={{
+                      flexShrink: 0,
+                      marginRight: "12px",
+                      background: "none",
+                      border: "1px solid var(--border-md)",
+                      borderRadius: "var(--r1)",
+                      padding: "6px 14px",
+                      fontSize: "0.75rem",
+                      cursor: "pointer",
+                      fontFamily: "inherit",
+                      color: "var(--t2)",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    Ver
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       <style>{`
         .modal-product-c {

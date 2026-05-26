@@ -11,6 +11,138 @@ import FiltroProductos from "../components/FiltroProductos";
 
 const API_BASE = import.meta.env.VITE_API_URL;
 
+// ─── Secciones de confianza ──────────────────────────────────────────────────
+
+const TRUST_ITEMS = [
+  {
+    text: "Envíos a toda Colombia",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+        <circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+      </svg>
+    ),
+  },
+  {
+    text: "Compra 100% segura",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+    ),
+  },
+  {
+    text: "Atención por WhatsApp",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+    ),
+  },
+  {
+    text: "Devoluciones garantizadas",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-5"/>
+      </svg>
+    ),
+  },
+];
+
+const TrustBanner = () => (
+  <div style={{
+    display: "flex",
+    background: "#F5F5F7",
+    borderRadius: "var(--r3)",
+    marginBottom: "32px",
+    overflowX: "auto",
+    scrollbarWidth: "none",
+    WebkitOverflowScrolling: "touch",
+  }}>
+    {TRUST_ITEMS.map((item, i) => (
+      <div key={i} style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "9px",
+        padding: "14px 24px",
+        flexShrink: 0,
+        flex: "1 0 auto",
+        borderRight: i < TRUST_ITEMS.length - 1 ? "1px solid var(--border)" : "none",
+        color: "var(--t1)",
+      }}>
+        {item.icon}
+        <span style={{ color: "var(--t2)", fontSize: "0.78rem", fontWeight: 500, whiteSpace: "nowrap" }}>
+          {item.text}
+        </span>
+      </div>
+    ))}
+  </div>
+);
+
+const WHY_ITEMS = [
+  {
+    title: "Calidad Premium",
+    desc: "Seleccionamos cada producto con los más altos estándares de calidad",
+    icon: (
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>
+      </svg>
+    ),
+  },
+  {
+    title: "Pago Seguro",
+    desc: "Procesado por Wompi, la plataforma más segura de Colombia",
+    icon: (
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    ),
+  },
+  {
+    title: "Envío Rápido",
+    desc: "Despachamos en 24-48 horas a todo el país",
+    icon: (
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+      </svg>
+    ),
+  },
+];
+
+const WhyUs = () => (
+  <div style={{ marginTop: "64px", paddingTop: "48px", borderTop: "1px solid var(--border)" }}>
+    <h3 style={{ textAlign: "center", fontWeight: 800, fontSize: "1.25rem", margin: "0 0 6px", color: "var(--t1)" }}>
+      ¿Por qué elegirnos?
+    </h3>
+    <div style={{ width: "28px", height: "2px", background: "var(--t1)", margin: "0 auto 36px", borderRadius: "2px" }} />
+    <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
+      {WHY_ITEMS.map((item, i) => (
+        <div key={i} style={{
+          flex: "1 1 200px",
+          background: "#FFFFFF",
+          border: "1px solid var(--border)",
+          borderRadius: "var(--r3)",
+          padding: "32px 24px",
+          textAlign: "center",
+          boxShadow: "var(--sh-sm)",
+        }}>
+          <div style={{ color: "var(--t1)", display: "flex", justifyContent: "center", marginBottom: "16px" }}>
+            {item.icon}
+          </div>
+          <p style={{ fontWeight: 700, fontSize: "0.92rem", color: "var(--t1)", margin: "0 0 8px" }}>
+            {item.title}
+          </p>
+          <p style={{ color: "var(--t2)", fontSize: "0.82rem", lineHeight: 1.65, margin: 0 }}>
+            {item.desc}
+          </p>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 export default function Catalogo({ usuario, onCarritoChange, esAdmin = false, reloadTrigger = 0 }) {
   const [productos, setProductos] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -166,8 +298,14 @@ const productosOrdenados = [...productosFiltrados].sort((a, b) => {
     </div>
   );
 
+  const relacionados = sel && !esAdmin
+    ? productos.filter(p => p.categoria_id === sel.categoria_id && p.id !== sel.id).slice(0, 3)
+    : [];
+
   return (
     <>
+      {!esAdmin && <TrustBanner />}
+
       {/* Fila 1: Heading + botones admin */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "16px", flexWrap: "wrap", gap: "12px" }}>
         <div>
@@ -346,6 +484,8 @@ const productosOrdenados = [...productosFiltrados].sort((a, b) => {
         esAdmin={esAdmin}
         onClose={() => setSel(null)}
         onAgregarAlCarrito={agregarAlCarrito}
+        relacionados={relacionados}
+        onVerRelacionado={setSel}
       />
 
       <AdminProductForm
@@ -354,6 +494,8 @@ const productosOrdenados = [...productosFiltrados].sort((a, b) => {
         productoEditando={productoEditando}
         onSuccess={handleFormSuccess}
       />
+
+      {!esAdmin && <WhyUs />}
     </>
   );
 }
