@@ -7,11 +7,12 @@ import ConfirmModal from "../components/ConfirmModal";
 const API_BASE = import.meta.env.VITE_API_URL;
 
 const ESTADO_STYLE = {
-  pendiente: { background: "#FFF8EE", border: "1px solid #FF9F0A", color: "#BF6900" },
-  pagado:    { background: "#F0FAF4", border: "1px solid #30D158", color: "#1A7F37" },
-  enviado:   { background: "#EEF4FF", border: "1px solid #0A84FF", color: "#0A6FBB" },
-  entregado: { background: "#E8F8EE", border: "1px solid #25A844", color: "#1A6B30" },
-  cancelado: { background: "#FFF2F1", border: "1px solid #FF3B30", color: "#CC2D22" },
+  pendiente:  { background: "#FFF8EE", border: "1px solid #FF9F0A", color: "#BF6900"  },
+  pagado:     { background: "#F0FAF4", border: "1px solid #30D158", color: "#1A7F37"  },
+  preparando: { background: "#EEF2FF", border: "1px solid #0071E3", color: "#0071E3"  },
+  enviado:    { background: "#EEF4FF", border: "1px solid #0A84FF", color: "#0A6FBB"  },
+  entregado:  { background: "#E8F8EE", border: "1px solid #25A844", color: "#1A6B30"  },
+  cancelado:  { background: "#FFF2F1", border: "1px solid #FF3B30", color: "#CC2D22"  },
 };
 
 const estadoStyle = (estado) => ({
@@ -40,6 +41,13 @@ const CheckIcon = () => (
     <polyline points="20 6 9 17 4 12"/>
   </svg>
 );
+const BoxIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+    <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+    <line x1="12" y1="22.08" x2="12" y2="12"/>
+  </svg>
+);
 const TruckIcon = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <rect x="1" y="3" width="15" height="13"/>
@@ -55,10 +63,11 @@ const HomeIcon = () => (
 );
 
 const TIMELINE_STEPS = [
-  { key: "pendiente", label: "Pendiente", Icon: ClockIcon  },
-  { key: "pagado",    label: "Pagado",    Icon: CheckIcon  },
-  { key: "enviado",   label: "Enviado",   Icon: TruckIcon  },
-  { key: "entregado", label: "Entregado", Icon: HomeIcon   },
+  { key: "pendiente",  label: "Pendiente",  Icon: ClockIcon  },
+  { key: "pagado",     label: "Pagado",     Icon: CheckIcon  },
+  { key: "preparando", label: "Preparando", Icon: BoxIcon    },
+  { key: "enviado",    label: "Enviado",    Icon: TruckIcon  },
+  { key: "entregado",  label: "Entregado",  Icon: HomeIcon   },
 ];
 
 function OrderTimeline({ estado }) {
@@ -128,11 +137,13 @@ function OrderTimeline({ estado }) {
                 </span>
               </div>
               <span style={{
-                fontSize: "0.68rem",
+                fontSize: "0.65rem",
                 fontWeight: isCurrent ? 700 : 500,
                 color: isActive ? "#1D1D1F" : "#AEAEB2",
                 textAlign: "center",
-                whiteSpace: "nowrap",
+                lineHeight: 1.2,
+                maxWidth: "100%",
+                overflowWrap: "break-word",
               }}>
                 {step.label}
               </span>

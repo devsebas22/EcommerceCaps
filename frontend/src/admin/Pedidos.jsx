@@ -6,11 +6,12 @@ import { authFetch } from "../utils/api";
 const API_BASE = import.meta.env.VITE_API_URL;
 
 const ESTADO_STYLE = {
-  pendiente: { background: "#FFF8EE", border: "1px solid #FF9F0A", color: "#BF6900" },
-  pagado:    { background: "#F0FAF4", border: "1px solid #30D158", color: "#1A7F37" },
-  enviado:   { background: "#EEF4FF", border: "1px solid #0A84FF", color: "#0A6FBB" },
-  entregado: { background: "#E8F8EE", border: "1px solid #25A844", color: "#1A6B30" },
-  cancelado: { background: "#FFF2F1", border: "1px solid #FF3B30", color: "#CC2D22" },
+  pendiente:  { background: "#FFF8EE", border: "1px solid #FF9F0A", color: "#BF6900" },
+  pagado:     { background: "#F0FAF4", border: "1px solid #30D158", color: "#1A7F37" },
+  preparando: { background: "#EEF2FF", border: "1px solid #0071E3", color: "#0071E3" },
+  enviado:    { background: "#EEF4FF", border: "1px solid #0A84FF", color: "#0A6FBB" },
+  entregado:  { background: "#E8F8EE", border: "1px solid #25A844", color: "#1A6B30" },
+  cancelado:  { background: "#FFF2F1", border: "1px solid #FF3B30", color: "#CC2D22" },
 };
 
 const estadoStyle = (estado) => ({
@@ -150,7 +151,7 @@ export default function Pedidos() {
                       onChange={(e) => actualizarEstado(p.id, e.target.value, e)}
                       style={estadoStyle(p.estado)}
                     >
-                      {["pendiente","pagado","enviado","entregado","cancelado"].map((e) => (
+                      {["pendiente","pagado","preparando","enviado","entregado","cancelado"].map((e) => (
                         <option key={e} value={e} style={{ background: "#FFFFFF", color: "#1D1D1F" }}>{e}</option>
                       ))}
                     </select>
