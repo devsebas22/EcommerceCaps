@@ -1,6 +1,8 @@
 from pydantic import BaseModel
-from app.schemas.producto import ProductoResponse
+
 from app.models.pedido import EstadoPedido
+from app.schemas.producto import ProductoResponse
+
 
 class PedidoItemResponse(BaseModel):
     id: int
@@ -18,7 +20,7 @@ class PedidoCreate(BaseModel):
 class PedidoResponse(BaseModel):
     id: int
     usuario_id: int
-    usuario_nombre: str | None = None   
+    usuario_nombre: str | None = None
     total: float
     estado: EstadoPedido
     direccion_envio: str

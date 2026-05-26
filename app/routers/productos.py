@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session, joinedload
+
+from app.auth import get_admin_actual
 from app.database import get_db
+from app.models.categoria import Categoria
 from app.models.producto import Producto
 from app.models.usuario import Usuario
-from app.models.categoria import Categoria
 from app.schemas.producto import ProductoCreate, ProductoResponse
-from app.auth import get_admin_actual
 
 router = APIRouter(
     prefix="/productos",

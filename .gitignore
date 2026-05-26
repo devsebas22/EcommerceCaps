@@ -34,5 +34,10 @@ Thumbs.db
 *.swp
 *.swo
 
+# ── Coverage ──
+htmlcov/
+.coverage
+coverage/
+
 # ── Logs ──
 *.log

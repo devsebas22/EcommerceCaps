@@ -1,5 +1,7 @@
 from pydantic import BaseModel
+
 from app.schemas.producto import ProductoResponse
+
 
 class CarritoItemBase(BaseModel):
     producto_id: int

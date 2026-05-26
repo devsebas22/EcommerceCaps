@@ -1,13 +1,24 @@
+import os
+from pathlib import Path
+
+import sentry_sdk
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
-from pathlib import Path
-from app.database import Base
-from app import models
-from app.routers import categorias, productos, usuarios, carrito, pedidos, imagenes, stats, webhook, firma, auth_recovery
-import os
-import sentry_sdk
-from dotenv import load_dotenv
+
+from app.routers import (
+    auth_recovery,
+    carrito,
+    categorias,
+    firma,
+    imagenes,
+    pedidos,
+    productos,
+    stats,
+    usuarios,
+    webhook,
+)
 
 load_dotenv()
 

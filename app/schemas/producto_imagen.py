@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+
 class ProductoImagenBase(BaseModel):
     url: str
     es_principal: bool = False

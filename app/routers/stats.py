@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+
+from app.auth import get_admin_actual
 from app.database import get_db
+from app.models.pedido import Pedido
 from app.models.producto import Producto
 from app.models.usuario import Usuario
-from app.models.pedido import Pedido
-from app.models.carrito import CarritoItem
-from app.auth import get_admin_actual
 
 router = APIRouter(
     prefix="/stats",
@@ -18,7 +18,7 @@ def obtener_stats(db: Session = Depends(get_db), admin: Usuario = Depends(get_ad
     total_usuarios = db.query(Usuario).count()
     total_pedidos = db.query(Pedido).count()
     productos_sin_stock = db.query(Producto).filter(Producto.stock == 0).count()
-    
+
     return {
         "total_productos": total_productos,
         "total_usuarios": total_usuarios,

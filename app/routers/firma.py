@@ -1,6 +1,8 @@
-import os
 import hashlib
+import os
+
 from fastapi import APIRouter, Depends, Query
+
 from app.auth import get_usuario_actual
 from app.models.usuario import Usuario
 

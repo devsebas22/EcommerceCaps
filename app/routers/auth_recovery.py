@@ -1,14 +1,16 @@
 import os
 import uuid
 from datetime import datetime, timedelta
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from pydantic import BaseModel, EmailStr
-from passlib.context import CryptContext
-from app.database import get_db
-from app.models.usuario import Usuario
-from app.models.password_reset import PasswordResetToken
+
 import resend
+from fastapi import APIRouter, Depends, HTTPException
+from passlib.context import CryptContext
+from pydantic import BaseModel, EmailStr
+from sqlalchemy.orm import Session
+
+from app.database import get_db
+from app.models.password_reset import PasswordResetToken
+from app.models.usuario import Usuario
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -26,14 +28,14 @@ class ResetPasswordRequest(BaseModel):
 @router.post("/forgot-password")
 def forgot_password(datos: ForgotPasswordRequest, db: Session = Depends(get_db)):
     usuario = db.query(Usuario).filter(Usuario.email == datos.email).first()
-    _RESP = {"mensaje": "Si el correo existe, recibirás un enlace de recuperación"}
+    _resp = {"mensaje": "Si el correo existe, recibirás un enlace de recuperación"}
     if not usuario:
-        return _RESP
+        return _resp
 
     # Invalidar tokens anteriores no usados
     db.query(PasswordResetToken).filter(
         PasswordResetToken.usuario_id == usuario.id,
-        PasswordResetToken.used == False,
+        not PasswordResetToken.used,
     ).update({"used": True})
 
     token = str(uuid.uuid4())
@@ -84,7 +86,7 @@ def forgot_password(datos: ForgotPasswordRequest, db: Session = Depends(get_db))
 def reset_password(datos: ResetPasswordRequest, db: Session = Depends(get_db)):
     record = db.query(PasswordResetToken).filter(
         PasswordResetToken.token == datos.token,
-        PasswordResetToken.used == False,
+        not PasswordResetToken.used,
     ).first()
 
     if not record:
