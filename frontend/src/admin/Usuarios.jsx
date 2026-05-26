@@ -65,12 +65,12 @@ export default function Usuarios({ admin }) {
         </div>
       </div>
 
-      <div style={{ background: "#FFFFFF", border: "1px solid var(--border)", borderRadius: "var(--r3)", overflow: "hidden", boxShadow: "var(--sh-sm)" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem" }}>
+      <div className="table-scroll-wrap" style={{ background: "#FFFFFF", border: "1px solid var(--border)", borderRadius: "var(--r3)", boxShadow: "var(--sh-sm)" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem", minWidth: "600px" }}>
           <thead>
             <tr>
-              {[["id","ID"],["nombre","Nombre"],["email","Email"],["telefono","Teléfono"],["puntos_fidelidad","Puntos"],["es_admin","Rol"]].map(([campo, label]) => (
-                <th key={campo} style={thStyle} onClick={() => ordenar(campo)}>
+              {[["id","ID",""],["nombre","Nombre",""],["email","Email",""],["telefono","Teléfono","hide-mobile"],["puntos_fidelidad","Puntos","hide-mobile"],["es_admin","Rol",""]].map(([campo, label, cls]) => (
+                <th key={campo} className={cls} style={thStyle} onClick={() => ordenar(campo)}>
                   {label} {orden.campo === campo ? (orden.dir === "asc" ? "↑" : "↓") : <span style={{ opacity: 0.35 }}>↕</span>}
                 </th>
               ))}
@@ -97,8 +97,8 @@ export default function Usuarios({ admin }) {
                 <td style={{ ...tdStyle, color: "var(--t2)" }}>#{u.id}</td>
                 <td style={{ ...tdStyle, fontWeight: 600 }}>{u.nombre}</td>
                 <td style={{ ...tdStyle, color: "var(--t2)" }}>{u.email}</td>
-                <td style={{ ...tdStyle, color: "var(--t2)" }}>{u.telefono || "—"}</td>
-                <td style={{ ...tdStyle, color: "var(--t1)", fontWeight: 700 }}>{u.puntos_fidelidad}</td>
+                <td className="hide-mobile" style={{ ...tdStyle, color: "var(--t2)" }}>{u.telefono || "—"}</td>
+                <td className="hide-mobile" style={{ ...tdStyle, color: "var(--t1)", fontWeight: 700 }}>{u.puntos_fidelidad}</td>
                 <td style={tdStyle}>
                   <span style={{
                     display: "inline-block",

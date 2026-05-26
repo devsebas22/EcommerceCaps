@@ -99,13 +99,13 @@ export default function Pedidos() {
         onCancelar={() => setConfirmEliminar(null)}
       />
       <Toast mensaje={mensaje} />
-      <div style={{ background: "#FFFFFF", border: "1px solid var(--border)", borderRadius: "var(--r3)", overflow: "hidden", boxShadow: "var(--sh-sm)" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem" }}>
+      <div className="table-scroll-wrap" style={{ background: "#FFFFFF", border: "1px solid var(--border)", borderRadius: "var(--r3)", boxShadow: "var(--sh-sm)" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem", minWidth: "680px" }}>
           <thead>
             <tr>
               <th style={{ ...thStyle, width: "28px", cursor: "default" }} />
-              {[["id","ID"],["usuario_nombre","Usuario"],["total","Total"],["direccion_envio","Dirección"],["estado","Estado"]].map(([campo, label]) => (
-                <th key={campo} style={thStyle} onClick={() => ordenar(campo)}>
+              {[["id","ID",""],["usuario_nombre","Usuario",""],["total","Total",""],["direccion_envio","Dirección","hide-mobile"],["estado","Estado",""]].map(([campo, label, cls]) => (
+                <th key={campo} className={cls} style={thStyle} onClick={() => ordenar(campo)}>
                   {label} {orden.campo === campo ? (orden.dir === "asc" ? "↑" : "↓") : <span style={{ opacity: 0.35 }}>↕</span>}
                 </th>
               ))}
@@ -143,7 +143,7 @@ export default function Pedidos() {
                   <td style={{ ...tdStyle, color: "var(--t2)" }}>#{p.id}</td>
                   <td style={{ ...tdStyle, fontWeight: 600 }}>{p.usuario_nombre || `Usuario #${p.usuario_id}`}</td>
                   <td style={{ ...tdStyle, color: "var(--t1)", fontWeight: 700 }}>${p.total.toLocaleString()}</td>
-                  <td style={{ ...tdStyle, color: "var(--t2)", fontSize: "0.85rem", maxWidth: "200px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.direccion_envio}</td>
+                  <td className="hide-mobile" style={{ ...tdStyle, color: "var(--t2)", fontSize: "0.85rem", maxWidth: "200px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.direccion_envio}</td>
                   <td style={tdStyle} onClick={e => e.stopPropagation()}>
                     <select
                       value={p.estado}

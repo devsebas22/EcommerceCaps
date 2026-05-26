@@ -120,12 +120,12 @@ export default function Categorias() {
         </button>
       </div>
 
-      <div style={{ background: "#FFFFFF", border: "1px solid var(--border)", borderRadius: "var(--r3)", overflow: "hidden", boxShadow: "var(--sh-sm)" }}>
+      <div className="table-scroll-wrap" style={{ background: "#FFFFFF", border: "1px solid var(--border)", borderRadius: "var(--r3)", boxShadow: "var(--sh-sm)" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem" }}>
           <thead>
             <tr>
-              {[["id","ID"],["nombre","Nombre"],["descripcion","Descripción"]].map(([campo, label]) => (
-                <th key={campo} style={thStyle} onClick={() => ordenar(campo)}>
+              {[["id","ID",""],["nombre","Nombre",""],["descripcion","Descripción","hide-mobile"]].map(([campo, label, cls]) => (
+                <th key={campo} className={cls} style={thStyle} onClick={() => ordenar(campo)}>
                   {label} {orden.campo === campo ? (orden.dir === "asc" ? "↑" : "↓") : <span style={{ opacity: 0.35 }}>↕</span>}
                 </th>
               ))}
@@ -151,7 +151,7 @@ export default function Categorias() {
               >
                 <td style={{ ...tdStyle, color: "var(--t2)" }}>#{c.id}</td>
                 <td style={{ ...tdStyle, fontWeight: 600 }}>{c.nombre}</td>
-                <td style={{ ...tdStyle, color: "var(--t2)", fontSize: "0.85rem" }}>{c.descripcion || "—"}</td>
+                <td className="hide-mobile" style={{ ...tdStyle, color: "var(--t2)", fontSize: "0.85rem" }}>{c.descripcion || "—"}</td>
                 <td style={{ ...tdStyle, display: "flex", gap: "12px" }}>
                   <button
                     onClick={() => abrirEditar(c)}
