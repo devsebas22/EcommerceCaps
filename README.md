@@ -1,7 +1,7 @@
 # 🛒 EcommerceCaps
 
 > Plataforma de e-commerce dedicada a la venta de gorras, lociones y relojes.
-> **Desarrollada por [Sebastián Mogollón Mendoza](https://github.com/devsebas22) y Juan Esteban Aguirre Foronda**
+> **Desarrollada por [Sebastián Mogollón Mendoza](https://github.com/devsebas22) y [Juan Esteban Aguirre Foronda](https://github.com/Baljeet-codes)**
 
 [![Python](https://img.shields.io/badge/Python-3.12+-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.136.0-009688?style=flat&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
