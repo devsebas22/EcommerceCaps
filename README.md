@@ -1,31 +1,41 @@
 # 🛒 EcommerceCaps
 
 > Plataforma de e-commerce dedicada a la venta de gorras, lociones y relojes.
+> **Desarrollada por [Sebastián Mogollón Mendoza](https://github.com/devsebas22) y Juan Esteban Aguirre Foronda**
 
 [![Python](https://img.shields.io/badge/Python-3.12+-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.136.0-009688?style=flat&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
 [![React](https://img.shields.io/badge/React-18.2-61DAFB?style=flat&logo=react&logoColor=white)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-5.2-646CFF?style=flat&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
+[![GitHub Actions](https://img.shields.io/badge/CI/CD-GitHub%20Actions-2088FF?style=flat&logo=githubactions&logoColor=white)](https://github.com/features/actions)
+[![ghcr.io](https://img.shields.io/badge/Registry-ghcr.io-8957E5?style=flat&logo=github&logoColor=white)](https://ghcr.io)
+[![Render](https://img.shields.io/badge/Deploy-Render-46E3B7?style=flat&logo=render&logoColor=white)](https://render.com)
+[![Supabase](https://img.shields.io/badge/DB-Supabase-3ECF8E?style=flat&logo=supabase&logoColor=white)](https://supabase.com)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ---
 
 ## 📋 Descripción del Proyecto
 
-EcommerceCaps es una API RESTful desarrollada con **FastAPI** que proporciona la infraestructura necesaria para una tienda en línea de accesorios (gorras, lociones y relojes). El proyecto incluye gestión de usuarios, productos, categorías, carrito de compras y pedidos.
+EcommerceCaps es una aplicación web full-stack de comercio electrónico construida con **FastAPI** (backend) y **React + Vite** (frontend). Incluye pasarela de pagos **Wompi**, envío de correos transaccionales con **Resend**, subida de imágenes a **ImgBB** y monitoreo de errores con **Sentry**.
+
+La aplicación se despliega automáticamente desde **GitHub Actions** hacia **Render** usando contenedores Docker almacenados en **GitHub Container Registry (ghcr.io)**, con base de datos PostgreSQL en **Supabase**.
 
 ### ✨ Características Principales
 
 - 🔐 **Autenticación segura** con JWT y hashing de contraseñas
-- 👥 **Gestión de usuarios** con roles y puntos de fidelidad
-- 📦 **Gestión de productos** con categorías, marcas y stock
+- 👥 **Gestión de usuarios** con roles (admin/usuario) y puntos de fidelidad
+- 📦 **Catálogo de productos** con categorías, marcas, imágenes múltiples y stock
 - 🛒 **Carrito de compras** persistente por usuario
-- 📋 **Sistema de pedidos** completo con estados
-- 🐘 **Base de datos PostgreSQL** con Docker
+- 💳 **Pagos integrados** con Wompi (widget + webhook)
+- 📋 **Sistema de pedidos** completo con estados (pendiente → pagado → preparando → enviado → entregado)
+- 🔐 **Recuperación de contraseña** por correo electrónico vía Resend
+- 📊 **Dashboard administrativo** con estadísticas y gestión completa
+- 🐘 **Base de datos PostgreSQL** gestionada con Alembic
+- 🚀 **CI/CD automatizado** con GitHub Actions → ghcr.io → Render
 - 📚 **Documentación interactiva** con Swagger UI
-- 🔄 **Scripts SQL** para inicialización y datos de prueba
 
 ---
 
@@ -34,32 +44,33 @@ EcommerceCaps es una API RESTful desarrollada con **FastAPI** que proporciona la
 | Categoría | Tecnología |
 |-----------|-------------|
 | **Backend** | FastAPI (Python 3.12+) |
-| **Base de datos** | PostgreSQL 16 |
+| **Frontend** | React 18 + Vite 5 + Bootstrap 5 |
+| **Base de datos** | PostgreSQL 16 (Supabase) |
 | **ORM** | SQLAlchemy 2.0 |
-| **Contenedores** | Docker + Docker Compose |
-| **Admin DB** | pgAdmin 4 |
-| **Servidor** | Uvicorn |
-| **Frontend** | React 18 + Vite 5 |
-| **UI** | Bootstrap 5 |
+| **Migraciones** | Alembic |
+| **Autenticación** | JWT (python-jose) + bcrypt |
+| **Pagos** | Wompi (widget + webhook con firma SHA-256) |
+| **Correo** | Resend API |
+| **Imágenes** | ImgBB (subida desde el cliente) |
+| **Errores** | Sentry SDK |
+| **Contenedores** | Docker |
+| **CI/CD** | GitHub Actions |
+| **Registry** | GitHub Container Registry (ghcr.io) |
+| **Producción** | Render + Supabase |
 
 ---
 
 ## 📋 Requisitos Previos
 
-> ⚠️ **IMPORTANTE:** Antes de iniciar, asegúrate de tener instaladas las versiones correctas de cada herramienta. Las versiones anteriores pueden causar problemas de compatibilidad.
+> ⚠️ **IMPORTANTE:** Antes de iniciar, asegúrate de tener instaladas las versiones correctas de cada herramienta.
 
-### Requisitos del Sistema
-
-| Herramienta | Versión Mínima | Versión Recomendada | Verificar Instalación |
-|-------------|----------------|---------------------|----------------------|
-| **Python** | 3.12+ | 3.12.x | `python3 --version` |
-| **Node.js** | 18.0+ | 20.x LTS | `node --version` |
-| **npm** | 9.0+ | 10.x | `npm --version` |
-| **Docker** | 20.10+ | Latest | `docker --version` |
-| **Docker Compose** | 2.0+ | Latest | `docker compose version` |
-| **PostgreSQL** (cliente) | 14+ | 16 | `psql --version` |
-
-### Verificar Versiones Instaladas
+| Herramienta | Versión Mínima | Verificar |
+|-------------|----------------|-----------|
+| **Python** | 3.12+ | `python3 --version` |
+| **Node.js** | 18.0+ | `node --version` |
+| **npm** | 9.0+ | `npm --version` |
+| **Docker** | 20.10+ | `docker --version` |
+| **Docker Compose** | 2.0+ | `docker compose version` |
 
 ```bash
 # Verificar todas las versiones instaladas
@@ -70,273 +81,329 @@ echo "=== Docker ===" && docker --version
 echo "=== Docker Compose ===" && docker compose version
 ```
 
-### Instalar Node.js (si no lo tienes)
-
-**Ubuntu/Debian:**
-```bash
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt-get install -y nodejs
-```
-
-**macOS (con Homebrew):**
-```bash
-brew install node@20
-```
-
-**Windows:**
-Descargar desde [nodejs.org](https://nodejs.org/) la versión LTS recomendada.
-
 ---
 
-## 🚀 Instalación y Configuración
+## 🚀 Desarrollo Local
 
 ### 1. Clonar el Repositorio
 
 ```bash
 git clone https://github.com/devsebas22/EcommerceCaps.git
-cd EcommerceCaps/proyectoFinal
+cd EcommerceCaps
 ```
 
 ### 2. Crear el Entorno Virtual
 
 ```bash
-python3 -m venv venv
-source venv/bin/activate    # Linux/Mac
-# venv\Scripts\activate     # Windows
+python3 -m venv .venv
+source .venv/bin/activate       # Linux/Mac
+# .venv\Scripts\activate        # Windows
 ```
 
-### 3. Instalar Dependencias de Python
+### 3. Instalar Dependencias
 
 ```bash
-pip install -r requirements.txt
+pip install -r requirements.txt      # Backend
+cd frontend && npm install && cd ..  # Frontend
 ```
 
-### 4. Instalar Dependencias del Frontend
+### 4. Configurar Variables de Entorno
 
-```bash
-cd frontend
-npm install
-cd ..
-```
-
-### 5. Configurar Variables de Entorno
-
-Todas las variables (backend y frontend) viven en un único `.env` en la raíz del proyecto. Copia el ejemplo y completa los valores:
+Copia el archivo de ejemplo y completa los valores:
 
 ```bash
 cp .env.example .env
 ```
 
-El archivo debe quedar así (ajusta los valores a tu entorno):
+Edita `.env` con tus credenciales:
 
 ```env
-# Backend
+# ── Backend ──
 DATABASE_URL=postgresql://ecommerce_user:ecommerce123@127.0.0.1:5433/ecommerce_db
-SECRET_KEY=una_clave_secreta_larga_y_aleatoria
+SECRET_KEY=genera_una_clave_con_openssl_rand_-hex_32
 ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
 WOMPI_PRIVATE_KEY=prv_test_...
+WOMPI_INTEGRITY_KEY=test_integrity_...
 WOMPI_EVENTS_SECRET=
+RESEND_API_KEY=re_...
+RESEND_FROM_EMAIL=noreply@tudominio.com
+FRONTEND_URL=http://localhost:5173
+SENTRY_DSN=
 
-# Frontend — Vite los lee desde la raíz gracias a envDir en vite.config.js
+# ── Frontend (VITE_*) ──
 VITE_API_URL=http://127.0.0.1:8000
 VITE_IMGBB_KEY=tu_key_de_imgbb
 VITE_WOMPI_PUBLIC_KEY=pub_test_...
-VITE_WOMPI_INTEGRITY_KEY=test_integrity_...
+VITE_WHATSAPP_NUMBER=573154895642
+VITE_INSTAGRAM_URL=
 ```
 
-> **Nota:** `frontend/vite.config.js` tiene `envDir: '..'`, lo que hace que Vite lea el `.env` de la raíz tanto en desarrollo local como al construir con Docker. No es necesario un `frontend/.env` separado.
+> **Nota:** `VITE_API_URL` apunta a `http://127.0.0.1:8000` en desarrollo y a `/api` en producción (mismo origen).
 
-### 6. Levantar la Base de Datos
+### 5. Levantar la Base de Datos
 
 ```bash
 docker compose up -d
 ```
 
-### 7. Inicializar la Base de Datos
+Esto inicia PostgreSQL en el puerto `5433`.
+
+### 6. Ejecutar Migraciones
 
 ```bash
-# Ejecutar script de creación de tablas
-docker exec -i ecommerce-db psql -U ecommerce_user -d ecommerce_db < create_tables.sql
-
-# (Opcional) Cargar datos de ejemplo
-docker exec -i ecommerce-db psql -U ecommerce_user -d ecommerce_db < seed.sql
+alembic upgrade head
 ```
 
----
-
-## ▶️ Iniciar el Proyecto
-
-### ⚡ Método Rápido (Recomendado): Script `iniciar.sh`
-
-> ⚠️ **Nota:** Este script está diseñado para sistemas **Linux/macOS** con Zsh. Requiere haber completado los pasos de instalación anteriores.
+### 7. Iniciar el Proyecto
 
 ```bash
-# Dar permisos de ejecución (solo la primera vez)
-chmod +x iniciar.sh
+# Opción 1 — Script rápido
+chmod +x iniciar.sh && ./iniciar.sh
 
-# Ejecutar el script
-./iniciar.sh
+# Opción 2 — Manual
+source .venv/bin/activate
+uvicorn app.main:app --reload --env-file .env &   # Backend :8000
+cd frontend && npm run dev                         # Frontend :5173
 ```
 
-**Esto iniciara:**
-1. Backend (FastAPI) en [http://127.0.0.1:8000](http://127.0.0.1:8000)
-2. Frontend (React + Vite) en [http://localhost:5173](http://localhost:5173)
-3. Documentación API en [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+### 8. Abrir en el Navegador
 
----
-
-### 📝 Método Manual: Iniciar Servicios Manualmente
-
-Si prefieres iniciar los servicios manualmente:
-
-#### Iniciar el Backend
-
-```bash
-source venv/bin/activate
-uvicorn app.main:app --reload --env-file .env
-```
-
-#### Iniciar el Frontend
-
-```bash
-cd frontend
-npm run dev
-```
-
-#### Acceder a la Documentación
-
-Abre en tu navegador: **[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)**
+| Servicio | URL |
+|----------|-----|
+| **Frontend** | [http://localhost:5173](http://localhost:5173) |
+| **API Docs** | [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) |
+| **Health** | [http://127.0.0.1:8000/health](http://127.0.0.1:8000/health) |
 
 ---
 
 ## 📁 Estructura del Proyecto
 
 ```
-proyectoFinal/
+EcommerceCaps/
 ├── app/
-│   ├── __init__.py         # Inicialización de la app
-│   ├── database.py         # Configuración de base de datos
-│   ├── main.py             # Punto de entrada de FastAPI
-│   ├── models/             # Modelos SQLAlchemy
+│   ├── main.py              # Punto de entrada FastAPI
+│   ├── database.py           # Configuración SQLAlchemy
+│   ├── auth.py               # JWT + dependencias
+│   ├── models/               # Modelos SQLAlchemy
 │   │   ├── usuario.py
 │   │   ├── producto.py
 │   │   ├── categoria.py
 │   │   ├── carrito.py
-│   │   └── pedido.py
-│   ├── routers/            # Endpoints de la API
+│   │   ├── pedido.py
+│   │   └── password_reset.py
+│   ├── routers/              # Endpoints de la API
 │   │   ├── usuarios.py
 │   │   ├── productos.py
 │   │   ├── categorias.py
 │   │   ├── carrito.py
-│   │   └── pedidos.py
-│   └── schemas/            # Esquemas Pydantic
-│       ├── usuario.py
-│       ├── producto.py
-│       ├── categoria.py
-│       ├── carrito.py
-│       └── pedido.py
-├── frontend/                # Frontend React + Vite
+│   │   ├── pedidos.py
+│   │   ├── imagenes.py
+│   │   ├── stats.py
+│   │   ├── webhook.py        # Webhook Wompi
+│   │   ├── firma.py          # Firma de integridad Wompi
+│   │   └── auth_recovery.py  # Recuperación de contraseña
+│   ├── schemas/              # Esquemas Pydantic
+│   │   ├── usuario.py
+│   │   ├── producto.py
+│   │   ├── producto_imagen.py
+│   │   ├── categoria.py
+│   │   ├── carrito.py
+│   │   └── pedido.py
+│   └── tests/                # Tests automatizados
+│       ├── conftest.py
+│       ├── test_auth.py
+│       ├── test_carrito.py
+│       ├── test_categorias.py
+│       ├── test_pedidos.py
+│       ├── test_productos.py
+│       └── test_usuarios.py
+├── frontend/                 # Frontend React + Vite
 │   ├── src/
-│   │   ├── App.jsx
-│   │   ├── Catalogo.jsx
-│   │   ├── Registro.jsx
 │   │   ├── main.jsx
-│   │   └── index.css
-│   ├── index.html
-│   ├── package.json
+│   │   ├── App.jsx
+│   │   ├── index.css
+│   │   ├── pages/            # Catálogo, Carrito, Login, Perfil, etc.
+│   │   ├── admin/            # Dashboard, Pedidos, Usuarios, Categorías
+│   │   ├── components/       # ProductCard, ProductModal, Toast, etc.
+│   │   ├── hooks/            # useCarrito
+│   │   └── utils/            # api.js, wompi.js
 │   └── vite.config.js
-├── create_tables.sql       # Script de creación de tablas
-├── seed.sql                # Datos de ejemplo iniciales
-├── docker-compose.yml      # Configuración de contenedores
-├── requirements.txt        # Dependencias Python
-├── iniciar.sh              # Script de inicio rápido
-└── .env                    # Variables de entorno
+├── alembic/                  # Migraciones de base de datos
+│   ├── env.py
+│   └── versions/
+├── .github/workflows/        # CI/CD pipelines
+│   ├── ci.yml                # PR → lint + test
+│   └── cd.yml                # Push a master → build + deploy
+├── Dockerfile                # Multi-stage build (Node → Python)
+├── entrypoint.sh             # Entrypoint del contenedor
+├── docker-compose.yml        # PostgreSQL local
+├── iniciar.sh                # Script de inicio rápido
+├── alembic.ini
+├── .env.example
+├── pyproject.toml            # Ruff + pytest config
+└── requirements.txt
 ```
 
 ---
 
-## 🗄️ Esquema de Base de Datos
+## 🗄️ Base de Datos
 
-### Tablas Principales
+### Tablas
 
 | Tabla | Descripción |
 |-------|-------------|
-| `usuarios` | Usuarios con email, password, dirección, teléfono, rol admin y puntos de fidelidad |
+| `usuarios` | Usuarios con email, contraseña, rol admin y puntos de fidelidad |
 | `categorias` | Categorías de productos (gorras, lociones, relojes) |
-| `productos` | Productos con nombre, descripción, precio, marca, stock e imagen |
-| `carritos` | Carritos asociados a usuarios |
-| `carrito_items` | Items dentro del carrito (relación carrito-producto) |
-| `pedidos` | Pedidos con estado, total y dirección de envío |
+| `productos` | Productos con nombre, precio, marca, stock |
+| `producto_imagenes` | Imágenes múltiples por producto |
+| `carritos` | Carrito por usuario |
+| `carrito_items` | Items dentro del carrito |
+| `pedidos` | Pedidos con estado y dirección de envío |
 | `pedido_items` | Items de cada pedido |
+| `password_reset_tokens` | Tokens para recuperación de contraseña |
 
-### Datos de Ejemplo (seed.sql)
+### Migraciones
 
-El proyecto incluye datos iniciales para probar:
-- **3 categorías:** gorras, lociones, relojes
-- **5 productos:** Gorras Nike, Loción Armani, Reloj Casio, Loción Gucci, Gorra Puma BMW
+```bash
+# Crear una nueva migración
+alembic revision --autogenerate -m "descripcion"
+
+# Aplicar migraciones
+alembic upgrade head
+
+# Revertir última migración
+alembic downgrade -1
+
+# Ver estado
+alembic current
+```
 
 ---
 
 ## 🔗 Endpoints de la API
 
-### Usuarios
+### Públicos
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
-| `POST` | `/usuarios/` | Crear usuario |
-| `GET` | `/usuarios/{id}` | Obtener usuario por ID |
-| `PUT` | `/usuarios/{id}` | Actualizar usuario |
+| `GET` | `/health` | Health check |
+| `POST` | `/api/usuarios/` | Registro de usuario |
+| `POST` | `/api/usuarios/login` | Inicio de sesión |
+| `GET` | `/api/productos/` | Listar productos (con paginación) |
+| `GET` | `/api/productos/{id}` | Obtener producto |
+| `GET` | `/api/categorias/` | Listar categorías |
+| `POST` | `/api/auth/forgot-password` | Solicitar recuperación de contraseña |
+| `POST` | `/api/auth/reset-password` | Restablecer contraseña |
+| `POST` | `/api/webhook/wompi` | Webhook de confirmación de pago |
 
-### Productos
+### Autenticados
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
-| `GET` | `/productos/` | Listar todos los productos |
-| `GET` | `/productos/{id}` | Obtener producto por ID |
-| `POST` | `/productos/` | Crear nuevo producto |
-| `PUT` | `/productos/{id}` | Actualizar producto |
-| `DELETE` | `/productos/{id}` | Eliminar producto |
+| `GET/POST` | `/api/carrito/{usuario_id}` | Ver/agregar al carrito |
+| `PUT` | `/api/carrito/{id}/item/{item_id}` | Actualizar cantidad |
+| `DELETE` | `/api/carrito/{id}/item/{item_id}` | Eliminar item |
+| `GET/PUT` | `/api/usuarios/{id}` | Obtener/actualizar perfil |
+| `POST` | `/api/pedidos/{usuario_id}` | Crear pedido |
+| `GET` | `/api/pedidos/historial/{usuario_id}` | Historial de pedidos |
+| `PUT` | `/api/pedidos/{id}/estado` | Actualizar estado del pedido |
+| `DELETE` | `/api/pedidos/{id}` | Cancelar pedido |
+| `GET` | `/api/wompi/firma` | Obtener firma de integridad para Wompi |
 
-### Categorías
+### Administrador
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
-| `GET` | `/categorias/` | Listar todas las categorías |
-| `GET` | `/categorias/{id}` | Obtener categoría por ID |
-| `POST` | `/categorias/` | Crear nueva categoría |
-| `DELETE` | `/categorias/{id}` | Eliminar categoría |
+| `GET` | `/api/usuarios/` | Listar todos los usuarios |
+| `POST/PUT/DELETE` | `/api/productos/` | CRUD de productos |
+| `POST/PUT/DELETE` | `/api/categorias/` | CRUD de categorías |
+| `POST/DELETE` | `/api/imagenes/` | Gestión de imágenes |
+| `GET` | `/api/pedidos/todos/` | Todos los pedidos |
+| `GET` | `/api/stats/` | Estadísticas del dashboard |
 
-### Carrito
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| `GET` | `/carrito/{usuario_id}` | Ver carrito del usuario |
-| `POST` | `/carrito/{usuario_id}` | Agregar producto al carrito |
-| `PUT` | `/carrito/{usuario_id}/item/{item_id}` | Actualizar cantidad de un item |
-| `DELETE` | `/carrito/{usuario_id}/item/{item_id}` | Eliminar item del carrito |
-
-### Pedidos
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| `POST` | `/pedidos/{usuario_id}` | Crear pedido desde el carrito |
-| `GET` | `/pedidos/historial/{usuario_id}` | Ver historial de pedidos |
-
-> 📖 Documentación completa disponible en **Swagger UI** en [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+> 📖 Documentación completa en Swagger UI: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
 ---
 
-## 🐳 Servicios Docker
+## 🚀 Despliegue en Producción
 
-| Servicio | Puerto | Descripción |
+El proyecto utiliza un pipeline de CI/CD completamente automatizado con **GitHub Actions**, **GitHub Container Registry (ghcr.io)** y **Render**.
+
+### Arquitectura
+
+```
+[Push a master] → GitHub Actions
+                    ├── 1. Lint + Test (backend & frontend)
+                    ├── 2. Build Docker image (con VITE_* args)
+                    ├── 3. Push a ghcr.io
+                    ├── 4. Migraciones (alembic upgrade head) contra Supabase
+                    └── 5. Disparar Deploy Hook → Render descarga imagen y sirve
+```
+
+### Requisitos en GitHub
+
+Se requieren **5 secrets** en GitHub → Settings → Secrets and variables → Actions:
+
+| Secret | Descripción |
+|--------|-------------|
+| `REGISTRY_PAT` | GitHub PAT con permiso `write:packages` |
+| `DATABASE_URL` | Cadena de conexión a Supabase (`?sslmode=require`) |
+| `VITE_IMGBB_KEY` | Clave pública de ImgBB |
+| `VITE_WOMPI_PUBLIC_KEY` | Llave pública de Wompi |
+| `RENDER_DEPLOY_HOOK_URL` | URL del Deploy Hook de Render |
+
+### Configuración en Render
+
+| Configuración | Valor |
+|--------------|-------|
+| **Source Type** | Container Registry |
+| **Image** | `ghcr.io/devsebas22/ecommerce-caps:latest` |
+| **Registry Credentials** | Usuario: `devsebas22` / Password: el mismo `REGISTRY_PAT` |
+| **Auto-Deploy** | OFF (lo controla GitHub Actions) |
+
+**Variables de entorno en Render:**
+
+```
+DATABASE_URL, SECRET_KEY, ALLOWED_ORIGINS,
+WOMPI_PRIVATE_KEY, WOMPI_INTEGRITY_KEY, WOMPI_EVENTS_SECRET,
+RESEND_API_KEY, RESEND_FROM_EMAIL, FRONTEND_URL,
+SENTRY_DSN
+```
+
+### Flujo de CI/CD
+
+1. Desarrollas en una rama (`feature/*`)
+2. Abres un Pull Request a `master` → se ejecuta **CI** (lint + tests)
+3. Al mergear a `master` → se ejecuta **CD**:
+   - Backend: ruff lint + pytest
+   - Frontend: build + vitest
+   - Build de imagen Docker multi-stage
+   - Push a ghcr.io
+   - Migraciones automáticas contra Supabase
+   - Deploy Hook a Render
+
+---
+
+## 🐳 Servicios Docker (Desarrollo Local)
+
+| Servicio | Puerto | Credenciales |
 |----------|--------|-------------|
-| **PostgreSQL** | `5433` | Base de datos |
-| **pgAdmin** | `5050` | Admin de DB (admin@admin.com / admin123) |
+| **PostgreSQL** | `5433` | `ecommerce_user` / `ecommerce123` |
+
+```bash
+docker compose up -d          # Iniciar
+docker compose down           # Detener
+docker compose down -v        # Detener y borrar volúmenes
+```
 
 ---
 
-## 🤝 Contribuir
+## 🧪 Tests
 
-1. Fork del repositorio
-2. Crea una rama (`git checkout -b feature/nueva-funcionalidad`)
-3. Commit tus cambios (`git commit -m 'Agregar nueva funcionalidad'`)
-4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
-5. Abre un Pull Request
+```bash
+# Backend (requiere PostgreSQL corriendo)
+pytest --cov=app/ -v
+
+# Frontend
+cd frontend && npx vitest run
+```
 
 ---
 
@@ -346,13 +413,17 @@ El proyecto incluye datos iniciales para probar:
 
 | |
 |---|
-| **Juan Esteban Aguirre Foronda** |
-| **Sebastian Mogollón Mendoza** |
+| **👤 Juan Esteban Aguirre Foronda** |
+| **👤 Sebastián Mogollón Mendoza** |
 
 </div>
-> © 2026 EcommerceCaps - Todos los derechos reservados---
 
-## �📄 Licencia
+> Desarrollado como proyecto universitario — Entornos de Desarrollo.
+> © 2026 EcommerceCaps — Todos los derechos reservados.
+
+---
+
+## 📄 Licencia
 
 Este proyecto está bajo la licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
 
@@ -360,6 +431,6 @@ Este proyecto está bajo la licencia MIT. Consulta el archivo [LICENSE](LICENSE)
 
 <div align="center">
 
-⭐️ Si te gusta este proyecto, ¡dale una estrella!
+⭐️ Si te gusta este proyecto, ¡dale una estrella en [GitHub](https://github.com/devsebas22/EcommerceCaps)!
 
 </div>
