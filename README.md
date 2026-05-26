@@ -131,14 +131,14 @@ FRONTEND_URL=http://localhost:5173
 SENTRY_DSN=
 
 # ── Frontend (VITE_*) ──
-VITE_API_URL=http://127.0.0.1:8000
+VITE_API_URL=http://127.0.0.1:8000/api
 VITE_IMGBB_KEY=tu_key_de_imgbb
 VITE_WOMPI_PUBLIC_KEY=pub_test_...
 VITE_WHATSAPP_NUMBER=573154895642
 VITE_INSTAGRAM_URL=
 ```
 
-> **Nota:** `VITE_API_URL` apunta a `http://127.0.0.1:8000` en desarrollo y a `/api` en producción (mismo origen).
+> **Nota:** `VITE_API_URL` apunta a `http://127.0.0.1:8000/api` en desarrollo y a `/api` en producción (mismo origen).
 
 ### 5. Levantar la Base de Datos
 
